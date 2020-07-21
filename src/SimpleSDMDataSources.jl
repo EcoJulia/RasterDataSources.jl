@@ -5,12 +5,22 @@ using ArchGDAL
 using HTTP
 using ZipFile
 
-function _raster_assets_folder()
-    project_path = dirname(something(Base.current_project(pwd()), Base.load_path_expand(LOAD_PATH[2])))
-    assets_folder = joinpath(project_path, "assets")
-    ispath(assets_folder) || mkdir(assets_folder)
-    return assets_folder
-end
+include("src/assets_path.jl")
 
+abstract struct SDMDataSource end
+abstract struct SDMDataSet end
+
+# List of data sources
+struct WorldClim <: SDMDataSource end
+struct CHELSA <: SDMDataSource end
+struct EarthEnv <: SDMDataSource end
+
+# List of data sets
+struct BioClim <: SDMDataSet end
+struct LandCover <: SDMDataSet end
+
+include("src/worldclim/bioclim.jl")
+
+export download_raster
 
 end # module

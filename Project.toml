@@ -6,4 +6,5 @@ version = "0.1.0"
 [deps]
 ArchGDAL = "c9ce4bd3-c3d5-55b8-8973-c0e20141b8c3"
 HTTP = "cd3eb016-35fb-5094-929b-558a96fad6f3"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 ZipFile = "a5390f91-8eb1-5f08-bee0-b1d1ffed6cea"

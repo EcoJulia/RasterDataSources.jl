@@ -1,4 +1,3 @@
-
 """
     landcover(layers::Vector{T}; full::Bool=false, path::AbstractString="assets") where {T <: Integer}
 

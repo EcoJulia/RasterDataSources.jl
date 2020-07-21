@@ -1,20 +1,12 @@
-using SimpleSDMLayers
+using SimpleSDMDataSources
 using Test
 
 global anyerrors = false
 
 tests = [
-   "construction" => "construction.jl",
-   "basics" => "basics.jl",
-   "overloads" => "overloads.jl",
-   "generated" => "generated.jl",
-   "import" => "dataread.jl",
    "worldclim" => "worldclim.jl",
    "landcover" => "landcover.jl",
-   "chelsa" => "chelsa.jl",
-   "coarsen" => "coarsen.jl",
-   "plotting" => "plots.jl",
-   "GBIF" => "gbif.jl"
+   "chelsa" => "chelsa.jl"
 ]
 
 for test in tests
