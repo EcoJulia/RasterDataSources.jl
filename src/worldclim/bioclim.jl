@@ -5,15 +5,15 @@ function download_raster(::Type{WorldClim}, ::Type{BioClim}; layer::Integer=1, r
     # Path to save the data
     path = SimpleSDMDataSources._raster_assets_folder(WorldClim, BioClim)
 
-    resolution = Dict(2.5 => "2.5", 5.0 => "5", 10.0 => "10")
+    resolutions = Dict(2.5 => "2.5", 5.0 => "5", 10.0 => "10")
 
-    output_file = joinpath(path, "wc2.1_$(res[w.resolution])m_bio_$(layer).tif")
-    zip_file = joinpath(path, "bioclim_2.1_$(res[w.resolution])m.zip")
+    output_file = joinpath(path, "wc2.1_$(resolutions[resolution])m_bio_$(layer).tif")
+    zip_file = joinpath(path, "bioclim_2.1_$(resolutions[resolution])m.zip")
 
     if !isfile(path)
         if !isfile(zip_file)
             root = "https://biogeo.ucdavis.edu/data/worldclim/v2.1/base/"
-            stem = "wc2.1_$(res[w.resolution])m_bio.zip"
+            stem = "wc2.1_$(resolutions[resolution])m_bio.zip"
             r = HTTP.request("GET", root * stem)
             open(zip_file, "w") do f
                 write(f, String(r.body))

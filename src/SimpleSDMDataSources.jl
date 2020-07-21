@@ -5,21 +5,28 @@ using ArchGDAL
 using HTTP
 using ZipFile
 
-include("src/assets_path.jl")
-
-abstract struct SDMDataSource end
-abstract struct SDMDataSet end
+# Abstract types for the download
+abstract type SDMDataSource end
+abstract type SDMDataSet end
 
 # List of data sources
 struct WorldClim <: SDMDataSource end
 struct CHELSA <: SDMDataSource end
 struct EarthEnv <: SDMDataSource end
 
+export WorldClim, CHELSA, EarthEnv
+
 # List of data sets
 struct BioClim <: SDMDataSet end
 struct LandCover <: SDMDataSet end
 
-include("src/worldclim/bioclim.jl")
+export BioClim, LandCover
+
+# Create a path for the various assets
+include("assets_path.jl")
+
+# Download worldclim data
+include("worldclim/bioclim.jl")
 
 export download_raster
 
