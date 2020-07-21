@@ -25,8 +25,9 @@ export BioClim, LandCover
 # Create a path for the various assets
 include("assets_path.jl")
 
-# Download worldclim data
+# Download raster data
 include("worldclim/bioclim.jl")
+include("earthenv/landcover.jl")
 
 export download_raster
 

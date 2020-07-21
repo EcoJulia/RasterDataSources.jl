@@ -4,9 +4,9 @@ using Test
 global anyerrors = false
 
 tests = [
-   "worldclim" => "worldclim.jl",
-   "landcover" => "landcover.jl",
-   "chelsa" => "chelsa.jl"
+   "worldclim || bioclim" => "worldclim-bioclim.jl",
+   "earthenv  || landcover" => "earthenv-landcover.jl"
+   # "chelsa" => "chelsa.jl"
 ]
 
 for test in tests
