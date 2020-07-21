@@ -19,8 +19,9 @@ export WorldClim, CHELSA, EarthEnv
 # List of data sets
 struct BioClim <: SDMDataSet end
 struct LandCover <: SDMDataSet end
+struct HabitatHeterogeneity <: SDMDataSet end
 
-export BioClim, LandCover
+export BioClim, LandCover, HabitatHeterogeneity
 
 # Create a path for the various assets
 include("assets_path.jl")
@@ -28,6 +29,7 @@ include("assets_path.jl")
 # Download raster data
 include("worldclim/bioclim.jl")
 include("earthenv/landcover.jl")
+include("earthenv/habitatheterogeneity.jl")
 
 export download_raster
 

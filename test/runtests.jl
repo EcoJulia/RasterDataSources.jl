@@ -5,7 +5,8 @@ global anyerrors = false
 
 tests = [
    "worldclim || bioclim" => "worldclim-bioclim.jl",
-   "earthenv  || landcover" => "earthenv-landcover.jl"
+   "earthenv  || landcover" => "earthenv-landcover.jl",
+   "earthenv  || heterogeneity" => "earthenv-heterogeneity.jl"
    # "chelsa" => "chelsa.jl"
 ]
 
