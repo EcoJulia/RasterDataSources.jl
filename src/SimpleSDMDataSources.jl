@@ -28,6 +28,7 @@ include("assets_path.jl")
 
 # Download raster data
 include("worldclim/bioclim.jl")
+include("chelsa/bioclim.jl")
 include("earthenv/landcover.jl")
 include("earthenv/habitatheterogeneity.jl")
 
