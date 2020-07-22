@@ -1,7 +1,6 @@
 module SimpleSDMDataSources
 
 # Load the dependencies for this package
-using ArchGDAL
 using HTTP
 using ZipFile
 
@@ -25,6 +24,9 @@ export BioClim, LandCover, HabitatHeterogeneity
 
 # Create a path for the various assets
 include("assets_path.jl")
+
+# Download the files if they don't exist
+include("download.jl")
 
 # Download raster data
 include("worldclim/bioclim.jl")

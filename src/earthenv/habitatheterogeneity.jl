@@ -22,12 +22,5 @@ function download_raster(::Type{EarthEnv}, ::Type{HabitatHeterogeneity}; layer::
     stem = "$(layer)_01_05_$(string(resolution))km_$(precision).tif"
     filename = "$(layer)_$(resolution)km.tif"
 
-    if !isfile(joinpath(path, filename))
-        layerrequest = HTTP.request("GET", root * stem)
-        open(joinpath(path, filename), "w") do layerfile
-            write(layerfile, String(layerrequest.body))
-        end
-    end
-
-    return joinpath(path, filename)
+    return SimpleSDMDataSources._download_file(joinpath(path, filename), root * stem)
 end
