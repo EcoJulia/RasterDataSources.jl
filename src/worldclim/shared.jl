@@ -1,6 +1,4 @@
 
-struct WorldClim{X} <: SDMDataSource end
-
 const WORLDCLIM_URL = "https://biogeo.ucdavis.edu/data/worldclim/v2.1"
 
 rasterpath(::Type{WorldClim{T}}) where T = 

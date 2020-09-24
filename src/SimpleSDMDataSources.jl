@@ -10,14 +10,18 @@ abstract type SDMDataSource end
 abstract type SDMDataSet end
 
 # List of data sources
-struct EarthEnv <: SDMDataSource end
+
+struct WorldClim{X} <: SDMDataSource end
 struct CHELSA <: SDMDataSource end
+struct EarthEnv <: SDMDataSource end
+
+export WorldClim, CHELSA, EarthEnv, AWAP, ALWB
+
+# List of data sets
 struct Weather <: SDMDataSet end
 struct BioClim <: SDMDataSet end
 struct LandCover <: SDMDataSet end
 struct HabitatHeterogeneity <: SDMDataSet end
-
-export WorldClim, CHELSA, EarthEnv, AWAP, ALWB
 
 export BioClim, Weather, LandCover, HabitatHeterogeneity
 

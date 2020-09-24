@@ -1,5 +1,3 @@
-struct BioClim <: SDMDataSet end
-
 const resolutions = Dict(2.5 => "2.5", 5.0 => "5", 10.0 => "10")
 
 function download_raster(T::Type{WorldClim{BioClim}}; layer::Integer=1, resolution::AbstractFloat=10.0)
