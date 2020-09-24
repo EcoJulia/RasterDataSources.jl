@@ -6,5 +6,5 @@ function download_raster(::Type{CHELSA}, ::Type{BioClim}; layer::Integer=1)
     url_root = "ftp://envidatrepo.wsl.ch/uploads/chelsa/chelsa_V1/climatologies/bio/"
 
     filepath = joinpath(path, filename)
-    return SimpleSDMDataSources._download_file(filepath, url_root * filename)
+    return _maybe_download(filepath, url_root * filename)
 end

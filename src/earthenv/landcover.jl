@@ -9,6 +9,6 @@ function download_raster(::Type{EarthEnv}, ::Type{LandCover}; layer::Integer=1, 
     filetype = discover ? "complete" : "partial"
     filename = "landcover_$(filetype)_$(layer).tif"
 
-    return _download_file(joinpath(path, filename), root * stem)
+    return _maybe_download(root * stem, joinpath(path, filename))
 
 end
