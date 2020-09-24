@@ -1,34 +1,35 @@
-function download_raster(::Type{WorldClim}, ::Type{BioClim}; layer::Integer=1, resolution::AbstractFloat=10.0)
+struct BioClim <: SDMDataSet end
 
+const resolutions = Dict(2.5 => "2.5", 5.0 => "5", 10.0 => "10")
+
+function download_raster(T::Type{WorldClim{BioClim}}; layer::Integer=1, resolution::AbstractFloat=10.0)
     1 ≤ layer ≤ 19 || throw(ArgumentError("The layer must be between 1 and 19"))
 
-    # Path to save the data
-    path = SimpleSDMDataSources._raster_assets_folder(WorldClim, BioClim)
+    raster_path = rasterpath(T, layer, resolution)
+    zip_path = zippath(T, layer, resolution)
 
-    resolutions = Dict(2.5 => "2.5", 5.0 => "5", 10.0 => "10")
-
-    output_file = joinpath(path, "wc2.1_$(resolutions[resolution])m_bio_$(layer).tif")
-    zip_file = joinpath(path, "bioclim_2.1_$(resolutions[resolution])m.zip")
-
-    if !isfile(path)
-        if !isfile(zip_file)
-            root = "https://biogeo.ucdavis.edu/data/worldclim/v2.1/base/"
-            stem = "wc2.1_$(resolutions[resolution])m_bio.zip"
-            r = HTTP.request("GET", root * stem)
-            open(zip_file, "w") do f
-                write(f, String(r.body))
-            end
-        end
-        zf = ZipFile.Reader(zip_file)
-        file_to_read =
-            first(filter(f -> joinpath(path, f.name) == output_file, zf.files))
-
-        if !isfile(joinpath(path, file_to_read.name))
-            write(joinpath(path, file_to_read.name), read(file_to_read))
-        end
+    if !isfile(raster_path)
+        _maybe_download(zipurl(T, layer, resolution), zip_path)
+        mkpath(dirname(raster_path))
+        raster_name = rastername(T, layer, resolution)
+        zf = ZipFile.Reader(zip_path)
+        write(raster_path, read(file_to_read(raster_name, zf)))
         close(zf)
     end
-
-    return joinpath(path, file_to_read.name)
+    return raster_path
 end
 
+# BioClim layers don't get their own folder
+rasterpath(T::Type{<:WorldClim{BioClim}}, layer) = rasterpath(T)
+
+rastername(T::Type{<:WorldClim{BioClim}}, key, res::AbstractFloat) =
+    "wc2.1_$(resolutions[res])m_bio_$(key).tif"
+
+zipname(T::Type{<:WorldClim{BioClim}}, key, res::AbstractFloat) =
+    "wc2.1_$(resolutions[res])m_bio.zip"
+
+zipurl(T::Type{<:WorldClim{BioClim}}, key, res::AbstractFloat) =
+    joinpath(WORLDCLIM_URL, "base", zipname(T, key, res))
+
+zippath(T::Type{<:WorldClim{BioClim}}, key, res::AbstractFloat) =
+    joinpath(rasterpath(T), "zips", zipname(T, key, res))
