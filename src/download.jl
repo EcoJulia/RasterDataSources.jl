@@ -1,9 +1,7 @@
-function _download_file(filename, url)
-    if !isfile(filename)
-        layerrequest = HTTP.request("GET", url)
-        open(filename, "w") do layerfile
-            write(layerfile, String(layerrequest.body))
-        end
+function _maybe_download(url, filepath)
+    if !isfile(filepath)
+        mkpath(dirname(filepath))
+        HTTP.download(url, filepath)
     end
-    return filename
+    filepath
 end
