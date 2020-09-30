@@ -1,29 +1,9 @@
-using SimpleSDMDataSources
-using Test
+using SimpleSDMDataSources, Test, Dates
 
-global anyerrors = false
-
-tests = [
-   "worldclim || bioclim" => "worldclim-bioclim.jl",
-   "earthenv  || landcover" => "earthenv-landcover.jl",
-   "earthenv  || heterogeneity" => "earthenv-heterogeneity.jl",
-   "CHELSA    || bioclim" => "chelsa-bioclim.jl"
-]
-
-for test in tests
-   try
-      include(test.second)
-      println("\033[1m\033[32m✓\033[0m\t$(test.first)")
-   catch e
-      global anyerrors = true
-      println("\033[1m\033[31m×\033[0m\t$(test.first)")
-      println("\033[1m\033[38m→\033[0m\ttest/$(test.second)")
-      showerror(stdout, e, backtrace())
-      println()
-      break
-   end
-end
-
-if anyerrors
-   throw("Tests failed")
-end
+include("worldclim-bioclim.jl")
+include("worldclim-weather.jl")
+include("earthenv-landcover.jl")
+include("earthenv-heterogeneity.jl")
+include("chelsa-bioclim.jl")
+include("alwb.jl")
+include("awap.jl")

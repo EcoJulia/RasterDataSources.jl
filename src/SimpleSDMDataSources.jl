@@ -12,8 +12,8 @@ abstract type SDMDataSet end
 # List of data sources
 
 struct WorldClim{X} <: SDMDataSource end
-struct CHELSA <: SDMDataSource end
-struct EarthEnv <: SDMDataSource end
+struct CHELSA{X} <: SDMDataSource end
+struct EarthEnv{X} <: SDMDataSource end
 
 export WorldClim, CHELSA, EarthEnv, AWAP, ALWB
 
@@ -42,6 +42,7 @@ include("worldclim/shared.jl")
 include("worldclim/bioclim.jl")
 include("worldclim/weather.jl")
 include("chelsa/bioclim.jl")
+include("earthenv/shared.jl")
 include("earthenv/landcover.jl")
 include("earthenv/habitatheterogeneity.jl")
 include("awap/awap.jl")
