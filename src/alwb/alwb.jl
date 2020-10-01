@@ -3,7 +3,11 @@
 #= ALWB has a lot of data sources - with varying
 degrees of nesting. Here wee use types to navigate
 and structure the nesting, instead of just using 
-symbols.
+symbols. 
+
+Symbols may be better, idk. They don't need to be imported which is good, 
+but there is more room for mistakes/confusion around grounpings
+and categories with symbols - which this dataset has a lot of.
 =#
 
 const ALWB_URL = "http://www.bom.gov.au/jsp/awra/thredds/fileServer/AWRACMS"
@@ -70,7 +74,18 @@ struct OpenWater end
 # Deep Drainage
 struct DeepDrainage end
 
+
+
 # Interface methods
+
+rasterlayers(::Type{<:ALWB}) = 
+    (SoilMoisture{Upper}, SoilMoisture{Lower}, SoilMoisture{Deep}, SoilMoisture{RootZone},
+     Evapotrans{Actual}, Evapotrans{Potential{Landscape}}, Evapotrans{Potential{Areal}}, 
+     Evapotrans{Potential{SyntheticPan}}, Evapotrans{RefCrop{Short}}, Evapotrans{RefCrop{Tall}}, 
+     Precipiation, Runoff, Evaporation{OpenWater}, DeepDrainage)
+
+rastername(T::Type{<:ALWB{M,P}}, layer, date) where {M,P} =
+    _pathsegment(layer) * _pathsegment(P, date) * ".nc"
 
 rasterpath(::Type{ALWB}) = joinpath(rasterpath(), "ALWB")
 rasterpath(::Type{ALWB{M,P}}) where {M,P} =
@@ -79,14 +94,13 @@ rasterpath(T::Type{<:ALWB}, layer) = joinpath(rasterpath(T), _pathsegment(layer)
 rasterpath(T::Type{<:ALWB}, layer, date) =
     joinpath(rasterpath(T), rastername(T, layer, date))
 
-rastername(T::Type{<:ALWB{M,P}}, layer, date) where {M,P} =
-    _pathsegment(layer) * _pathsegment(P, date) * ".nc"
-
 rasterurl(T::Type{<:ALWB{M,P}}, layer, date) where {M,P} =
     joinpath(ALWB_URL, _pathsegment(T), rastername(T, layer, date))
 
-# download_raster(::Type{<:ALWB}; dates, kwargs...) = download_raster(T, AWAP_ALL; dates, kwargs...)
-function download_raster(T::Type{<:ALWB{M,P}}, layer::Type; dates) where {M,P} dates = _date_sequence(dates, P(1))
+download_raster(T::Type{<:ALWB}, layers::Tuple=rasterlayers(T); kwargs...) =
+    map(l -> download_raster(T, l; kwargs...), layers)
+function download_raster(T::Type{<:ALWB{M,P}}, layer::Type; dates) where {M,P} 
+    dates = _date_sequence(dates, P(1))
     mkpath(rasterpath(T, layer))
     raster_paths = String[]
     for d in dates
@@ -97,6 +111,7 @@ function download_raster(T::Type{<:ALWB{M,P}}, layer::Type; dates) where {M,P} d
     end
     raster_paths
 end
+
 
 
 # Utilitiy methods

@@ -1,5 +1,8 @@
 const resolutions = Dict(2.5 => "2.5", 5.0 => "5", 10.0 => "10")
 
+
+# Interface methods
+
 function download_raster(T::Type{WorldClim{BioClim}}; layer::Integer=1, resolution::AbstractFloat=10.0)
     1 ≤ layer ≤ 19 || throw(ArgumentError("The layer must be between 1 and 19"))
 

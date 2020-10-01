@@ -1,3 +1,5 @@
+# Interface methods
+
 function download_raster(T::Type{CHELSA{BioClim}}; layer::Integer=1)
     1 ≤ layer ≤ 19 || throw(ArgumentError("The layer must be between 1 and 19"))
     path = rasterpath(T, layer)

@@ -16,5 +16,5 @@
 
     # These files are 3GB each. Probably too big to test in CI.
     # Not sure what to do about that.
-    # download_raster(WorldClim{Weather}, :prec, Date(2001):Month(1):Date(2001, 12))
+    # download_raster(WorldClim{Weather}, :prec; dates=Date(2001):Month(1):Date(2001, 12))
 end

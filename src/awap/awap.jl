@@ -13,36 +13,33 @@ struct H15 end
 struct MinAve end
 struct MaxAve end
 
-const AWAP_LAYERS = (Solar, Rainfall, VapourPressure{H09}, VapourPressure{H15}, Temperature{MinAve})
 const AWAP_DATEFORMAT = DateFormat("yyyymmdd")
 
 
 
 # Interface methods
 
-download_raster(T::Type{AWAP}, layers::Tuple; kwargs...) =
-    # What to return here? A NamedTuple of Vectors of paths?
-    (map(l -> download_raster(T, l; kwargs...), layers); nothing)
-download_raster(::Type{AWAP}; dates, kwargs...) =
-    download_raster(AWAP, AWAP_LAYERS; dates, kwargs...)
-download_raster(T::Type{AWAP}, t; kwargs...) =
-    download_raster(T, typeof(t); kwargs...)
+download_raster(T::Type{AWAP}, layers::Tuple=rasterlayers(T); kwargs...) =
+    map(l -> download_raster(T, l; kwargs...), layers)
 function download_raster(T::Type{AWAP}, layer::Type; dates)
     dates = _date_sequence(dates, Day(1))
     mkpath(rasterpath(T, layer))
+    raster_paths = String[]
     for d in dates
         raster_path = rasterpath(T, layer, d)
-        println(raster_path)
         if !isfile(raster_path)
             zip_path = zippath(T, layer, d)
-            println(zip_path)
             _maybe_download(zipurl(T, layer, d), zip_path)
             run(`uncompress $zip_path -f`)
         end
+        push!(raster_paths, raster_path)
     end
-    # What to return here? A vector of paths?
-    nothing
+    return raster_paths
 end
+
+rasterlayers(::Type{<:AWAP}) = 
+    (Solar, Rainfall, VapourPressure{H09}, VapourPressure{H15}, 
+     Temperature{MinAve}, Temperature{MaxAve})
 
 rasterpath(T::Type{AWAP}) = joinpath(rasterpath(), "AWAP")
 rasterpath(T::Type{AWAP}, layer) = joinpath(rasterpath(T), _pathsegments(layer)[1:2]...)
@@ -64,6 +61,7 @@ end
 zipname(T::Type{AWAP}, layer, date) = _date2string(T, date) * ".grid.Z"
 
 zippath(T::Type{AWAP}, layer, date) = joinpath(rasterpath(T, layer), zipname(T, layer, date))
+
 
 
 # Utilitiy methods
