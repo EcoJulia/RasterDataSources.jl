@@ -7,4 +7,4 @@ rasterpath(T::Type{<:WorldClim}, layer) = joinpath(rasterpath(T), string(layer))
 rasterpath(T::Type{<:WorldClim}, layer, x) =
     joinpath(rasterpath(T, layer), rastername(T, layer, x))
 
-file_to_read(raster_name, zf) = first(filter(f -> f.name == raster_name, zf.files))
+_zipfile_to_read(raster_name, zf) = first(filter(f -> f.name == raster_name, zf.files))

@@ -14,7 +14,7 @@ function download_raster(T::Type{WorldClim{BioClim}}; layer::Integer=1, resoluti
         mkpath(dirname(raster_path))
         raster_name = rastername(T, layer, resolution)
         zf = ZipFile.Reader(zip_path)
-        write(raster_path, read(file_to_read(raster_name, zf)))
+        write(raster_path, read(_zipfile_to_read(raster_name, zf)))
         close(zf)
     end
     return raster_path

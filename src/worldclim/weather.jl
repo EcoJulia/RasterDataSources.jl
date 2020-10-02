@@ -11,10 +11,10 @@ const WEATHER_DECADES = Dict(Date(1960) => "1960-1969",
 rasterlayers(::Type{WorldClim{Weather}}) = (:tmin, :tmax, :prec)
 
 function download_raster(T::Type{WorldClim{Weather}}, layers::Tuple=rasterlayers(T); kwargs...)
-    all(l -> l in WEATHER_LAYERS, layers) || throw(ArgumentError("Layers must be from $(rasterlayers(T))"))
+    all(l -> l in rasterlayers(T), layers) || throw(ArgumentError("Layers must be from $(rasterlayers(T))"))
     map(l -> download_raster(T, l; kwargs...), layers)
 end
-function download_raster(T::Type{WorldClim{Weather}}, layer; dates)
+function download_raster(T::Type{WorldClim{Weather}}, layer::Symbol; dates)
     dates = _date_sequence(dates, Month(1))
     decadestart = Date.(1960:10:2020)
     raster_paths = String[]
@@ -31,7 +31,7 @@ function download_raster(T::Type{WorldClim{Weather}}, layer; dates)
             if !isfile(raster_path)
                 raster_name = rastername(T, layer, d)
                 println("Writing $(raster_path)...")
-                write(raster_path, read(file_to_read(raster_name, zf)))
+                write(raster_path, read(_zipfile_to_read(raster_name, zf)))
             end
             push!(raster_paths, raster_path)
         end
