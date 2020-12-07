@@ -1,7 +1,7 @@
 
 # Types
 
-struct AWAP <: SDMDataSource end
+struct AWAP <: RasterDataSource end
 
 struct Temperature{X} end
 struct VapourPressure{X} end

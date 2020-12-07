@@ -1,9 +1,9 @@
 @testset "CHELSEA BioClim" begin
-    using SimpleSDMDataSources: rasterurl
+    using RasterDataSources: rasterurl
 
     @test rastername(CHELSA{BioClim}, 5) == "CHELSA_bio10_05.tif"
 
-    bioclim_path = joinpath(ENV["ECODATASOURCES_PATH"], "CHELSA/BioClim")
+    bioclim_path = joinpath(ENV["RASTERDATASOURCES_PATH"], "CHELSA/BioClim")
     @test rasterpath(CHELSA{BioClim}) == bioclim_path
     @test rasterpath(CHELSA{BioClim}, 5) == joinpath(bioclim_path, "CHELSA_bio10_05.tif")
 

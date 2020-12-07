@@ -1,4 +1,4 @@
-using SimpleSDMDataSources, Test, Dates
+using RasterDataSources, Test, Dates
 
 include("worldclim-bioclim.jl")
 include("worldclim-weather.jl")

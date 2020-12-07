@@ -1,4 +1,4 @@
-module SimpleSDMDataSources
+module RasterDataSources
 
 # Load the dependencies for this package
 using HTTP,
@@ -6,22 +6,22 @@ using HTTP,
       Dates
 
 # Abstract types for the download
-abstract type SDMDataSource end
-abstract type SDMDataSet end
+abstract type RasterDataSource end
+abstract type RasterDataSet end
 
 # List of data sources
 
-struct WorldClim{X} <: SDMDataSource end
-struct CHELSA{X} <: SDMDataSource end
-struct EarthEnv{X} <: SDMDataSource end
+struct WorldClim{X} <: RasterDataSource end
+struct CHELSA{X} <: RasterDataSource end
+struct EarthEnv{X} <: RasterDataSource end
 
 export WorldClim, CHELSA, EarthEnv, AWAP, ALWB
 
 # List of data sets
-struct Weather <: SDMDataSet end
-struct BioClim <: SDMDataSet end
-struct LandCover <: SDMDataSet end
-struct HabitatHeterogeneity <: SDMDataSet end
+struct Weather <: RasterDataSet end
+struct BioClim <: RasterDataSet end
+struct LandCover <: RasterDataSet end
+struct HabitatHeterogeneity <: RasterDataSet end
 
 export BioClim, Weather, LandCover, HabitatHeterogeneity
 
