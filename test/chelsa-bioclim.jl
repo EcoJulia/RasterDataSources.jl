@@ -1,5 +1,5 @@
 @testset "CHELSEA BioClim" begin
-    using SimpleSDMDataSources: rasterurl
+    using RasterDataSources: rasterurl
 
     @test rastername(CHELSA{BioClim}, 5) == "CHELSA_bio10_05.tif"
 

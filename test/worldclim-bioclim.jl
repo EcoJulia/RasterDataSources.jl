@@ -1,5 +1,5 @@
 @testset "WorldClim BioClim" begin
-    using SimpleSDMDataSources: rastername, zipurl, zipname, zippath
+    using RasterDataSources: rastername, zipurl, zipname, zippath
 
     zip_file = "https://biogeo.ucdavis.edu/data/worldclim/v2.1/base/wc2.1_10m_bio.zip"
     @test zipurl(WorldClim{BioClim}, 2, 10.0) == zip_file

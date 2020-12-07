@@ -1,5 +1,5 @@
 @testset "AWAP" begin
-    using SimpleSDMDataSources: rastername, zipurl, zipname, zippath
+    using RasterDataSources: rastername, zipurl, zipname, zippath
 
     raster_file = joinpath(ENV["ECODATASOURCES_PATH"], "AWAP/vprp/vprph09/20010101.grid")
     @test rasterpath(AWAP, VapourPressure{H09}, Date(2001, 1)) == raster_file

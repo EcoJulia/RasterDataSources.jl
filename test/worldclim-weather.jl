@@ -1,6 +1,6 @@
 @testset "WorldClim Weather" begin
 
-    using SimpleSDMDataSources: rastername, zipurl, zipname, zippath
+    using RasterDataSources: rastername, zipurl, zipname, zippath
 
     raster_file = joinpath(ENV["ECODATASOURCES_PATH"], "WorldClim/Weather/prec/wc2.1_2.5m_prec_2001-01.tif")
     @test rasterpath(WorldClim{Weather}, :prec, Date(2001, 1)) == raster_file

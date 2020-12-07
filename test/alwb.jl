@@ -1,9 +1,9 @@
 @testset "AWAP" begin
-    using SimpleSDMDataSources: rastername, rasterurl, Values, Deciles, 
+    using RasterDataSources: rastername, rasterurl, Values, Deciles, 
           SoilMoisture, Lower, Upper, Evapotrans, Potential, Areal, Actual, RefCrop, Tall,
           DeepDrainage
 
-    alwb_path = joinpath(ENV["ECODATASOURCES_PATH"], "ALWB")
+    alwb_path = joinpath(ENV["RASTERDATASOURCES_PATH"], "ALWB")
     @test rasterpath(ALWB) == alwb_path
     @test rasterpath(ALWB{Values,Year}) == joinpath(alwb_path, "values/year")
     @test rastername(ALWB{Values,Year}, SoilMoisture{Lower}, Date(2001, 1)) == "ss_pct.nc"

@@ -1,5 +1,5 @@
 @testset "EarthEnv HabitatHeterogeneity" begin
-    using SimpleSDMDataSources: rastername, rasterurl, rasterpath
+    using RasterDataSources: rastername, rasterurl, rasterpath
 
     @test rastername(EarthEnv{HabitatHeterogeneity}, :cv, 1) == "cv_1km.tif"
     hh_path = joinpath(ENV["ECODATASOURCES_PATH"], "EarthEnv/habitat_heterogeneity")
