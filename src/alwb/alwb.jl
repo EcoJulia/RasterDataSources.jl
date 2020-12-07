@@ -26,7 +26,7 @@ struct Deciles <: DataMode end
 
 const ALWBperiod = Union{Day,Month,Year}
 
-struct ALWB{M<:DataMode,D<:ALWBperiod} <: SDMDataSource end
+struct ALWB{M<:DataMode,D<:ALWBperiod} <: RasterDataSource end
 
 # Precipitation
 struct Precipiation end
