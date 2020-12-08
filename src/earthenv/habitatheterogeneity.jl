@@ -9,7 +9,7 @@ rastername(::Type{EarthEnv{HabitatHeterogeneity}}, layer::Symbol, resolution::In
 rasterpath(T::Type{<:EarthEnv{HabitatHeterogeneity}}, layer::Symbol, resolution::Integer) = 
     joinpath(rasterpath(T), string(resolution) * "km", rastername(T, layer, resolution))
 rasterurl(T::Type{EarthEnv{HabitatHeterogeneity}}, layer, resolution::Integer) = 
-    joinpath(rasterurl(T), "$(layer)_01_05_$(string(resolution))km_$(_getprecision(layer, resolution)).tif")
+    joinpath(rasterurl(T), "$(resolution)km/$(layer)_01_05_$(resolution)km_$(_getprecision(layer, resolution)).tif")
 
 function download_raster(T::Type{EarthEnv{HabitatHeterogeneity}}; layer::Symbol=:cv, resolution::Integer=25)
     _check_layer(T, layer)
