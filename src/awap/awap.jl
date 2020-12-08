@@ -21,7 +21,7 @@ const AWAP_DATEFORMAT = DateFormat("yyyymmdd")
 download_raster(T::Type{AWAP}, layers::Tuple=layers(T); kwargs...) =
     map(l -> download_raster(T, l; kwargs...), layers)
 function download_raster(T::Type{AWAP}, layer::Type; dates)
-    check_layer(T, layer)
+    _check_layer(T, layer)
     dates = _date_sequence(dates, Day(1))
     mkpath(rasterpath(T, layer))
     raster_paths = String[]
@@ -54,7 +54,7 @@ function zipurl(T::Type{AWAP}, layer, date)
     # So we download in to a different name as there no output
     # name flages for `uncompress`. It's ancient.
     uri = URI(scheme="http", host="www.bom.gov.au", path="/web03/ncc/www/awap")
-    joinpath(urs, s..., "grid/0.05/history/nat/$d$d.grid.Z")
+    joinpath(uri, s..., "grid/0.05/history/nat/$d$d.grid.Z")
 end
 zipname(T::Type{AWAP}, layer, date) = _date2string(T, date) * ".grid.Z"
 zippath(T::Type{AWAP}, layer, date) = joinpath(rasterpath(T, layer), zipname(T, layer, date))
