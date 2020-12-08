@@ -6,7 +6,7 @@
     @test rastername(AWAP, VapourPressure{H09}, Date(2001, 1)) == "20010101.grid" 
 
     @test zipurl(AWAP, VapourPressure{H09}, Date(2001, 1)) ==
-        "http://www.bom.gov.au/web03/ncc/www/awap/vprp/vprph09/daily/grid/0.05/history/nat/2001010120010101.grid.Z"
+        URI(scheme="http", host="www.bom.gov.au", path="/web03/ncc/www/awap/vprp/vprph09/daily/grid/0.05/history/nat/2001010120010101.grid.Z")
     @test zippath(AWAP, VapourPressure{H09}, Date(2001, 1)) ==
         joinpath(ENV["RASTERDATASOURCES_PATH"], "AWAP/vprp/vprph09/20010101.grid.Z")
     @test zipname(AWAP, VapourPressure{H09}, Date(2001, 1)) == "20010101.grid.Z"

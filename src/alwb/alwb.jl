@@ -10,8 +10,7 @@ but there is more room for mistakes/confusion around grounpings
 and categories with symbols - which this dataset has a lot of.
 =#
 
-const ALWB_URL = "http://www.bom.gov.au/jsp/awra/thredds/fileServer/AWRACMS"
-
+const ALWB_URI = URI(scheme="http", host="www.bom.gov.au", path="/jsp/awra/thredds/fileServer/AWRACMS")
 
 abstract type DataMode end
 
@@ -78,7 +77,7 @@ struct DeepDrainage end
 
 # Interface methods
 
-rasterlayers(::Type{<:ALWB}) = 
+layers(::Type{<:ALWB}) = 
     (SoilMoisture{Upper}, SoilMoisture{Lower}, SoilMoisture{Deep}, SoilMoisture{RootZone},
      Evapotrans{Actual}, Evapotrans{Potential{Landscape}}, Evapotrans{Potential{Areal}}, 
      Evapotrans{Potential{SyntheticPan}}, Evapotrans{RefCrop{Short}}, Evapotrans{RefCrop{Tall}}, 
@@ -95,11 +94,12 @@ rasterpath(T::Type{<:ALWB}, layer, date) =
     joinpath(rasterpath(T), rastername(T, layer, date))
 
 rasterurl(T::Type{<:ALWB{M,P}}, layer, date) where {M,P} =
-    joinpath(ALWB_URL, _pathsegment(T), rastername(T, layer, date))
+    joinpath(ALWB_URI, _pathsegment(T), rastername(T, layer, date))
 
-download_raster(T::Type{<:ALWB}, layers::Tuple=rasterlayers(T); kwargs...) =
+download_raster(T::Type{<:ALWB}, layers::Tuple=layers(T); kwargs...) =
     map(l -> download_raster(T, l; kwargs...), layers)
 function download_raster(T::Type{<:ALWB{M,P}}, layer::Type; dates) where {M,P} 
+    _check_layer(T, layer)
     dates = _date_sequence(dates, P(1))
     mkpath(rasterpath(T, layer))
     raster_paths = String[]

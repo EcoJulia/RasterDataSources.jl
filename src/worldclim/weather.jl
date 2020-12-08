@@ -5,13 +5,10 @@ const WEATHER_DECADES = Dict(Date(1960) => "1960-1969",
                              Date(2000) => "2000-2009",
                              Date(2010) => "2010-2018")
 
-
 # Interface methods
 
-rasterlayers(::Type{WorldClim{Weather}}) = (:tmin, :tmax, :prec)
-
-function download_raster(T::Type{WorldClim{Weather}}, layers::Tuple=rasterlayers(T); kwargs...)
-    all(l -> l in rasterlayers(T), layers) || throw(ArgumentError("Layers must be from $(rasterlayers(T))"))
+function download_raster(T::Type{WorldClim{Weather}}, layers::Tuple=layers(T); kwargs...)
+    _check_layer.(Ref(T), layers)
     map(l -> download_raster(T, l; kwargs...), layers)
 end
 function download_raster(T::Type{WorldClim{Weather}}, layer::Symbol; dates)
@@ -40,19 +37,15 @@ function download_raster(T::Type{WorldClim{Weather}}, layer::Symbol; dates)
     return raster_paths
 end
 
-rastername(T::Type{<:WorldClim{Weather}}, key, date) =
-    joinpath("wc2.1_2.5m_$(key)_$(_date2string(T, date)).tif")
-
-zipname(T::Type{<:WorldClim{Weather}}, key, decade) =
-    "wc2.1_2.5m_$(key)_$(WEATHER_DECADES[decade]).zip"
-
-zipurl(T::Type{<:WorldClim{Weather}}, key, decade) =
-    joinpath(WORLDCLIM_URL, "hist", zipname(T, key, decade))
-
-zippath(T::Type{<:WorldClim{Weather}}, key, decade) =
-    joinpath(rasterpath(T), "zips", zipname(T, key, decade))
-
-
+layers(::Type{WorldClim{Weather}}) = (:tmin, :tmax, :prec)
+rastername(T::Type{<:WorldClim{Weather}}, layer, date) =
+    joinpath("wc2.1_2.5m_$(layer)_$(_date2string(T, date)).tif")
+zipname(T::Type{<:WorldClim{Weather}}, layer, decade) =
+    "wc2.1_2.5m_$(layer)_$(WEATHER_DECADES[decade]).zip"
+zipurl(T::Type{<:WorldClim{Weather}}, layer, decade) =
+    joinpath(WORLDCLIM_URI, "hist", zipname(T, layer, decade))
+zippath(T::Type{<:WorldClim{Weather}}, layer, decade) =
+    joinpath(rasterpath(T), "zips", zipname(T, layer, decade))
 
 # Utility methods
 

@@ -1,5 +1,8 @@
+struct WorldClim{X} <: RasterDataSource end
 
-const WORLDCLIM_URL = "https://biogeo.ucdavis.edu/data/worldclim/v2.1"
+const WORLDCLIM_URI = URI(scheme="https", host="biogeo.ucdavis.edu", path="/data/worldclim/v2.1")
+
+resolutions(::Type{<:WorldClim}) = ("30s", "2.5m", "5m", "10m")
 
 rasterpath(::Type{WorldClim{T}}) where T = 
     joinpath(rasterpath(), "WorldClim", string(nameof(T)))

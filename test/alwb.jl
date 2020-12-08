@@ -13,9 +13,9 @@
         joinpath(alwb_path, "values/day/ss_pct_2001.nc")
 
     @test rasterurl(ALWB{Values,Year}, SoilMoisture{Lower}, Date(2001, 1)) ==
-        "http://www.bom.gov.au/jsp/awra/thredds/fileServer/AWRACMS/values/year/ss_pct.nc"
+        URI(scheme="http", host="www.bom.gov.au", path="/jsp/awra/thredds/fileServer/AWRACMS/values/year/ss_pct.nc")
     @test rasterurl(ALWB{Values,Day}, SoilMoisture{Lower}, Date(2001, 1)) ==
-        "http://www.bom.gov.au/jsp/awra/thredds/fileServer/AWRACMS/values/day/ss_pct_2001.nc"
+        URI(scheme="http", host="www.bom.gov.au", path="/jsp/awra/thredds/fileServer/AWRACMS/values/day/ss_pct_2001.nc")
 
     dates = DateTime(2018, 01, 01), DateTime(2018, 03, 02)
     download_raster(ALWB{Values,Day}, SoilMoisture{Lower}; dates=dates)

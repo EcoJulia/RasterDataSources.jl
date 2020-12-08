@@ -1,10 +1,7 @@
-const resolutions = Dict(2.5 => "2.5", 5.0 => "5", 10.0 => "10")
 
-
-# Interface methods
-
-function download_raster(T::Type{WorldClim{BioClim}}; layer::Integer=1, resolution::AbstractFloat=10.0)
-    1 ≤ layer ≤ 19 || throw(ArgumentError("The layer must be between 1 and 19"))
+function download_raster(T::Type{WorldClim{BioClim}}; layer::Integer=1, resolution::String="10m")
+    _check_layer(T, layer)
+    _check_resolution(T, resolution)
 
     raster_path = rasterpath(T, layer, resolution)
     zip_path = zippath(T, layer, resolution)
@@ -20,17 +17,12 @@ function download_raster(T::Type{WorldClim{BioClim}}; layer::Integer=1, resoluti
     return raster_path
 end
 
+layers(::Type{WorldClim{BioClim}}) = 1:19
 # BioClim layers don't get their own folder
 rasterpath(T::Type{<:WorldClim{BioClim}}, layer) = rasterpath(T)
-
-rastername(T::Type{<:WorldClim{BioClim}}, key, res::AbstractFloat) =
-    "wc2.1_$(resolutions[res])m_bio_$(key).tif"
-
-zipname(T::Type{<:WorldClim{BioClim}}, key, res::AbstractFloat) =
-    "wc2.1_$(resolutions[res])m_bio.zip"
-
-zipurl(T::Type{<:WorldClim{BioClim}}, key, res::AbstractFloat) =
-    joinpath(WORLDCLIM_URL, "base", zipname(T, key, res))
-
-zippath(T::Type{<:WorldClim{BioClim}}, key, res::AbstractFloat) =
+rastername(T::Type{<:WorldClim{BioClim}}, key, res) = "wc2.1_$(res)_bio_$key.tif"
+zipname(T::Type{<:WorldClim{BioClim}}, key, res) = "wc2.1_$(res)_bio.zip"
+zipurl(T::Type{<:WorldClim{BioClim}}, key, res) =
+    joinpath(WORLDCLIM_URI, "base", zipname(T, key, res))
+zippath(T::Type{<:WorldClim{BioClim}}, key, res) =
     joinpath(rasterpath(T), "zips", zipname(T, key, res))

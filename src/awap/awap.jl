@@ -16,12 +16,12 @@ struct MaxAve end
 const AWAP_DATEFORMAT = DateFormat("yyyymmdd")
 
 
-
 # Interface methods
 
-download_raster(T::Type{AWAP}, layers::Tuple=rasterlayers(T); kwargs...) =
+download_raster(T::Type{AWAP}, layers::Tuple=layers(T); kwargs...) =
     map(l -> download_raster(T, l; kwargs...), layers)
 function download_raster(T::Type{AWAP}, layer::Type; dates)
+    check_layer(T, layer)
     dates = _date_sequence(dates, Day(1))
     mkpath(rasterpath(T, layer))
     raster_paths = String[]
@@ -37,15 +37,13 @@ function download_raster(T::Type{AWAP}, layer::Type; dates)
     return raster_paths
 end
 
-rasterlayers(::Type{<:AWAP}) = 
+layers(::Type{<:AWAP}) = 
     (Solar, Rainfall, VapourPressure{H09}, VapourPressure{H15}, 
      Temperature{MinAve}, Temperature{MaxAve})
-
 rasterpath(T::Type{AWAP}) = joinpath(rasterpath(), "AWAP")
 rasterpath(T::Type{AWAP}, layer) = joinpath(rasterpath(T), _pathsegments(layer)[1:2]...)
 rasterpath(T::Type{AWAP}, layer, date::Dates.AbstractTime) =
     joinpath(rasterpath(T, layer), rastername(T, layer, date))
-
 rastername(T::Type{AWAP}, layer, date::Dates.AbstractTime) =
     joinpath(_date2string(T, date) * ".grid")
 
@@ -55,13 +53,11 @@ function zipurl(T::Type{AWAP}, layer, date)
     # The actual zip name has the date twice, which is weird.
     # So we download in to a different name as there no output
     # name flages for `uncompress`. It's ancient.
-    joinpath("http://www.bom.gov.au/web03/ncc/www/awap", s..., "grid/0.05/history/nat/$d$d.grid.Z")
+    uri = URI(scheme="http", host="www.bom.gov.au", path="/web03/ncc/www/awap")
+    joinpath(urs, s..., "grid/0.05/history/nat/$d$d.grid.Z")
 end
-
 zipname(T::Type{AWAP}, layer, date) = _date2string(T, date) * ".grid.Z"
-
 zippath(T::Type{AWAP}, layer, date) = joinpath(rasterpath(T, layer), zipname(T, layer, date))
-
 
 
 # Utilitiy methods

@@ -14,8 +14,10 @@ function rasterurl(T::Type{EarthEnv{LandCover}}, layer::Integer, discover::Bool)
     joinpath(rasterurl(T), stem)
 end
 
+layers(::Type{EarthEnv{LandCover}}) = 1:12
+
 function download_raster(T::Type{EarthEnv{LandCover}}; layer::Integer=1, discover::Bool=false)
-    1 ≤ layer ≤ 12 || throw(ArgumentError("The layer must be between 1 and 12"))
+    _check_layer(T, layer)
     url = rasterurl(T, layer, discover)
     path = rasterpath(T, layer, discover)
     return _maybe_download(url, path)
