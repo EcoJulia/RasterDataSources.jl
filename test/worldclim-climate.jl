@@ -8,6 +8,6 @@
 
     raster_file = joinpath(ENV["RASTERDATASOURCES_PATH"], "WorldClim", "Climate", "wind", "wc2.1_10m_wind_01.tif")
     @test rasterpath(WorldClim{Climate}, :wind, "10m", 1) == raster_file
-    @test download_raster(WorldClim{Climate}; layer=:wind, resolution="10m", month=1) == raster_file
+    @test download_raster(WorldClim{Climate}, :wind; resolution="10m", month=1) == raster_file
     @test isfile(raster_file)
 end
