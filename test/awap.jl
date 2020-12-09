@@ -11,8 +11,9 @@
         joinpath(ENV["RASTERDATASOURCES_PATH"], "AWAP", "vprp", "vprph09", "20010101.grid.Z")
     @test zipname(AWAP, VapourPressure{H09}, Date(2001, 1)) == "20010101.grid.Z"
 
-    dates = DateTime(2001, 01, 01), DateTime(2001, 01, 02)
-    download_raster(AWAP, VapourPressure{H09}; dates=dates)
-
-    @test isfile(raster_file)
+    if Sys.islinux()
+        dates = DateTime(2001, 01, 01), DateTime(2001, 01, 02)
+        download_raster(AWAP, VapourPressure{H09}; dates=dates)
+        @test isfile(raster_file)
+    end
 end
