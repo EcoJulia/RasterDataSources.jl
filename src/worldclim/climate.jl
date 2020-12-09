@@ -1,5 +1,5 @@
 
-download_raster(T::Type{WorldClim{Climate}}; layer::Symbol, resolution::String="10m", month=1:12) =
+download_raster(T::Type{WorldClim{Climate}}, layer::Symbol; resolution::String="10m", month=1:12) =
     _download_raster(T, layer, resolution, month)
 
 function _download_raster(T::Type{WorldClim{Climate}}, layer, resolution, months)

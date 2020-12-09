@@ -94,7 +94,7 @@ rasterpath(T::Type{<:ALWB}, layer, date) =
     joinpath(rasterpath(T), rastername(T, layer, date))
 
 rasterurl(T::Type{<:ALWB{M,P}}, layer, date) where {M,P} =
-    joinpath(ALWB_URI, _pathsegment(T), rastername(T, layer, date))
+    joinpath(ALWB_URI, _pathsegments(T)..., rastername(T, layer, date))
 
 download_raster(T::Type{<:ALWB}, layers::Tuple=layers(T); kwargs...) =
     map(l -> download_raster(T, l; kwargs...), layers)
@@ -158,7 +158,7 @@ _pathsegment(::Type{Evaporation{OpenWater}}) = "msl_wet"
 # http://www.bom.gov.au/jsp/awra/thredds/fileServer/AWRACMS/values/day/dd_2017.nc
 _pathsegment(::Type{DeepDrainage}) = "dd"
 
-_pathsegment(::Type{ALWB{M,P}}) where {M,P} = joinpath(_pathsegment(M), _pathsegment(P))
+_pathsegments(::Type{ALWB{M,P}}) where {M,P} = _pathsegment(M), _pathsegment(P)
 _pathsegment(::Type{Values}) = "values"
 _pathsegment(::Type{Deciles}) = "deciles"
 _pathsegment(::Type{Day}) = "day"

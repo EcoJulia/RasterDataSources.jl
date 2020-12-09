@@ -1,4 +1,4 @@
-@testset "AWAP" begin
+@testset "ALWB" begin
     using RasterDataSources: rastername, rasterurl, Values, Deciles, 
           SoilMoisture, Lower, Upper, Evapotrans, Potential, Areal, Actual, RefCrop, Tall,
           DeepDrainage

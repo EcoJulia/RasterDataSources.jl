@@ -1,5 +1,5 @@
 
-function download_raster(T::Type{WorldClim{BioClim}}; layer::Integer=1, resolution::String="10m")
+function download_raster(T::Type{WorldClim{BioClim}}, layer::Integer; resolution::String="10m")
     _check_layer(T, layer)
     _check_resolution(T, resolution)
 
