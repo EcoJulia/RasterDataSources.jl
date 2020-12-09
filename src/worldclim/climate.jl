@@ -1,11 +1,14 @@
 
-download_raster(T::Type{WorldClim{Climate}}, layer::Symbol; resolution::String="10m", month=1:12) =
+download_raster(T::Type{WorldClim{Climate}}, layer; resolution::String="10m", month=1:12) =
     _download_raster(T, layer, resolution, month)
 
-function _download_raster(T::Type{WorldClim{Climate}}, layer, resolution, months)
+function _download_raster(T::Type{WorldClim{Climate}}, layers, resolution, months)
+    map(l -> _download_raster(T, l, resolution, months), layers)
+end
+function _download_raster(T::Type{WorldClim{Climate}}, layer::Symbol, resolution, months)
     map(m -> _download_raster(T, layer, resolution, m), months)
 end
-function _download_raster(T::Type{WorldClim{Climate}}, layer, resolution, month::Integer)
+function _download_raster(T::Type{WorldClim{Climate}}, layer::Symbol, resolution, month::Integer)
     _check_layer(T, layer)
     _check_resolution(T, resolution)
     raster_path = rasterpath(T, layer, resolution, month)
