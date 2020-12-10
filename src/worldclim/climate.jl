@@ -24,7 +24,7 @@ function _download_raster(T::Type{WorldClim{Climate}}, layer::Symbol, resolution
     return raster_path
 end
 
-layers(::Type{WorldClim{Climate}}) = (:tmin, :tmax, :tave, :prec, :srad, :wind, :vapr)
+layers(::Type{WorldClim{Climate}}) = (:tmin, :tmax, :tavg, :prec, :srad, :wind, :vapr)
 # Climate layers don't get their own folder
 rasterpath(T::Type{<:WorldClim{Climate}}, layer) = joinpath(rasterpath(T), string(layer))
 rasterpath(T::Type{<:WorldClim{Climate}}, layer, res, month) = 
