@@ -1,5 +1,10 @@
 # RasterDataSources.jl
 
+[![](https://img.shields.io/badge/docs-stable-blue.svg)](https://cesaraustralia.github.io/RasterDataSources.jl/stable)
+[![](https://img.shields.io/badge/docs-dev-blue.svg)](https://cesaraustralia.github.io/RasterDataSources.jl/dev)
+![CI](https://github.com/cesaraustralia/RasterDataSources.jl/workflows/CI/badge.svg)
+[![codecov.io](http://codecov.io/github/cesaraustralia/RasterDataSources.jl/coverage.svg?branch=master)](http://codecov.io/github/cesaraustralia/RasterDataSources.jl?branch=master)
+
 This package downloads raster data sourcess for use directly or by other Julia
 packages. The collection is largely focussed on datasets relevent
 to ecology, but will have a lot of crossover with other sciences.
