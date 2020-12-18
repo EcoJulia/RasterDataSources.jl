@@ -1,25 +1,32 @@
-# Interface methods
-
 resolutions(::Type{EarthEnv{HabitatHeterogeneity}}) = (1, 5, 25)
 layers(::Type{EarthEnv{HabitatHeterogeneity}}) = 
     (:cv, :evenness, :range, :shannon, :simpson, :std, :Contrast, :Correlation, 
      :Dissimilarity, :Entropy, :Homogeneity, :Maximum, :Uniformity, :Variance)
-rastername(::Type{EarthEnv{HabitatHeterogeneity}}, layer::Symbol, resolution::Integer) =
-    "$(layer)_$(resolution)km.tif"
-rasterpath(T::Type{<:EarthEnv{HabitatHeterogeneity}}, layer::Symbol, resolution::Integer) = 
-    joinpath(rasterpath(T), string(resolution) * "km", rastername(T, layer, resolution))
-rasterurl(T::Type{EarthEnv{HabitatHeterogeneity}}, layer, resolution::Integer) = 
-    joinpath(rasterurl(T), "$(resolution)km/$(layer)_01_05_$(resolution)km_$(_getprecision(layer, resolution)).tif")
 
-function download_raster(T::Type{EarthEnv{HabitatHeterogeneity}}; layer::Symbol=:cv, resolution::Integer=25)
+"""
+    getraster(T::Type{EarthEnv{HabitatHeterogeneity}}, [layer::Integer]; resolution::Int=25) => String
+
+Download EarthEnv habitat heterogeneity data, choosing layers from: 
+$(layers(EarthEnv{HabitatHeterogeneity})) and resolution from 
+$(resolutions(EarthEnv{HabitatHeterogeneity})).
+
+Without a layer argument, all layers will be getrastered and a tuple of paths returned. 
+If the data is already getrastered the path will be returned without the getraster.
+"""
+function getraster(T::Type{EarthEnv{HabitatHeterogeneity}}, layer::Symbol; resolution=25)
     _check_layer(T, layer)
     _check_resolution(T, resolution)
-    path = rasterpath(T, layer, resolution)
-    url = rasterurl(T, layer, resolution) 
+    path = rasterpath(T, layer; resolution)
+    url = rasterurl(T, layer; resolution) 
     return _maybe_download(url, path)
 end
 
-# Utility methods
+rastername(::Type{EarthEnv{HabitatHeterogeneity}}, layer::Symbol; resolution::Integer=25) =
+    "$(layer)_$(resolution)km.tif"
+rasterpath(T::Type{<:EarthEnv{HabitatHeterogeneity}}, layer::Symbol; resolution::Integer=25) =
+    joinpath(rasterpath(T), string(resolution) * "km", rastername(T, layer; resolution))
+rasterurl(T::Type{EarthEnv{HabitatHeterogeneity}}, layer; resolution::Integer=25) =
+    joinpath(rasterurl(T), "$(resolution)km/$(layer)_01_05_$(resolution)km_$(_getprecision(layer, resolution)).tif")
 
 _pathsegment(::Type{HabitatHeterogeneity}) = "habitat_heterogeneity"
 
@@ -33,4 +40,3 @@ function _getprecision(layer, resolution)
     precision = ((resolution == 25) && (layer == :Entropy)) ? "uint32" : precision
     # /HELL
 end
-

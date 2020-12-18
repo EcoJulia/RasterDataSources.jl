@@ -5,32 +5,48 @@
 ![CI](https://github.com/cesaraustralia/RasterDataSources.jl/workflows/CI/badge.svg)
 [![codecov.io](http://codecov.io/github/cesaraustralia/RasterDataSources.jl/coverage.svg?branch=master)](http://codecov.io/github/cesaraustralia/RasterDataSources.jl?branch=master)
 
-This package downloads raster data sourcess for use directly or by other Julia
-packages. The collection is largely focussed on datasets relevent
-to ecology, but will have a lot of crossover with other sciences.
+RasterDataSources downloads raster data for local use or for integration
+into other spatial data packages, like
+[GeoData.jl](https://github.com/rafaqz/GeoData.jl).
 
-RasterDataSources was based on code from the `SimpleSDMDataSoures` 
-package by Timothée Poisot.
+The collection is largely focussed on datasets relevant to ecology,
+but will have a lot of crossover with other sciences.
 
-## Example
-
-First, to specify the directory in which the data is to be downloaded, modify your `startup.jl` file located in your `Julia` install directory (e.g. `Julia\Julia 1.5.2\etc\julia\startup.jl`) to include the following line:
-
-`ENV["RASTERDATASOURCES_PATH"] = "\MyDataLocation"`
-
-Then run the following code:
+Usage is generally via the `getraster` method - which will download the
+raster data source if it isn't available locally, or simply return the path/s
+of the raster file/s.
 
 ```julia
-#lolad packages
-using RasterDataSources, Dates, GeoData
-using RasterDataSources: Values, SoilMoisture, Upper, Lower
+julia> using RasterDataSources
 
-# download montly mean tavg data from WorldClim at the 10 m resoltution
-layers = (:tavg, )
-months = 1:12
-download_raster(WorldClim{Climate}, layers; resolution = "10m", month=months)
-
-# make GeoSeries
-ser = series(WorldClim{Climate}; layers=layers)
-
+julia> getraster(WorldClim{Climate}, :wind)
+12-element Array{String,1}:
+ "/home/user/Data/WorldClim/Climate/wind/wc2.1_10m_wind_01.tif"
+ "/home/user/Data/WorldClim/Climate/wind/wc2.1_10m_wind_02.tif"
+ "/home/user/Data/WorldClim/Climate/wind/wc2.1_10m_wind_03.tif"
+ "/home/user/Data/WorldClim/Climate/wind/wc2.1_10m_wind_04.tif"
+ "/home/user/Data/WorldClim/Climate/wind/wc2.1_10m_wind_05.tif"
+ "/home/user/Data/WorldClim/Climate/wind/wc2.1_10m_wind_06.tif"
+ "/home/user/Data/WorldClim/Climate/wind/wc2.1_10m_wind_07.tif"
+ "/home/user/Data/WorldClim/Climate/wind/wc2.1_10m_wind_08.tif"
+ "/home/user/Data/WorldClim/Climate/wind/wc2.1_10m_wind_09.tif"
+ "/home/user/Data/WorldClim/Climate/wind/wc2.1_10m_wind_10.tif"
+ "/home/user/Data/WorldClim/Climate/wind/wc2.1_10m_wind_11.tif"
+ "/home/user/Data/WorldClim/Climate/wind/wc2.1_10m_wind_12.tif"
 ```
+
+To download data you will need to specify a folder to put it in. You can do this
+by assigning the environment variable `RASTERDATASOURCES_PATH`:
+
+```julia
+ENV["RASTERDATASOURCES_PATH"] = "/home/user/Data/"
+```
+
+This can be put in your `startup.jl` file or the system environment.
+
+
+Pull requests are with additional data sources are welcomed, but should as much as
+possible follow the structure used for existing data sources.
+
+RasterDataSources was based on code from the `SimpleSDMDataSoures.jl`
+package by Timothée Poisot.
