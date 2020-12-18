@@ -43,8 +43,8 @@ function getraster(T::Type{AWAP}, layer::Symbol; date)
     for d in dates
         raster_path = rasterpath(T, layer; date=d)
         if !isfile(raster_path)
-            zip_path = zippath(T, layer, d)
-            _maybe_download(zipurl(T, layer, d), zip_path)
+            zip_path = zippath(T, layer; date=d)
+            _maybe_download(zipurl(T, layer; date=d), zip_path)
             run(`uncompress $zip_path -f`)
         end
         push!(raster_paths, raster_path)
