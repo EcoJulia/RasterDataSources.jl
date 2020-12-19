@@ -1,4 +1,4 @@
-layers(::Type{WorldClim{Climate}}) = (:tmin, :tmax, :tave, :prec, :srad, :wind, :vapr)
+layers(::Type{WorldClim{Climate}}) = (:tmin, :tmax, :tavg, :prec, :srad, :wind, :vapr)
 
 """
     getraster(T::Type{WorldClim{Climate}}, [layer::Symbol]; resolution::String="10m", month=1:12) => Vector{String}
