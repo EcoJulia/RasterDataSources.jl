@@ -1,8 +1,8 @@
 
-function getraster(T::Type{<:RasterDataSource}, layers::Tuple=layers(T); kw...)
+function getraster(T::Type{<:RasterDataSource}, layers::Tuple=layers(T), args...; kw...)
     map(layers) do l
         _check_layer(T, l)
-        getraster(T, l; kw...)
+        getraster(T, l, args...; kw...)
     end
 end
 
@@ -32,11 +32,7 @@ function delete_rasters(T::Type)
     ispath(rasterpath(T)) && rm(rasterpath(T))
 end
 
-function delete_rasters(::Type{TS}, ::Type{TD}) where {TS <: RasterDataSource, TD <: RasterDataSet}
-    ispath(_raster_assets_folder(TS, TD)) && rm(_raster_assets_folder(TS, TD); recursive=false)
-end
-
-_check_resolution(T, res) =
+_check_res(T, res) =
     res in resolutions(T) || throw(ArgumentError("Resolution $res not in $(resolutions(T))"))
 _check_layer(T, layer) =
     layer in layers(T) || throw(ArgumentError("Layer $layer not in $(layers(T))"))
@@ -45,6 +41,6 @@ _date2string(t, date) = Dates.format(date, _dateformat(t))
 _string2date(t, d::AbstractString) = Date(d, _dateformat(t))
 
 _date_sequence(dates::AbstractArray, step) = dates
-_date_sequence(dates::Tuple, step) = first(dates):step:last(dates)
+_date_sequence(dates::NTuple{2}, step) = first(dates):step:last(dates)
 _date_sequence(date, step) = date:step:date
 

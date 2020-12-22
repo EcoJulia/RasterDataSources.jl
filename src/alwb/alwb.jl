@@ -63,25 +63,28 @@ layers(::Type{<:ALWB}) = (:rain_day, :s0_pct, :ss_pct, :sd_pct, :sm_pct, :qtot, 
                           :e0, :ma_wet, :pen_pet, :fao_pet, :asce_pet, :msl_wet, :dd)
 
 """
-    getraster(T::Type{<:ALWB{Union{Deciles,Values},Union{Day,Month,Year}}}, layer::Symbol; date) => Vector{String}
+    getraster(T::Type{<:ALWB{Union{Deciles,Values},Union{Day,Month,Year}}}, layer; date)
+    getraster(T::Type{<:ALWB{Union{Deciles,Values},Union{Day,Month,Year}}}, layer, date)
 
 Download ALWB weather data, choosing layers from: $(layers(ALWB)).
 
 Without a layer argument, all layers will be getrastered, and a tuple of path vectors returned. 
 If the data is already getrastered the path will be returned.
 """
-function getraster(T::Type{<:ALWB{M,P}}, layer::Symbol; date) where {M,P} 
+getraster(T::Type{<:ALWB}, layer::Symbol; date) = getraster(T, layer, date)
+function getraster(T::Type{<:ALWB{M,P}}, layer::Symbol, dates::Tuple) where {M,P}
+    getraster(T, layer, _date_sequence(dates, P(1)))
+end
+function getraster(T::Type{<:ALWB}, layer::Symbol, date::Dates.TimeType)
     _check_layer(T, layer)
-    dates = _date_sequence(date, P(1))
     mkpath(rasterpath(T))
-    raster_paths = String[]
-    for d in dates
-        url = rasterurl(T, layer; date=d)
-        path = rasterpath(T, layer; date=d)
-        _maybe_download(url, path)
-        push!(raster_paths, path)
-    end
-    raster_paths
+    url = rasterurl(T, layer; date=date)
+    path = rasterpath(T, layer; date=date)
+    _maybe_download(url, path)
+    path
+end
+function getraster(T::Type{<:ALWB}, layer::Symbol, dates::AbstractArray)
+    getraster.(T, layer, dates)
 end
 
 rastername(T::Type{<:ALWB{M,P}}, layer; date) where {M,P} =

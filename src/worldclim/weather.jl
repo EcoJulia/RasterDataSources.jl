@@ -1,7 +1,8 @@
 layers(::Type{WorldClim{Weather}}) = (:tmin, :tmax, :prec)
 
 """
-    getraster(T::Type{WorldClim{Weather}}, [layer::Symbol]; date) => Vector{String}
+    getraster(T::Type{WorldClim{Weather}}, [layer]; date) => Vector{String}
+    getraster(T::Type{WorldClim{Weather}}, layer::Symbol, date)
 
 Download WorldClim weather data, choosing layers from: $(layers(WorldClim{Weather})).
 
@@ -9,29 +10,34 @@ Without a layer argument, all layers will be getrastered, and a tuple of paths i
 If the data is already getrastered the path will be returned.
 """
 function getraster(T::Type{WorldClim{Weather}}, layer::Symbol; date)
-    date = _date_sequence(date, Month(1))
+    getraster(T::Type{WorldClim{Weather}}, layer::Symbol, date)
+end
+function getraster(T::Type{WorldClim{Weather}}, layer::Symbol, date::Tuple)
+    getraster(T, layer, _date_sequence(date, Month(1)))
+end
+function getraster(T::Type{WorldClim{Weather}}, layer::Symbol, date::Dates.TimeType)
     decadestart = Date.(1960:10:2020)
-    raster_paths = String[]
-
     for i in eachindex(decadestart[1:end-1])
         # At least one date is in the decade
-        any(d -> d >= decadestart[i] && d < decadestart[i+1], date) || continue
-        zip_path = zippath(T, layer, decadestart[i])
-        _maybe_download(zipurl(T, layer, decadestart[i]), zip_path)
+        date >= decadestart[i] && date < decadestart[i+1] || continue
+        zip_path = zippath(T, layer; decade=decadestart[i])
+        _maybe_download(zipurl(T, layer; decade=decadestart[i]), zip_path)
         zf = ZipFile.Reader(zip_path)
-        for d in date
-            raster_path = rasterpath(T, layer; date=d)
-            mkpath(dirname(raster_path))
-            if !isfile(raster_path)
-                raster_name = rastername(T, layer, d)
-                println("Writing $(raster_path)...")
-                write(raster_path, read(_zipfile_to_read(raster_name, zf)))
-            end
-            push!(raster_paths, raster_path)
+        raster_path = rasterpath(T, layer; date=date)
+        mkpath(dirname(raster_path))
+        if !isfile(raster_path)
+            raster_name = rastername(T, layer, date)
+            println("Writing $(raster_path)...")
+            write(raster_path, read(_zipfile_to_read(raster_name, zf)))
         end
+        push!(raster_paths, raster_path)
         close(zf)
+        return raster_path
     end
-    return raster_paths
+    error("Date $date not between 1960 and 2020")
+end
+function getraster(T::Type{WorldClim{Weather}}, layer::Symbol, dates::AbstractArray)
+    getraster.(T, layer, dates)
 end
 
 const WEATHER_DECADES = Dict(Date(1960) => "1960-1969",

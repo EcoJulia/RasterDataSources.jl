@@ -20,7 +20,8 @@ const AWAP_PATHSEGMENTS = (
 layers(::Type{AWAP}) = (:solar, :rainfall, :vprpress09, :vprpress15, :tmin, :tmax)
 
 """
-    getraster(T::Type{AWAP}, layer::Symbol; date) => Vector{String}
+    getraster(T::Type{AWAP}, layer::Symbol; date) => String
+    getraster(T::Type{AWAP}, layer::Symbol, date) => String
 
 Download data from the AWAP weather dataset, for `layer` in $(layers(AWAP)),
 and `date` as a `DateTime` or iterable of `DateTime`.
@@ -35,21 +36,23 @@ Rainfall for the first month of 2001
 getraster(AWAP, :rainfall; date=Date(2001, 1, 1):Day(1):Date(2001, 1, 31))
 ```
 """
-function getraster(T::Type{AWAP}, layer::Symbol; date)
+getraster(T::Type{AWAP}, layer::Symbol; date) = getraster(T, layer, date)
+function getraster(T::Type{AWAP}, layer::Symbol, dates::Tuple)
+    getraster(T, layer, _date_sequence(dates, Day(1)))
+end
+function getraster(T::Type{AWAP}, layer::Symbol, date::Dates.TimeType)
     _check_layer(T, layer)
-    dates = _date_sequence(date, Day(1))
     mkpath(_rasterpath(T, layer))
-    raster_paths = String[]
-    for d in dates
-        raster_path = rasterpath(T, layer; date=d)
-        if !isfile(raster_path)
-            zip_path = zippath(T, layer; date=d)
-            _maybe_download(zipurl(T, layer; date=d), zip_path)
-            run(`uncompress $zip_path -f`)
-        end
-        push!(raster_paths, raster_path)
+    raster_path = rasterpath(T, layer; date=date)
+    if !isfile(raster_path)
+        zip_path = zippath(T, layer; date=date)
+        _maybe_download(zipurl(T, layer; date=date), zip_path)
+        run(`uncompress $zip_path -f`)
     end
-    return raster_paths
+    return raster_path
+end
+function getraster(T::Type{AWAP}, layer::Symbol, dates::AbstractArray)
+    getraster.(T, layer, dates)
 end
 
 rasterpath(T::Type{AWAP}) = joinpath(rasterpath(), "AWAP")
