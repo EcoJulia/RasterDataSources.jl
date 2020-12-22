@@ -2,6 +2,7 @@ layers(::Type{EarthEnv{LandCover}}) = 1:12
 
 """
     getraster(T::Type{EarthEnv{LandCover}}, [layer::Integer]; discover::Bool=false) => String
+    getraster(T::Type{EarthEnv{LandCover}}, layer::Integer, discover::Bool) => String
 
 Download EarthEnv landcover data, choosing layers from: $(layers(EarthEnv{LandCover})).
 
@@ -9,6 +10,9 @@ Without a layer argument, all layers will be getrastered and a tuple of paths re
 If the data is already getrastered the path will be returned.
 """
 function getraster(T::Type{EarthEnv{LandCover}}, layer::Integer; discover::Bool=false)
+    getraster(T, layer, discover)
+end
+function getraster(T::Type{EarthEnv{LandCover}}, layer::Integer, discover::Bool)
     _check_layer(T, layer)
     url = rasterurl(T, layer; discover)
     path = rasterpath(T, layer; discover)

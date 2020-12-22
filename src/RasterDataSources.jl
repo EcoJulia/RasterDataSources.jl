@@ -1,9 +1,10 @@
 module RasterDataSources
 
 using Dates,
+      GeoData,
       HTTP,
-      ZipFile,
-      URIs
+      URIs,
+      ZipFile
 
 abstract type RasterDataSource end
 abstract type RasterDataSet end
@@ -18,7 +19,11 @@ export WorldClim, CHELSA, EarthEnv, AWAP, ALWB
 
 export BioClim, Climate, Weather, LandCover, HabitatHeterogeneity
 
+export Values, Deciles
+
 export getraster
+
+export geoarray, stack, series
 
 include("shared.jl")
 include("worldclim/shared.jl")
