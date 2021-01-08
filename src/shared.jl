@@ -1,5 +1,5 @@
 
-function getraster(T::Type{<:RasterDataSource}, layers::Tuple=layers(T), args...; kw...)
+function getraster(T::Type{<:RasterDataSource}, layers=layers(T), args...; kw...)
     map(layers) do l
         _check_layer(T, l)
         getraster(T, l, args...; kw...)
