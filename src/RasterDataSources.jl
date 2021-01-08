@@ -3,6 +3,7 @@ module RasterDataSources
 using Dates,
       GeoData,
       HTTP,
+      Requires,
       URIs,
       ZipFile
 
@@ -36,5 +37,11 @@ include("earthenv/landcover.jl")
 include("earthenv/habitatheterogeneity.jl")
 include("awap/awap.jl")
 include("alwb/alwb.jl")
+
+function __init__()
+    @require GeoData="9b6fcbb8-86d6-11e9-1ce7-23a6bb139a78" begin
+        include("geodata.jl")
+    end
+end
 
 end # module
