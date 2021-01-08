@@ -12,6 +12,8 @@
     @test rasterurl(CHELSA{BioClim}, 5) == 
         URI(scheme="https", host="os.zhdk.cloud.switch.ch", path="/envicloud/chelsa/chelsa_V1/climatologies/bio/CHELSA_bio10_05.tif")
 
-    getraster(CHELSA{BioClim}, 5)
-    @test isfile(joinpath(bioclim_path, "CHELSA_bio10_05.tif"))
+    raster_path = joinpath(bioclim_path, "CHELSA_bio10_05.tif")
+    @test getraster(CHELSA{BioClim}, 5) == raster_path
+    @test getraster(CHELSA{BioClim}, (5,)) == (raster_path,)
+    @test isfile(raster_path)
 end

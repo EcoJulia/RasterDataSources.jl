@@ -14,8 +14,11 @@ If the data is already getrastered the path will be returned.
 function getraster(T::Type{WorldClim{Climate}}, layer; month=1:12, res::String=defres(T))
     getraster(T, layer, month, res)
 end
-function getraster(T::Type{WorldClim{Climate}}, layers, months, res::String)
+function getraster(T::Type{WorldClim{Climate}}, layers::Tuple, months, res::String)
     map(l -> getraster(T, l, months, res), layers)
+end
+function getraster(T::Type{WorldClim{Climate}}, layer::Symbol, months::AbstractArray, res::String)
+    getraster.(T, layer, months, Ref(res))
 end
 function getraster(T::Type{WorldClim{Climate}}, layer::Symbol, month::Integer, res::String)
     _check_layer(T, layer)
@@ -31,9 +34,6 @@ function getraster(T::Type{WorldClim{Climate}}, layer::Symbol, month::Integer, r
         close(zf)
     end
     return raster_path
-end
-function getraster(T::Type{WorldClim{Climate}}, layer::Symbol, months::AbstractArray, res::String)
-    getraster.(T, layer, months, Ref(res))
 end
 
 # Climate layers don't get their own folder
