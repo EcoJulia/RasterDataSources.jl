@@ -1,10 +1,10 @@
 layers(::Type{EarthEnv{LandCover}}) = 1:12
 
 """
-    getraster(T::Type{EarthEnv{LandCover}}, [layer::Integer]; discover::Bool=false) => String
+    getraster(T::Type{EarthEnv{LandCover}}, [layer::Union{AbstractArray,Tuple,Integer}]; discover::Bool=false) => String
     getraster(T::Type{EarthEnv{LandCover}}, layer::Integer, discover::Bool) => String
 
-Download EarthEnv landcover data, choosing layers from: $(layers(EarthEnv{LandCover})).
+Download EarthEnv landcover data, choosing `layer` from: $(layers(EarthEnv{LandCover})).
 
 Without a layer argument, all layers will be getrastered and a tuple of paths returned. 
 If the data is already getrastered the path will be returned.

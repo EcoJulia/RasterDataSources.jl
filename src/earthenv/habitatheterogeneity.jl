@@ -5,11 +5,11 @@ layers(::Type{EarthEnv{HabitatHeterogeneity}}) =
      :Dissimilarity, :Entropy, :Homogeneity, :Maximum, :Uniformity, :Variance)
 
 """
-    getraster(T::Type{EarthEnv{HabitatHeterogeneity}}, [layer::Integer]; res::Int=25) => String
+    getraster(T::Type{EarthEnv{HabitatHeterogeneity}}, [layer::Union{Tuple,Integer}]; res::Int=25) => String
     getraster(T::Type{EarthEnv{HabitatHeterogeneity}}, layer::Integer, res::Int=25) => String
 
-Download EarthEnv habitat heterogeneity data, choosing layers from: 
-$(layers(EarthEnv{HabitatHeterogeneity})) and res from 
+Download EarthEnv habitat heterogeneity data, choosing `layer` from: 
+$(layers(EarthEnv{HabitatHeterogeneity})) and `res` from 
 $(resolutions(EarthEnv{HabitatHeterogeneity})).
 
 Without a layer argument, all layers will be getrastered and a tuple of paths returned. 

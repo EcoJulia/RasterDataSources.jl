@@ -1,5 +1,5 @@
 """
-CHELSA{BioClim} <: RasterDataSource
+    CHELSA{BioClim} <: RasterDataSource
 
 Data from CHELSA, currently only the `BioClim` layer is implemented.
 

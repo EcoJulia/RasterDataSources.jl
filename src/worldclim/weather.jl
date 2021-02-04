@@ -1,10 +1,10 @@
 layers(::Type{WorldClim{Weather}}) = (:tmin, :tmax, :prec)
 
 """
-    getraster(T::Type{WorldClim{Weather}}, [layer]; date) => Vector{String}
+    getraster(T::Type{WorldClim{Weather}}, [layer::Union{Symbol,Tuple}]; date) => Vector{String}
     getraster(T::Type{WorldClim{Weather}}, layer::Symbol, date)
 
-Download WorldClim weather data, choosing layers from: $(layers(WorldClim{Weather})).
+Download WorldClim weather data, choosing `layer` from: $(layers(WorldClim{Weather})).
 
 Without a layer argument, all layers will be getrastered, and a tuple of paths is returned. 
 If the data is already getrastered the path will be returned.

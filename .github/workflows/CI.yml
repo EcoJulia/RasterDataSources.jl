@@ -1,16 +1,18 @@
 name: CI
-
 on:
   push:
     branches:
       - master
   pull_request:
-
+defaults:
+  run:
+    shell: bash
 jobs:
   test:
     name: Julia ${{ matrix.version }} - ${{ matrix.os }} - ${{ matrix.arch }}
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: true
       matrix:
         version:
           - '1.5'

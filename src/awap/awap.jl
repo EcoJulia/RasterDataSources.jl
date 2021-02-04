@@ -1,11 +1,16 @@
-"""
-    AWAP <: RasterDataSource
+struct AWAP <: RasterDataSource end
+
+layers(::Type{AWAP}) = (:solar, :rainfall, :vprpress09, :vprpress15, :tmin, :tmax)
+
+@doc """
+AWAP <: RasterDataSource
 
 Daily weather data from the Australian Water Availability Project, developed by CSIRO.
 
 See: [www.csiro.au/awap](http://www.csiro.au/awap/)
-"""
-struct AWAP <: RasterDataSource end
+
+The available layers are: $(layers(AWAP)).
+""" AWAP
 
 const AWAP_PATHSEGMENTS = (
     solar = ("solar", "solarave", "daily"),
@@ -16,8 +21,6 @@ const AWAP_PATHSEGMENTS = (
     tmax = ("temperature", "maxave", "daily"),
 )
 # Add ndvi monthly?  ndvi, ndviave, month
-
-layers(::Type{AWAP}) = (:solar, :rainfall, :vprpress09, :vprpress15, :tmin, :tmax)
 
 """
     getraster(T::Type{AWAP}, layer::Symbol; date) => String

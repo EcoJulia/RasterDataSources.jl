@@ -1,24 +1,24 @@
 layers(::Type{WorldClim{Climate}}) = (:tmin, :tmax, :tavg, :prec, :srad, :wind, :vapr)
 
 """
-    getraster(T::Type{WorldClim{Climate}}, [layer]; res::String="10m", month=1:12) => Vector{String}
-    getraster(T::Type{WorldClim{Climate}}, layer, month, res)
+    getraster(T::Type{WorldClim{Climate}}, [layer::Union{Symbol,Tuple}]; month=1:12, res::String="10m") => Vector{String}
+    getraster(T::Type{WorldClim{Climate}}, layer::Symbol, month::Integer, res::String)
 
 Download WorldClim weather data, choosing `layer` from $(layers(WorldClim{Climate})),
 and `res` from $(resolutions(WorldClim{Climate})), and months from `1:12`.
 
 Without a layer argument, all layers will be getrastered, and a tuple of paths is returned. 
-By default all months are getrastered, but can also be getrastered individually.
+By default all months are downloaded , but can also be downloaded individually.
 If the data is already getrastered the path will be returned.
 """
 function getraster(T::Type{WorldClim{Climate}}, layer; month=1:12, res::String=defres(T))
     getraster(T, layer, month, res)
 end
-function getraster(T::Type{WorldClim{Climate}}, layers::Tuple, months, res::String)
-    map(l -> getraster(T, l, months, res), layers)
+function getraster(T::Type{WorldClim{Climate}}, layers::Tuple, month, res::String)
+    map(l -> getraster(T, l, month, res), layers)
 end
-function getraster(T::Type{WorldClim{Climate}}, layer::Symbol, months::AbstractArray, res::String)
-    getraster.(T, layer, months, Ref(res))
+function getraster(T::Type{WorldClim{Climate}}, layer::Symbol, month::AbstractArray, res::String)
+    getraster.(T, layer, month, Ref(res))
 end
 function getraster(T::Type{WorldClim{Climate}}, layer::Symbol, month::Integer, res::String)
     _check_layer(T, layer)

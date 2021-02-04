@@ -2,16 +2,28 @@
 const ALWB_URI = URI(scheme="http", host="www.bom.gov.au", path="/jsp/awra/thredds/fileServer/AWRACMS")
 
 abstract type DataMode end
+
 """
+    Values <: DataMode
+
 Get as the regular measured values.
 """
 struct Values <: DataMode end
 """
+    Deciles <: DataMode
+
 Get the dataset in relative deciles.
 """
 struct Deciles <: DataMode end
 
-"""
+struct ALWB{M<:DataMode,D<:Union{Day,Month,Year}} <: RasterDataSource end
+
+layers(::Type{<:ALWB}) = (
+    :rain_day, :s0_pct, :ss_pct, :sd_pct, :sm_pct, :qtot, :etot, 
+    :e0, :ma_wet, :pen_pet, :fao_pet, :asce_pet, :msl_wet, :dd
+)
+
+@doc """
     ALWB{Union{Deciles,Values},Union{Day,Month,Year}} <: RasterDataSource
 
 Data from the Australian Landscape Water Balance (ALWB) data set.
@@ -20,8 +32,9 @@ See: [www.bom.gov.au/water/landscape](http://www.bom.gov.au/water/landscape)
 
 Layers are available in daily, monthly and 
 annual resolutions, and as `Values` or relative `Deciles`.
-"""
-struct ALWB{M<:DataMode,D<:Union{Day,Month,Year}} <: RasterDataSource end
+
+The available layers are: $(layers(ALWB)).
+""" ALWB
 
 # http://www.bom.gov.au/jsp/awra/thredds/fileServer/AWRACMS/values/day/rain_day_2017.nc
 # Precipiation = "rain_day"
@@ -58,9 +71,6 @@ struct ALWB{M<:DataMode,D<:Union{Day,Month,Year}} <: RasterDataSource end
 # http://www.bom.gov.au/jsp/awra/thredds/fileServer/AWRACMS/values/day/dd_2017.nc
 # DeepDrainage = "dd"
 
-# TODO use better aliases for these
-layers(::Type{<:ALWB}) = (:rain_day, :s0_pct, :ss_pct, :sd_pct, :sm_pct, :qtot, :etot, 
-                          :e0, :ma_wet, :pen_pet, :fao_pet, :asce_pet, :msl_wet, :dd)
 
 """
     getraster(T::Type{<:ALWB{Union{Deciles,Values},Union{Day,Month,Year}}}, layer; date)
