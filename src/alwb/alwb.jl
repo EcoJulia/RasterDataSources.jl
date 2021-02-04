@@ -33,7 +33,7 @@ See: [www.bom.gov.au/water/landscape](http://www.bom.gov.au/water/landscape)
 Layers are available in daily, monthly and 
 annual resolutions, and as `Values` or relative `Deciles`.
 
-The available layers are: $(layers(ALWB)).
+The available layers are: `$(layers(ALWB))`.
 """ ALWB
 
 # http://www.bom.gov.au/jsp/awra/thredds/fileServer/AWRACMS/values/day/rain_day_2017.nc
@@ -76,10 +76,10 @@ The available layers are: $(layers(ALWB)).
     getraster(T::Type{<:ALWB{Union{Deciles,Values},Union{Day,Month,Year}}}, layer; date)
     getraster(T::Type{<:ALWB{Union{Deciles,Values},Union{Day,Month,Year}}}, layer, date)
 
-Download ALWB weather data, choosing layers from: $(layers(ALWB)).
+Download ALWB weather data, choosing layers from: `$(layers(ALWB))`.
 
-Without a layer argument, all layers will be getrastered, and a tuple of path vectors returned. 
-If the data is already getrastered the path will be returned.
+Without a layer argument, all layers will be downloaded, and a tuple of path vectors returned. 
+If the data is already downloaded the path will be returned.
 """
 getraster(T::Type{<:ALWB}, layer::Symbol; date) = getraster(T, layer, date)
 function getraster(T::Type{<:ALWB{M,P}}, layer::Symbol, dates::Tuple) where {M,P}

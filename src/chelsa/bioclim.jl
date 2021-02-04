@@ -12,10 +12,10 @@ layers(::Type{CHELSA{BioClim}}) = 1:19
 """
     getraster(T::Type{CHELSA{BioClim}}, [layer::Integer]) => String
 
-Download CHELSA BioClim data, choosing layers from: $(layers(CHELSA{BioClim})).
+Download CHELSA BioClim data, choosing layers from: `$(layers(CHELSA{BioClim}))`.
 
-Without a layer argument, all layers will be getrastered, and a tuple of paths is returned. 
-If the data is already getrastered the path will be returned.
+Without a layer argument, all layers will be downloaded, and a tuple of paths is returned. 
+If the data is already downloaded the path will be returned.
 """
 function getraster(T::Type{CHELSA{BioClim}}, layer::Integer)
     _check_layer(T, layer)

@@ -1,19 +1,20 @@
 resolutions(::Type{EarthEnv{HabitatHeterogeneity}}) = ("1km", "5km", "25km")
 defres(::Type{EarthEnv{HabitatHeterogeneity}}) = "25km"
-layers(::Type{EarthEnv{HabitatHeterogeneity}}) = 
-    (:cv, :evenness, :range, :shannon, :simpson, :std, :Contrast, :Correlation, 
-     :Dissimilarity, :Entropy, :Homogeneity, :Maximum, :Uniformity, :Variance)
+layers(::Type{EarthEnv{HabitatHeterogeneity}}) = (
+    :cv, :evenness, :range, :shannon, :simpson, :std, :Contrast, :Correlation, 
+    :Dissimilarity, :Entropy, :Homogeneity, :Maximum, :Uniformity, :Variance
+)
 
 """
     getraster(T::Type{EarthEnv{HabitatHeterogeneity}}, [layer::Union{Tuple,Integer}]; res::Int=25) => String
     getraster(T::Type{EarthEnv{HabitatHeterogeneity}}, layer::Integer, res::Int=25) => String
 
 Download EarthEnv habitat heterogeneity data, choosing `layer` from: 
-$(layers(EarthEnv{HabitatHeterogeneity})) and `res` from 
-$(resolutions(EarthEnv{HabitatHeterogeneity})).
+`$(layers(EarthEnv{HabitatHeterogeneity}))` and `res` from 
+`$(resolutions(EarthEnv{HabitatHeterogeneity}))`.
 
-Without a layer argument, all layers will be getrastered and a tuple of paths returned. 
-If the data is already getrastered the path will be returned without the getraster.
+Without a layer argument, all layers will be downloaded and a tuple of paths returned. 
+If the data is already downloaded the path will be returned without the getraster.
 """
 function getraster(T::Type{EarthEnv{HabitatHeterogeneity}}, layer::Symbol; res::String=defres(T))
     getraster(T, layer, res)

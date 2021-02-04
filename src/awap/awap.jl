@@ -9,7 +9,7 @@ Daily weather data from the Australian Water Availability Project, developed by 
 
 See: [www.csiro.au/awap](http://www.csiro.au/awap/)
 
-The available layers are: $(layers(AWAP)).
+The available layers are: `$(layers(AWAP))`.
 """ AWAP
 
 const AWAP_PATHSEGMENTS = (
@@ -26,15 +26,16 @@ const AWAP_PATHSEGMENTS = (
     getraster(T::Type{AWAP}, layer::Symbol; date) => String
     getraster(T::Type{AWAP}, layer::Symbol, date) => String
 
-Download data from the AWAP weather dataset, for `layer` in $(layers(AWAP)),
+Download data from the AWAP weather dataset, for `layer` in `$(layers(AWAP))`,
 and `date` as a `DateTime` or iterable of `DateTime`.
 
 AWAP is available on a daily timestep. If no `layer` is specified, 
-all layers will be getrastered, and a `Tuple` of `Vector{String}` will be returned.
+all layers will be downloaded, and a `Tuple` of `Vector{String}` will be returned.
 
 ## Example
 
-Rainfall for the first month of 2001
+Rainfall for the first month of 2001:
+
 ```julia
 getraster(AWAP, :rainfall; date=Date(2001, 1, 1):Day(1):Date(2001, 1, 31))
 ```

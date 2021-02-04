@@ -7,9 +7,9 @@ layers(::Type{WorldClim{Climate}}) = (:tmin, :tmax, :tavg, :prec, :srad, :wind, 
 Download WorldClim weather data, choosing `layer` from $(layers(WorldClim{Climate})),
 and `res` from $(resolutions(WorldClim{Climate})), and months from `1:12`.
 
-Without a layer argument, all layers will be getrastered, and a tuple of paths is returned. 
+Without a layer argument, all layers will be downloaded, and a tuple of paths is returned. 
 By default all months are downloaded , but can also be downloaded individually.
-If the data is already getrastered the path will be returned.
+If the data is already downloaded the path will be returned.
 """
 function getraster(T::Type{WorldClim{Climate}}, layer; month=1:12, res::String=defres(T))
     getraster(T, layer, month, res)
