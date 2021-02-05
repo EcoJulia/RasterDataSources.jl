@@ -5,12 +5,9 @@
 ![CI](https://github.com/cesaraustralia/RasterDataSources.jl/workflows/CI/badge.svg)
 [![codecov.io](http://codecov.io/github/cesaraustralia/RasterDataSources.jl/coverage.svg?branch=master)](http://codecov.io/github/cesaraustralia/RasterDataSources.jl?branch=master)
 
-RasterDataSources downloads raster data for local use or for integration
-into other spatial data packages, like
-[GeoData.jl](https://github.com/rafaqz/GeoData.jl).
-
-The collection is largely focussed on datasets relevant to ecology,
-but will have a lot of crossover with other sciences.
+RasterDataSources downloads raster data for local use or for integration into other spatial data packages, like
+[GeoData.jl](https://github.com/rafaqz/GeoData.jl). The collection is largely focussed on datasets relevant
+to ecology, but will have a lot of crossover with other sciences.
 
 Currently sources include :
 
@@ -25,10 +22,11 @@ Currently sources include :
 Please open an issue if you need more datasets added, or (even better) open a pull request 
 following the form of the other datasets where possible.
 
+## Retreiving data
 
 Usage is generally via the `getraster` method - which will download the
 raster data source if it isn't available locally, or simply return the path/s
-of the raster file/s.
+of the raster file/s:
 
 ```julia
 julia> using RasterDataSources
@@ -49,6 +47,14 @@ julia> getraster(WorldClim{Climate}, :wind)
  "/home/user/Data/WorldClim/Climate/wind/wc2.1_10m_wind_12.tif"
 ```
 
+## Installation and setup
+
+Install as usual with:
+
+```julia
+] add RasterDataSources
+```
+
 To download data you will need to specify a folder to put it in. You can do this
 by assigning the environment variable `RASTERDATASOURCES_PATH`:
 
@@ -59,8 +65,4 @@ ENV["RASTERDATASOURCES_PATH"] = "/home/user/Data/"
 This can be put in your `startup.jl` file or the system environment.
 
 
-Pull requests are with additional data sources are welcomed, but should as much as
-possible follow the structure used for existing data sources.
-
-RasterDataSources was based on code from the `SimpleSDMDataSoures.jl`
-package by Timothée Poisot.
+RasterDataSources was based on code from the `SimpleSDMDataSoures.jl` package by Timothée Poisot.
