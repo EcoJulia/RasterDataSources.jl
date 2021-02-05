@@ -22,7 +22,7 @@ Currently sources include :
 | AWAP      | http://www.bom.gov.au/jsp/awap/index.jsp | Complete                             |
 | ALWB      | http://www.bom.gov.au/water/landscape/   | Complete                             |
 
-Please add an issue for more datasets to add, or create a PR 
+Please open an issue if you need more datasets added, or (even better) open a pull request 
 following the form of the other datasets where possible.
 
 
