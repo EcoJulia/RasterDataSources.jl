@@ -1,7 +1,7 @@
 name = "RasterDataSources"
 uuid = "3cb90ccd-e1b6-4867-9617-4276c8b2ca36"
 authors = ["Timothée Poisot, Rafael Schouten"]
-version = "0.2.2"
+version = "0.2.3"
 
 [deps]
 Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
