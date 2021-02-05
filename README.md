@@ -12,6 +12,20 @@ into other spatial data packages, like
 The collection is largely focussed on datasets relevant to ecology,
 but will have a lot of crossover with other sciences.
 
+Currently sources include :
+
+| Source    | URL                                      | Status                               |
+| --------- | ---------------------------------------- |--------------------------------------|
+| CHELSA    | https://chelsa-climate.org               | BioClim layers only                  |
+| WorldClim | https://www.worldclim.org                | Climate, Weather and BioClim layers  |
+| EarthEnv  | http://www.earthenv.org                  | LandCover and HabitatHeterogeneity   |
+| AWAP      | http://www.bom.gov.au/jsp/awap/index.jsp | Complete                             |
+| ALWB      | http://www.bom.gov.au/water/landscape/   | Complete                             |
+
+Please add an issue for more datasets to add, or create a PR 
+following the form of the other datasets where possible.
+
+
 Usage is generally via the `getraster` method - which will download the
 raster data source if it isn't available locally, or simply return the path/s
 of the raster file/s.
