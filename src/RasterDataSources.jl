@@ -12,15 +12,6 @@ using Dates,
       URIs,
       ZipFile
 
-abstract type RasterDataSource end
-abstract type RasterDataSet end
-
-struct BioClim <: RasterDataSet end
-struct Climate <: RasterDataSet end
-struct Weather <: RasterDataSet end
-struct LandCover <: RasterDataSet end
-struct HabitatHeterogeneity <: RasterDataSet end
-
 export WorldClim, CHELSA, EarthEnv, AWAP, ALWB
 
 export BioClim, Climate, Weather, LandCover, HabitatHeterogeneity
@@ -31,6 +22,7 @@ export getraster
 
 export geoarray, stack, series
 
+include("types.jl")
 include("shared.jl")
 include("worldclim/shared.jl")
 include("worldclim/bioclim.jl")
