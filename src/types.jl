@@ -17,19 +17,6 @@ BioClim datasets. Usually containing 19 numbered layers.
 struct BioClim <: RasterDataSet end
 
 """
-    FutureBioClim <: RasterDataSet
-
-BioClim future datasets. Usually containing 19 numbered layers.
-"""
-struct FutureBioClim <: RasterDataSet
-    year::Int64
-    model::String
-    rcp::String
-end
-
-struct FutureBC{Y<:Integer,M<:,R} end
-
-"""
     Climate <: RasterDataSet
 
 Climate datasets. These are usually months of the year, not specific dates.
@@ -98,3 +85,8 @@ struct RCP26 <: RCP end
 struct RCP45 <: RCP end
 struct RCP60 <: RCP end
 struct RCP85 <: RCP end
+
+"""
+Future version of a dataset
+"""
+struct Future{T<:Union{BioClim}} <: RasterDataSet end
