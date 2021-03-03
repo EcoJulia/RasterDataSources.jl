@@ -15,23 +15,6 @@ function _maybe_download(uri::URI, filepath)
     filepath
 end
 
-function rasterpath() 
-    if haskey(ENV, "RASTERDATASOURCES_PATH") && isdir(ENV["RASTERDATASOURCES_PATH"])
-        ENV["RASTERDATASOURCES_PATH"]
-    else
-        error("You must set `ENV[\"RASTERDATASOURCES_PATH\"]` to a path in your system")
-    end
-end
-
-function delete_rasters()
-    # May need an "are you sure"? - this could be a lot of GB of data to lose
-    ispath(rasterpath()) && rm(rasterpath())
-end
-
-function delete_rasters(T::Type)
-    ispath(rasterpath(T)) && rm(rasterpath(T))
-end
-
 _check_res(T, res) =
     res in resolutions(T) || throw(ArgumentError("Resolution $res not in $(resolutions(T))"))
 _check_layer(T, layer) =
