@@ -31,6 +31,7 @@ export getraster
 
 export geoarray, stack, series
 
+include("rasterpath.jl")
 include("shared.jl")
 include("worldclim/shared.jl")
 include("worldclim/bioclim.jl")
