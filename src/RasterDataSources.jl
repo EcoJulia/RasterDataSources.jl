@@ -16,6 +16,19 @@ export WorldClim, CHELSA, EarthEnv, AWAP, ALWB
 
 export BioClim, Climate, Weather, LandCover, HabitatHeterogeneity
 
+# RCP
+export RCP26, RCP45, RCP60, RCP85
+
+# CC models
+export ACCESS1, BNUESM, CCSM4, CESM1BGC, CESM1CAM5, CMCCCMS, CMCCCM, CNRMCM5,
+    CSIROMk3, CanESM2, FGOALS, FIOESM, GFDLCM3, GFDLESM2G, GFDLESM2M, GISSE2HCC,
+    GISSE2H, GISSE2RCC, GISSE2R, HadGEM2AO, HadGEM2CC, IPSLCM5ALR, IPSLCM5AMR,
+    MIROCESMCHEM, MIROCESM, MIROC5, MPIESMLR, MPIESMMR, MRICGCM3, MRIESM1, NorESM1M,
+    BccCsm1, Inmcm4
+
+# Future datasets
+export Future
+
 export Values, Deciles
 
 export getraster
