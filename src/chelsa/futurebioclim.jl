@@ -6,14 +6,12 @@ Download CHELSA BioClim data, choosing layers from: `$(layers(CHELSA{BioClim}))`
 Without a layer argument, all layers will be downloaded, and a tuple of paths is returned. 
 If the data is already downloaded the path will be returned.
 """
-function getraster(T::Type{CHELSA{Future{BioClim}}}, layer::Integer; model=CCSM4, rcp=RCP45, date=Year(2050))
-    @info T
-    @info model
+function getraster(T::Type{CHELSA{F}}, layer::Integer; date=Year(2050)) where {F <: Future}
     @assert date ∈ [Year(2050), Year(2070)]
     # Prepare the string for URL / storage
     date_string = date == Year(2050) ? "2041-2060" : "2061-2080"
-    model_string = _format_model(CHELSA, model)
-    rcp_string = _format_rcp(CHELSA, rcp)
+    model_string = _format_model(CHELSA, F)
+    rcp_string = _format_rcp(CHELSA, F)
     # TODO check that the model has the RCP
     _check_layer(T, layer)
     path = rasterpath(T, layer, model_string, rcp_string, date_string)

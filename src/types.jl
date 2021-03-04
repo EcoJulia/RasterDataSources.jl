@@ -89,4 +89,4 @@ struct RCP85 <: RCP end
 """
 Future version of a dataset
 """
-struct Future{T<:Union{BioClim}} <: RasterDataSet end
+struct Future{T<:Union{BioClim}, M<:ClimateModel, R<:RCP} <: RasterDataSet end
