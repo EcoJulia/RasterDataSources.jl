@@ -14,19 +14,17 @@ function getraster(T::Type{CHELSA{Future{BioClim}}}, layer::Integer; model=CCSM4
     date_string = date == Year(2050) ? "2041-2060" : "2060-2080"
     model_string = _format_model(CHELSA, model)
     rcp_string = _format_rcp(CHELSA, rcp)
-    #_check_layer(T, layer)
-    #path = rasterpath(T, layer)
-    #url = rasterurl(T, layer)
-    #return _maybe_download(url, path)
+    # TODO check that the model has the RCP
+    _check_layer(T, layer)
+    path = rasterpath(T, layer, model_string, rcp_string, date_string)
+    url = rasterurl(T, layer, model_string, rcp_string, date_string)
+    return _maybe_download(url, path)
 end
 
-rastername(::Type{CHELSA{Future{BioClim}}}, layer::Integer) = "CHELSA_bio_mon_$(MODEL)_$(RCP)_r1i1p1_g025.nc_$(layer)_$(YR)_V1.2.tif "
+rastername(::Type{CHELSA{Future{BioClim}}}, layer::Integer, model, rcp, date) = "CHELSA_bio_mon_$(model)_$(rcp)_r1i1p1_g025.nc_$(layer)_$(date)_V1.2.tif "
 
-rasterpath(::Type{CHELSA{Future{BioClim}}}) = joinpath(rasterpath(CHELSA), "Future", "BioClim", RCP, MODEL)
-rasterpath(T::Type{CHELSA{Future{BioClim}}}, layer::Integer) = joinpath(rasterpath(T), rastername(T, layer))
+rasterpath(::Type{CHELSA{Future{BioClim}}}, model, rcp, date) = joinpath(rasterpath(CHELSA), "Future", "BioClim", rcp, model, date)
+rasterpath(T::Type{CHELSA{Future{BioClim}}}, layer::Integer, model, rcp, date) = joinpath(rasterpath(T, model, rcp, date), rastername(T, layer, model, rcp, date))
 
-rasterurl(::Type{CHELSA{Future{BioClim}}}) = joinpath(rasterurl(CHELSA), "climatologies/bio/")
-rasterurl(T::Type{CHELSA{Future{BioClim}}}, layer::Integer) = joinpath(rasterurl(T), rastername(T, layer))
-
-
-#https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V1/cmip5/2041-2060/bio/CHELSA_bio_mon_GFDL-ESM2M_rcp26_r1i1p1_g025.nc_14_2041-2060_V1.2.tif 
+rasterurl(::Type{CHELSA{Future{BioClim}}}, model, rcp, date) = joinpath(rasterurl(CHELSA), "cmip5/$(date)")
+rasterurl(T::Type{CHELSA{Future{BioClim}}}, layer::Integer, model, rcp, date) = joinpath(rasterurl(T, model, rcp, date), rastername(T, layer, model, rcp, date))
