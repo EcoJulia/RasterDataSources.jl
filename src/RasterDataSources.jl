@@ -27,7 +27,7 @@ export ACCESS1, BNUESM, CCSM4, CESM1BGC, CESM1CAM5, CMCCCMS, CMCCCM, CNRMCM5,
     BccCsm1, Inmcm4
 
 # Future datasets
-export Future
+export FutureClimate
 
 export Values, Deciles
 

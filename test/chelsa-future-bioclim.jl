@@ -1,4 +1,4 @@
-@testset "CHELSEA Future BioClim" begin
+@testset "CHELSA Future BioClim" begin
     using RasterDataSources: rasterurl
 
     @test rastername(CHELSA{BioClim}, FutureClimate{CCSM4,RCP26}, 5, Year(2050)) == "CHELSA_bio_mon_CCSM4_rcp26_r1i1p1_g025.nc_5_2041-2060_V1.2.tif"
