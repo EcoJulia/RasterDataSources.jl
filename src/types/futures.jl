@@ -1,51 +1,15 @@
-"""
-    RasterDataSource Abstract supertype for raster data collections.  """
-abstract type RasterDataSource end
 
 """
-    RasterDataSet
-
-Abstract supertye for datasets that belong to a in a [`RasterDataSource`](@ref).
+Asbtract type for any `Future` element - anything that represents a temporal
+projection will be represented by a subtype of this.
 """
-abstract type RasterDataSet end
-
-"""
-    BioClim <: RasterDataSet
-
-BioClim datasets. Usually containing 19 numbered layers.
-"""
-struct BioClim <: RasterDataSet end
+abstract type FutureRaster end
 
 """
-    Climate <: RasterDataSet
-
-Climate datasets. These are usually months of the year, not specific dates.
+Abstract type for climate models.
 """
-struct Climate <: RasterDataSet end
-
-"""
-    Weather <: RasterDataSet
-
-Weather datasets. These are usually large time-series of specific dates.
-"""
-struct Weather <: RasterDataSet end
-
-"""
-    LandCover <: RasterDataSet
-
-Land-cover datasets.
-"""
-struct LandCover <: RasterDataSet end
-
-"""
-    HabitatHeterogeneity <: RasterDataSet
-
-Habitat heterogeneity datasets.
-"""
-struct HabitatHeterogeneity <: RasterDataSet end
-
-
 abstract type ClimateModel end
+
 struct ACCESS1 <: ClimateModel end
 struct BNUESM <: ClimateModel end
 struct CCSM4 <: ClimateModel end
@@ -80,13 +44,20 @@ struct NorESM1M <: ClimateModel end
 struct BccCsm1 <: ClimateModel end
 struct Inmcm4 <: ClimateModel end
 
+"""
+Abstract type for RCPs
+"""
 abstract type RCP end
+
 struct RCP26 <: RCP end
 struct RCP45 <: RCP end
 struct RCP60 <: RCP end
 struct RCP85 <: RCP end
 
+
 """
-Future version of a dataset
+Future climate dataset: specified by a model and a RCP
 """
-struct Future{T<:Union{BioClim}, M<:ClimateModel, R<:RCP} <: RasterDataSet end
+struct FutureClimate{C<:ClimateModel, R<:RCP} <: FutureRaster end
+_model(F::Type{FutureClimate{X,Y}}) where {X,Y} = X
+_rcp(F::Type{FutureClimate{X,Y}}) where {X,Y} = Y

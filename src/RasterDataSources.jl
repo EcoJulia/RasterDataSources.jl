@@ -35,7 +35,8 @@ export getraster
 
 export geoarray, stack, series
 
-include("types.jl")
+include("types/data.jl")
+include("types/futures.jl")
 include("shared.jl")
 include("worldclim/shared.jl")
 include("worldclim/bioclim.jl")
