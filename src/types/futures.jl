@@ -1,11 +1,15 @@
 
 """
-Asbtract type for any `Future` element - anything that represents a temporal
+    FutureRaster
+
+Asbtract type for any "future" element - anything that represents a temporal
 projection will be represented by a subtype of this.
 """
 abstract type FutureRaster end
 
 """
+    ClimateModel
+
 Abstract type for climate models.
 """
 abstract type ClimateModel end
@@ -54,31 +58,39 @@ struct MIROC6 <: ClimateModel end
 struct MRIESM2 <: ClimateModel end
 
 """
+    RepresentativeConcentrationPathway
+
 Abstract type for Representative Concentration Pathways (RCPs)
 """
-abstract type RCP end
+abstract type RepresentativeConcentrationPathway end
 
-struct RCP26 <: RCP end
-struct RCP45 <: RCP end
-struct RCP60 <: RCP end
-struct RCP85 <: RCP end
+struct RCP26 <: RepresentativeConcentrationPathway end
+struct RCP45 <: RepresentativeConcentrationPathway end
+struct RCP60 <: RepresentativeConcentrationPathway end
+struct RCP85 <: RepresentativeConcentrationPathway end
 
 """
+    SharedSocioeconomicPathway
+
 Abstract type for Shared Socio-economic Pathways (SSPs)
 """
-abstract type SSP end
+abstract type SharedSocioeconomicPathway end
 
-struct SSP126 <: SSP end
-struct SSP245 <: SSP end
-struct SSP370 <: SSP end
-struct SSP585 <: SSP end
+struct SSP126 <: SharedSocioeconomicPathway end
+struct SSP245 <: SharedSocioeconomicPathway end
+struct SSP370 <: SharedSocioeconomicPathway end
+struct SSP585 <: SharedSocioeconomicPathway end
 
 """
+    ClimateScenario
+
 A ClimateScenario can be a RCP or a SSP
 """
-ClimateScenario = Union{SSP, RCP}
+ClimateScenario = Union{RepresentativeConcentrationPathway, SharedSocioeconomicPathway}
 
 """
+    FutureClimate{C<:ClimateModel, R<:ClimateScenario}
+
 Future climate dataset: specified by a model and a scenario
 """
 struct FutureClimate{C<:ClimateModel, R<:ClimateScenario} <: FutureRaster end
