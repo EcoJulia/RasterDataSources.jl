@@ -43,9 +43,18 @@ struct MRIESM1 <: ClimateModel end
 struct NorESM1M <: ClimateModel end
 struct BccCsm1 <: ClimateModel end
 struct Inmcm4 <: ClimateModel end
+struct BCCCSM2MR <: ClimateModel end
+struct CNRMCM61 <: ClimateModel end
+struct CNRMESM21 <: ClimateModel end
+struct CanESM5 <: ClimateModel end
+struct GFDLESM4 <: ClimateModel end
+struct IPSLCM6ALR <: ClimateModel end
+struct MIROCES2L <: ClimateModel end
+struct MIROC6 <: ClimateModel end
+struct MRIESM2 <: ClimateModel end
 
 """
-Abstract type for RCPs
+Abstract type for Representative Concentration Pathways (RCPs)
 """
 abstract type RCP end
 
@@ -54,10 +63,25 @@ struct RCP45 <: RCP end
 struct RCP60 <: RCP end
 struct RCP85 <: RCP end
 
+"""
+Abstract type for Shared Socio-economic Pathways (SSPs)
+"""
+abstract type SSP end
+
+struct SSP126 <: SSP end
+struct SSP245 <: SSP end
+struct SSP370 <: SSP end
+struct SSP585 <: SSP end
 
 """
-Future climate dataset: specified by a model and a RCP
+A ClimateScenario can be a RCP or a SSP
 """
-struct FutureClimate{C<:ClimateModel, R<:RCP} <: FutureRaster end
-_model(F::Type{FutureClimate{X,Y}}) where {X,Y} = X
-_rcp(F::Type{FutureClimate{X,Y}}) where {X,Y} = Y
+ClimateScenario = Union{SSP, RCP}
+
+"""
+Future climate dataset: specified by a model and a scenario
+"""
+struct FutureClimate{C<:ClimateModel, R<:ClimateScenario} <: FutureRaster end
+_model(::Type{FutureClimate{X,Y}}) where {X,Y} = X
+_scenario(::Type{FutureClimate{X,Y}}) where {X,Y} = Y
+_rcp(X) = _scenario(X)
