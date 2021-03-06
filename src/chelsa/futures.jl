@@ -7,9 +7,7 @@ Without a layer argument, all layers will be downloaded, and a tuple of paths is
 If the data is already downloaded the path will be returned.
 """
 function getraster(T::Type{CHELSA{BioClim}}, ::Type{F}, layer::Integer, date=Year(2050)) where {F <: FutureClimate}
-    # TODO check that the model has the RCP
     _check_layer(T, layer)
-    _validate_climate_model(CHELSA{BioClim}, F)
     path = rasterpath(T, F, layer, date)
     url = rasterurl(T, F, layer, date)
     return _maybe_download(url, path)
