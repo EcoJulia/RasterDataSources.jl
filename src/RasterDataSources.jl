@@ -46,7 +46,6 @@ include("shared.jl")
 
 include("worldclim/shared.jl")
 include("worldclim/bioclim.jl")
-#include("worldclim/futures.jl")
 include("worldclim/climate.jl")
 include("worldclim/weather.jl")
 
