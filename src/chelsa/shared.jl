@@ -14,6 +14,9 @@ rasterurl(::Type{CHELSA}) = URI(scheme="https", host="os.zhdk.cloud.switch.ch", 
 # Layer definitions
 layers(::Type{CHELSA{BioClim}}) = 1:19
 
+# Future models allowed
+_validate_climate_model(::Type{<:CHELSA{BioClim}}, ::Type{FutureClimate{<:ClimateModel, <:RepresentativeConcentrationPathway}}) = nothing
+
 # Format future models and RCPs
 _format(::Type{CHELSA}, ::Type{RCP26}) = "rcp26"
 _format(::Type{CHELSA}, ::Type{RCP45}) = "rcp45"
@@ -51,5 +54,5 @@ _format(::Type{CHELSA}, ::Type{MPIESMMR}) = "MPI-ESM-MR"
 _format(::Type{CHELSA}, ::Type{MRICGCM3}) = "MRI-CGCM3"
 _format(::Type{CHELSA}, ::Type{MRIESM1}) = "MRI-ESM1"
 _format(::Type{CHELSA}, ::Type{NorESM1M}) = "NorESM1-M"
-_format(::Type{CHELSA}, ::Type{BccCsm1}) = "bcc-csm-1"
+_format(::Type{CHELSA}, ::Type{BCCCSM1}) = "bcc-csm-1"
 _format(::Type{CHELSA}, ::Type{Inmcm4}) = "inmcm4"

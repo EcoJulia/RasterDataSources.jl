@@ -45,7 +45,7 @@ struct MPIESMMR <: ClimateModel end
 struct MRICGCM3 <: ClimateModel end
 struct MRIESM1 <: ClimateModel end
 struct NorESM1M <: ClimateModel end
-struct BccCsm1 <: ClimateModel end
+struct BCCCSM1 <: ClimateModel end
 struct Inmcm4 <: ClimateModel end
 struct BCCCSM2MR <: ClimateModel end
 struct CNRMCM61 <: ClimateModel end
@@ -56,6 +56,7 @@ struct IPSLCM6ALR <: ClimateModel end
 struct MIROCES2L <: ClimateModel end
 struct MIROC6 <: ClimateModel end
 struct MRIESM2 <: ClimateModel end
+
 
 """
     RepresentativeConcentrationPathway
@@ -89,11 +90,12 @@ A ClimateScenario can be a RCP or a SSP
 ClimateScenario = Union{RepresentativeConcentrationPathway, SharedSocioeconomicPathway}
 
 """
-    FutureClimate{C<:ClimateModel, R<:ClimateScenario}
+    FutureClimate{M<:ClimateModel, S<:ClimateScenario} <: FutureRaster
 
 Future climate dataset: specified by a model and a scenario
 """
-struct FutureClimate{C<:ClimateModel, R<:ClimateScenario} <: FutureRaster end
+struct FutureClimate{M<:ClimateModel, S<:ClimateScenario} <: FutureRaster end
 _model(::Type{FutureClimate{X,Y}}) where {X,Y} = X
 _scenario(::Type{FutureClimate{X,Y}}) where {X,Y} = Y
-_rcp(X) = _scenario(X)
+
+_validate_climate_model(S::Type{<:RasterDataSource}, F::Type{<:FutureClimate}) = throw(ArgumentError("$(S) does not have support for $(F)"))

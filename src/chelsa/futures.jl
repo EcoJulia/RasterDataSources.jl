@@ -9,6 +9,7 @@ If the data is already downloaded the path will be returned.
 function getraster(T::Type{CHELSA{BioClim}}, ::Type{F}, layer::Integer, date=Year(2050)) where {F <: FutureClimate}
     # TODO check that the model has the RCP
     _check_layer(T, layer)
+    _validate_climate_model(CHELSA{BioClim}, F)
     path = rasterpath(T, F, layer, date)
     url = rasterurl(T, F, layer, date)
     return _maybe_download(url, path)
@@ -17,10 +18,10 @@ end
 function rastername(::Type{CHELSA{BioClim}}, ::Type{F}, layer::Integer, date::Year=Year(2050)) where {F <: FutureClimate}
     @assert date ∈ [Year(2050), Year(2070)]
     date_string = date == Year(2050) ? "2041-2060" : "2061-2080"
-    return "CHELSA_bio_mon_$(_format(CHELSA, _model(F)))_$(_format(CHELSA, _rcp(F)))_r1i1p1_g025.nc_$(layer)_$(date_string)_V1.2.tif"
+    return "CHELSA_bio_mon_$(_format(CHELSA, _model(F)))_$(_format(CHELSA, _scenario(F)))_r1i1p1_g025.nc_$(layer)_$(date_string)_V1.2.tif"
 end
 
-rasterpath(::Type{CHELSA{BioClim}}, ::Type{F}) where {F <: FutureClimate} = joinpath(rasterpath(CHELSA), "Future", "BioClim", _format(CHELSA, _rcp(F)), _format(CHELSA, _model(F)))
+rasterpath(::Type{CHELSA{BioClim}}, ::Type{F}) where {F <: FutureClimate} = joinpath(rasterpath(CHELSA), "Future", "BioClim", _format(CHELSA, _scenario(F)), _format(CHELSA, _model(F)))
 rasterpath(T::Type{CHELSA{BioClim}}, ::Type{F}, layer::Integer, date::Year) where {F <: FutureClimate} = joinpath(rasterpath(T, F), rastername(T, F, layer, date))
 
 function rasterurl(::Type{CHELSA{BioClim}}, ::Type{F}, date::Year) where {F <: FutureClimate}
