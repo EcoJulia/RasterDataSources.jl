@@ -97,5 +97,3 @@ Future climate dataset: specified by a model and a scenario
 struct FutureClimate{M<:ClimateModel, S<:ClimateScenario} <: FutureRaster end
 _model(::Type{FutureClimate{X,Y}}) where {X,Y} = X
 _scenario(::Type{FutureClimate{X,Y}}) where {X,Y} = Y
-
-_validate_climate_model(S::Type{<:RasterDataSource}, F::Type{<:FutureClimate}) = throw(ArgumentError("$(S) does not have support for $(F)"))

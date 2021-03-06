@@ -14,9 +14,6 @@ rasterurl(::Type{CHELSA}) = URI(scheme="https", host="os.zhdk.cloud.switch.ch", 
 # Layer definitions
 layers(::Type{CHELSA{BioClim}}) = 1:19
 
-# Future models allowed
-_validate_climate_model(::Type{CHELSA{BioClim}}, ::Type{FutureClimate{<:ClimateModel, <:RepresentativeConcentrationPathway}}) = nothing
-
 # Format future models and RCPs
 _format(::Type{CHELSA}, ::Type{RCP26}) = "rcp26"
 _format(::Type{CHELSA}, ::Type{RCP45}) = "rcp45"
