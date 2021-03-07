@@ -6,6 +6,7 @@ module RasterDataSources
 end RasterDataSources
 
 using Dates,
+      GeoArrays,
       GeoData,
       HTTP,
       Requires,
