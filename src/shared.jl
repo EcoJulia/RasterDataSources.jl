@@ -6,11 +6,11 @@ function getraster(T::Type{<:RasterDataSource}, layers=layers(T), args...; kw...
     end
 end
 
-function _maybe_download(uri::URI, filepath)
+function _maybe_download(uri::URI, filepath; kw...)
     if !isfile(filepath)
         mkpath(dirname(filepath))
         println("Starting download for $uri")
-        HTTP.download(string(uri), filepath)
+        HTTP.download(string(uri), filepath; kw...)
     end
     filepath
 end

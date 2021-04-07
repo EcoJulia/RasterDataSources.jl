@@ -6,13 +6,18 @@ module RasterDataSources
 end RasterDataSources
 
 using Dates,
+using Base64,
+      Dates,
+      GeoData,
       HTTP,
       URIs,
       ZipFile
 
-export WorldClim, CHELSA, EarthEnv, AWAP, ALWB
+export WorldClim, CHELSA, EarthEnv, AWAP, ALWB, SMAP
 
 export BioClim, Climate, Weather, LandCover, HabitatHeterogeneity
+
+export L4
 
 export Values, Deciles
 
@@ -31,5 +36,6 @@ include("earthenv/landcover.jl")
 include("earthenv/habitatheterogeneity.jl")
 include("awap/awap.jl")
 include("alwb/alwb.jl")
+include("smap/l4.jl")
 
 end # module
