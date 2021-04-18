@@ -1,15 +1,21 @@
 layers(::Type{WorldClim{Climate}}) = (:tmin, :tmax, :tavg, :prec, :srad, :wind, :vapr)
 
 """
-    getraster(T::Type{WorldClim{Climate}}, [layer::Union{Symbol,Tuple}]; month=1:12, res::String="10m") => Vector{String}
+    getraster(T::Type{WorldClim{Climate}}, [layer::Union{Tuple,Symbol}]; month=1:12, res::String="10m") => Vector{String}
     getraster(T::Type{WorldClim{Climate}}, layer::Symbol, month::Integer, res::String)
 
-Download WorldClim weather data, choosing `layer` from $(layers(WorldClim{Climate})),
-and `res` from $(resolutions(WorldClim{Climate})), and months from `1:12`.
+Download [`WorldClim`](@ref) [`Climate`](@ref) data. 
 
-Without a layer argument, all layers will be downloaded, and a tuple of paths is returned. 
-By default all months are downloaded , but can also be downloaded individually.
-If the data is already downloaded the path will be returned.
+# Arguments
+- `layer` `Symbol` or `Tuple` of `Symbol` from `$(layers(WorldClim{Climate}))`. 
+    Without a `layer` argument, all layers will be downloaded, and a tuple of paths returned.
+
+# Keywords
+- `month`: `Integer` or `AbstractArray` of `Integer`. By default all months are downloaded,
+    but can be chosen from `1:12`.
+- `res`: `String` chosen from $(resolutions(WorldClim{Climate})), "10m" by default.
+
+Returns the filepath/s of the downloaded or pre-existing files.
 """
 function getraster(T::Type{WorldClim{Climate}}, layer; month=1:12, res::String=defres(T))
     getraster(T, layer, month, res)
@@ -37,12 +43,12 @@ function getraster(T::Type{WorldClim{Climate}}, layer::Symbol, month::Integer, r
 end
 
 # Climate layers don't get their own folder
-rasterpath(T::Type{<:WorldClim{Climate}}, layer; res, month) = 
+rasterpath(T::Type{<:WorldClim{Climate}}, layer; res, month) =
     joinpath(_rasterpath(T, layer), rastername(T, layer; res, month))
 _rasterpath(T::Type{<:WorldClim{Climate}}, layer) = joinpath(rasterpath(T), string(layer))
-rastername(T::Type{<:WorldClim{Climate}}, layer; res, month) = 
+rastername(T::Type{<:WorldClim{Climate}}, layer; res, month) =
     "wc2.1_$(res)_$(layer)_$(_pad2(month)).tif"
-zipname(T::Type{<:WorldClim{Climate}}, layer; res, month=1) = 
+zipname(T::Type{<:WorldClim{Climate}}, layer; res, month=1) =
     "wc2.1_$(res)_$(layer).zip"
 zipurl(T::Type{<:WorldClim{Climate}}, layer; res, month=1) =
     joinpath(WORLDCLIM_URI, "base", zipname(T, layer; res, month))

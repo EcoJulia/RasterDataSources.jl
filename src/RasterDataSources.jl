@@ -19,6 +19,7 @@ export Values, Deciles
 export getraster
 
 include("types.jl")
+include("interface.jl")
 include("shared.jl")
 include("worldclim/shared.jl")
 include("worldclim/bioclim.jl")

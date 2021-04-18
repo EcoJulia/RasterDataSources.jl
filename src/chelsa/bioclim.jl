@@ -1,21 +1,23 @@
 """
-    CHELSA{BioClim} <: RasterDataSource
+    CHELSA <: RasterDataSource
 
-Data from CHELSA, currently only the `BioClim` layer is implemented.
-
-See: [chelsa-climate.org](https://chelsa-climate.org/)
+Data from CHELSA, at [chelsa-climate.org](https://chelsa-climate.org/).
+Currently only the `BioClim` dataset is implemented.
 """
 struct CHELSA{X} <: RasterDataSource end
 
 layers(::Type{CHELSA{BioClim}}) = 1:19
 
 """
-    getraster(T::Type{CHELSA{BioClim}}, [layer::Integer]) => String
+    getraster(source::Type{CHELSA{BioClim}}, [layer::Union{Tuple,Integer}]) => Union{Tuple,String}
 
-Download CHELSA BioClim data, choosing layers from: `$(layers(CHELSA{BioClim}))`.
+Download [`CHELSA`](@ref) [`BioClim`](@ref) data from [chelsa-climate.org](https://chelsa-climate.org/).
 
-Without a layer argument, all layers will be downloaded, and a tuple of paths is returned. 
-If the data is already downloaded the path will be returned.
+# Arguments
+- `layer`: `Integer` or tuple/range of `Integer` from `$(layers(CHELSA{BioClim}))`. 
+    Without a `layer` argument, all layers will be downloaded, and a `Vector` of paths returned.
+
+Returns the filepath/s of the downloaded or pre-existing files.
 """
 function getraster(T::Type{CHELSA{BioClim}}, layer::Integer)
     _check_layer(T, layer)

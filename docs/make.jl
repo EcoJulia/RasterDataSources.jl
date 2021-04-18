@@ -2,6 +2,8 @@ using Documenter, RasterDataSources
 
 makedocs(
     sitename = "RasterDataSources.jl",
+    checkdocs = :all,
+    strict = true,
 )
 
 deploydocs(

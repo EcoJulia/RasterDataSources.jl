@@ -6,9 +6,10 @@ abstract type DataMode end
 """
     Values <: DataMode
 
-Get as the regular measured values.
+Get the dataset as regular measured values.
 """
 struct Values <: DataMode end
+
 """
     Deciles <: DataMode
 
@@ -26,14 +27,14 @@ layers(::Type{<:ALWB}) = (
 @doc """
     ALWB{Union{Deciles,Values},Union{Day,Month,Year}} <: RasterDataSource
 
-Data from the Australian Landscape Water Balance (ALWB) data set.
+Data from the Australian Landscape Water Balance (ALWB) data source.
 
 See: [www.bom.gov.au/water/landscape](http://www.bom.gov.au/water/landscape)
 
-Layers are available in daily, monthly and 
+The available layers are: `$(layers(ALWB))`, available in daily, monthly and 
 annual resolutions, and as `Values` or relative `Deciles`.
 
-The available layers are: `$(layers(ALWB))`.
+`getraster` for `ALWB` must use a `date` keyword to specify the date to download.
 """ ALWB
 
 # http://www.bom.gov.au/jsp/awra/thredds/fileServer/AWRACMS/values/day/rain_day_2017.nc
@@ -45,11 +46,7 @@ The available layers are: `$(layers(ALWB))`.
 # http://www.bom.gov.au/jsp/awra/thredds/fileServer/AWRACMS/values/day/sd_pct_2017.nc
 # SoilMoisture_Deep = "sd_pct"
 # http://www.bom.gov.au/jsp/awra/thredds/fileServer/AWRACMS/values/day/sm_pct_2017.nc
-# SoilMoisture_RootZone = "sm_pct"
-
-# http://www.bom.gov.au/jsp/awra/thredds/fileServer/AWRACMS/values/day/qtot_2017.nc
-# Runoff = "qtot"
-
+# SoilMoisture_RootZone = "sm_pct" # http://www.bom.gov.au/jsp/awra/thredds/fileServer/AWRACMS/values/day/qtot_2017.nc # Runoff = "qtot"
 # http://www.bom.gov.au/jsp/awra/thredds/fileServer/AWRACMS/values/day/etot_2017.nc
 # Evapotrans_Actual = "etot"
 # http://www.bom.gov.au/jsp/awra/thredds/fileServer/AWRACMS/values/day/e0_2017.nc
@@ -73,13 +70,30 @@ The available layers are: `$(layers(ALWB))`.
 
 
 """
-    getraster(T::Type{<:ALWB{Union{Deciles,Values},Union{Day,Month,Year}}}, layer; date)
-    getraster(T::Type{<:ALWB{Union{Deciles,Values},Union{Day,Month,Year}}}, layer, date)
+    getraster(source::Type{<:ALWB{Union{Deciles,Values},Union{Day,Month,Year}}}, [layer]; date)
 
-Download ALWB weather data, choosing layers from: `$(layers(ALWB))`.
+Download [`ALWB`](@ref) weather data from 
+[www.bom.gov.au/water/landscape](http://www.bom.gov.au/water/landscape) as values or 
+deciles with timesteps of `Day`, `Month` or `Year`.
 
-Without a layer argument, all layers will be downloaded, and a tuple of path vectors returned. 
-If the data is already downloaded the path will be returned.
+# Arguments
+- `layer`: `Symbol` or `Tuple` of `Symbol` from `$(layers(ALWB))`. Without a 
+    `layer` argument, all layers will be downloaded, and a `Vector` of paths returned.
+
+# Keywords
+- `date`: a `DateTime`, `AbstractVector` of `DateTime` or a `Tuple` of start and end dates.
+    For multiple dates, multiple filenames will be returned. AWAP is available with a daily
+    timestep.
+
+# Example
+This will return the file containing annual averages, including your date:
+
+```julia
+julia> getraster(ALWB{Values,Year}, :ss_pct; date=Date(2001, 2))
+"/your/RASTERDATASOURCES_PATH/ALWB/values/month/ss_pct.nc"
+```
+
+Returns the filepath/s of the downloaded or pre-existing files.
 """
 getraster(T::Type{<:ALWB}, layer::Symbol; date) = getraster(T, layer, date)
 function getraster(T::Type{<:ALWB{M,P}}, layer::Symbol, dates::Tuple) where {M,P}

@@ -1,13 +1,19 @@
 layers(::Type{EarthEnv{LandCover}}) = 1:12
 
 """
-    getraster(T::Type{EarthEnv{LandCover}}, [layer::Union{AbstractArray,Tuple,Integer}]; discover::Bool=false) => String
+    getraster(T::Type{EarthEnv{LandCover}}, [layer::Union{AbstractArray,Tuple,Integer}]; discover::Bool=false) => Union{Tuple,String}
     getraster(T::Type{EarthEnv{LandCover}}, layer::Integer, discover::Bool) => String
 
-Download EarthEnv landcover data, choosing `layer` from: `$(layers(EarthEnv{LandCover}))`.
+Download [`EarthEnv`](@ref) landcover data.
 
-Without a layer argument, all layers will be downloaded and a tuple of paths returned. 
-If the data is already downloaded the path will be returned.
+# Arguments
+- `layer`: `Integer` or tuple/range of `Integer` from `$(layers(EarthEnv{LandCover}))`. 
+    Without a `layer` argument, all layers will be downloaded, and a tuple of paths returned.
+
+# Keywords
+- `discover::Bool` use the dataset that integrates the DISCover model.
+
+Returns the filepath/s of the downloaded or pre-existing files.
 """
 function getraster(T::Type{EarthEnv{LandCover}}, layer::Integer; discover::Bool=false)
     getraster(T, layer, discover)
