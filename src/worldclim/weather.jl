@@ -30,11 +30,10 @@ function getraster(T::Type{WorldClim{Weather}}, layer::Symbol, date::Dates.TimeT
         raster_path = rasterpath(T, layer; date=date)
         mkpath(dirname(raster_path))
         if !isfile(raster_path)
-            raster_name = rastername(T, layer, date)
+            raster_name = rastername(T, layer; date=date)
             println("Writing $(raster_path)...")
             write(raster_path, read(_zipfile_to_read(raster_name, zf)))
         end
-        push!(raster_paths, raster_path)
         close(zf)
         return raster_path
     end
