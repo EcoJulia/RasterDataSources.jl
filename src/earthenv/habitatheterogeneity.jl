@@ -6,15 +6,19 @@ layers(::Type{EarthEnv{HabitatHeterogeneity}}) = (
 )
 
 """
-    getraster(T::Type{EarthEnv{HabitatHeterogeneity}}, [layer::Union{Tuple,Integer}]; res::Int=25) => String
-    getraster(T::Type{EarthEnv{HabitatHeterogeneity}}, layer::Integer, res::Int=25) => String
+    getraster(source::Type{EarthEnv{HabitatHeterogeneity}}, [layer]; res="25km")
+    getraster(source::Type{EarthEnv{HabitatHeterogeneity}}, layer, res)
 
-Download EarthEnv habitat heterogeneity data, choosing `layer` from: 
-`$(layers(EarthEnv{HabitatHeterogeneity}))` and `res` from 
-`$(resolutions(EarthEnv{HabitatHeterogeneity}))`.
+Download [`EarthEnv`](@ref) habitat heterogeneity data.
 
-Without a layer argument, all layers will be downloaded and a tuple of paths returned. 
-If the data is already downloaded the path will be returned without the getraster.
+# Arguments
+- `layer`: `Symbol` or `Tuple` of `Symbol` from `$(layers(EarthEnv{HabitatHeterogeneity}))`. 
+    Without a `layer` argument, all layers will be downloaded, and a tuple of paths returned.
+
+# Keywords
+- `res`: `String` chosen from `$(resolutions(EarthEnv{HabitatHeterogeneity}))`, defaulting to "25km".
+
+Returns the filepath/s of the downloaded or pre-existing files.
 """
 function getraster(T::Type{EarthEnv{HabitatHeterogeneity}}, layer::Symbol; res::String=defres(T))
     getraster(T, layer, res)

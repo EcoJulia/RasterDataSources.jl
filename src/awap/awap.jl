@@ -23,22 +23,35 @@ const AWAP_PATHSEGMENTS = (
 # Add ndvi monthly?  ndvi, ndviave, month
 
 """
-    getraster(T::Type{AWAP}, layer::Symbol; date) => String
-    getraster(T::Type{AWAP}, layer::Symbol, date) => String
+    getraster(source::Type{AWAP}, [layer::Union{Tuple,Symbol}]; date::Union{DateTime,Tuple,AbstractVector})
+    getraster(T::Type{AWAP}, layer::Symbol, date::Union{DateTime,Tuple,AbstractVector})
 
-Download data from the AWAP weather dataset, for `layer` in `$(layers(AWAP))`,
-and `date` as a `DateTime` or iterable of `DateTime`.
+Download data from the [`AWAP`](@ref) weather dataset, from
+[www.csiro.au/awap](http://www.csiro.au/awap/).
 
-AWAP is available on a daily timestep. If no `layer` is specified, 
-all layers will be downloaded, and a `Tuple` of `Vector{String}` will be returned.
+# Arguments
+- `layer` `Symbol` or `Tuple` of `Symbol` for `layer`s in `$(layers(AWAP))`. Without a 
+    `layer` argument, all layers will be downloaded, and a tuple of paths returned.
 
-## Example
+# Keywords
+- `date`: a `DateTime`, `AbstractVector` of `DateTime` or a `Tuple` of start and end dates.
+    For multiple dates, multiple filenames will be returned. AWAP is available with a daily
+    timestep.
 
-Rainfall for the first month of 2001:
+# Example
+Download rainfall for the first month of 2001:
 
 ```julia
-getraster(AWAP, :rainfall; date=Date(2001, 1, 1):Day(1):Date(2001, 1, 31))
+julia> getraster(AWAP, :rainfall; date=Date(2001, 1, 1):Day(1):Date(2001, 1, 31))
+
+31-element Vector{String}:
+ "/your/path/AWAP/rainfall/totals/20010101.grid"
+ "/your/path/AWAP/rainfall/totals/20010102.grid"
+ ...
+ "/your/path/AWAP/rainfall/totals/20010131.grid"
 ```
+
+Returns the filepath/s of the downloaded or pre-existing files.
 """
 getraster(T::Type{AWAP}, layer::Symbol; date) = getraster(T, layer, date)
 function getraster(T::Type{AWAP}, layer::Symbol, dates::Tuple)
@@ -76,7 +89,7 @@ function zipurl(T::Type{AWAP}, layer; date)
     joinpath(uri, s..., "grid/0.05/history/nat/$d$d.grid.Z")
 end
 zipname(T::Type{AWAP}, layer; date) = _date2string(T, date) * ".grid.Z"
-zippath(T::Type{AWAP}, layer; date) = 
+zippath(T::Type{AWAP}, layer; date) =
     joinpath(_rasterpath(T, layer), zipname(T, layer; date))
 
 
