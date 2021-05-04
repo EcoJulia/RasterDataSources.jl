@@ -1,3 +1,6 @@
+using RasterDataSources, URIs, Test, Dates
+using RasterDataSources: rastername, rasterpath, zipurl, zipname, zippath
+
 @testset "AWAP" begin
     using RasterDataSources: rastername, zipurl, zipname, zippath
 

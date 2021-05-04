@@ -1,5 +1,7 @@
+using RasterDataSources, URIs, Test, Dates
+using RasterDataSources: rastername, rasterurl, rasterpath
+
 @testset "ALWB" begin
-    using RasterDataSources: rastername, rasterurl, Values, Deciles
 
     alwb_path = joinpath(ENV["RASTERDATASOURCES_PATH"], "ALWB")
     @test rasterpath(ALWB) == alwb_path

@@ -1,6 +1,7 @@
-@testset "CHELSEA BioClim" begin
-    using RasterDataSources: rasterurl, rasterpath
+using RasterDataSources, URIs, Test, Dates
+using RasterDataSources: rastername, rasterpath, rasterurl
 
+@testset "CHELSEA BioClim" begin
     @test rastername(CHELSA{BioClim}, 5) == "CHELSA_bio10_05.tif"
 
     bioclim_path = joinpath(ENV["RASTERDATASOURCES_PATH"], "CHELSA", "BioClim")
