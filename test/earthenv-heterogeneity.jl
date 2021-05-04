@@ -2,7 +2,7 @@
     using RasterDataSources: rastername, rasterurl, rasterpath
 
     @test rastername(EarthEnv{HabitatHeterogeneity}, :cv; res="1km") == "cv_1km.tif"
-    hh_path = joinpath(ENV["RASTERDATASOURCES_PATH"], "EarthEnv", "habitat_heterogeneity")
+    hh_path = joinpath(ENV["RASTERDATASOURCES_PATH"], "EarthEnv", "HabitatHeterogeneity")
     @test rasterpath(EarthEnv{HabitatHeterogeneity}) == hh_path
     @test rasterpath(EarthEnv{HabitatHeterogeneity}, :cv; res="1km") == joinpath(hh_path, "1km", "cv_1km.tif")
 

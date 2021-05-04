@@ -41,7 +41,7 @@ struct Weather <: RasterDataSet end
 
 Land-cover datasets.
 """
-struct LandCover <: RasterDataSet end
+struct LandCover{X} <: RasterDataSet end
 
 """
     HabitatHeterogeneity <: RasterDataSet
