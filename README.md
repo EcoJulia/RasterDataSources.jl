@@ -13,8 +13,8 @@ Currently sources include :
 
 | Source    | URL                                      | Status                               |
 | --------- | ---------------------------------------- |--------------------------------------|
-| CHELSA    | https://chelsa-climate.org               | BioClim layers only                  |
-| WorldClim | https://www.worldclim.org                | Climate, Weather and BioClim layers  |
+| CHELSA    | https://chelsa-climate.org               | BioClim, Future BioClim and Climate  |
+| WorldClim | https://www.worldclim.org                | Climate, Weather and BioClim         |
 | EarthEnv  | http://www.earthenv.org                  | LandCover and HabitatHeterogeneity   |
 | AWAP      | http://www.bom.gov.au/jsp/awap/index.jsp | Complete                             |
 | ALWB      | http://www.bom.gov.au/water/landscape/   | Complete                             |

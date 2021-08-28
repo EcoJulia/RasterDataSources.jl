@@ -10,7 +10,13 @@ function _maybe_download(uri::URI, filepath)
     if !isfile(filepath)
         mkpath(dirname(filepath))
         println("Starting download for $uri")
-        HTTP.download(string(uri), filepath)
+        try
+            HTTP.download(string(uri), filepath)
+        catch e
+            # Remove anything that was downloaded before the error
+            isfile(filepath) && rm(filepath)
+            throw(e)
+        end
     end
     filepath
 end

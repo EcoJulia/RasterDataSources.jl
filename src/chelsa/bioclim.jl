@@ -1,11 +1,3 @@
-"""
-    CHELSA <: RasterDataSource
-
-Data from CHELSA, at [chelsa-climate.org](https://chelsa-climate.org/).
-Currently only the `BioClim` dataset is implemented.
-"""
-struct CHELSA{X} <: RasterDataSource end
-
 layers(::Type{CHELSA{BioClim}}) = 1:19
 
 """
@@ -31,5 +23,5 @@ rastername(::Type{CHELSA{BioClim}}, layer::Integer) = "CHELSA_bio10_$(lpad(layer
 rasterpath(::Type{CHELSA{BioClim}}) = joinpath(rasterpath(CHELSA), "BioClim")
 rasterpath(T::Type{CHELSA{BioClim}}, layer::Integer) = joinpath(rasterpath(T), rastername(T, layer))
 
-rasterurl(::Type{CHELSA{BioClim}}) = joinpath(rasterurl(CHELSA), "climatologies/bio/")
+rasterurl(::Type{CHELSA{BioClim}}) = joinpath(rasterurl(CHELSA), "chelsa_V1/climatologies/bio/")
 rasterurl(T::Type{CHELSA{BioClim}}, layer::Integer) = joinpath(rasterurl(T), rastername(T, layer))

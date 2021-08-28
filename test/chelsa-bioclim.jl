@@ -8,7 +8,7 @@
     @test rasterpath(CHELSA{BioClim}, 5) == joinpath(bioclim_path, "CHELSA_bio10_05.tif")
 
     @test rasterurl(CHELSA) == 
-        URI(scheme="https", host="os.zhdk.cloud.switch.ch", path="/envicloud/chelsa/chelsa_V1/")
+        URI(scheme="https", host="os.zhdk.cloud.switch.ch", path="/envicloud/chelsa/")
     @test rasterurl(CHELSA{BioClim}, 5) == 
         URI(scheme="https", host="os.zhdk.cloud.switch.ch", path="/envicloud/chelsa/chelsa_V1/climatologies/bio/CHELSA_bio10_05.tif")
 
