@@ -16,10 +16,14 @@ function _maybe_download(uri::URI, filepath)
 end
 
 function rasterpath() 
-    if haskey(ENV, "RASTERDATASOURCES_PATH") && isdir(ENV["RASTERDATASOURCES_PATH"])
-        ENV["RASTERDATASOURCES_PATH"]
+    if haskey(ENV, "RASTERDATASOURCES_PATH")
+        if isdir(ENV["RASTERDATASOURCES_PATH"])
+            ENV["RASTERDATASOURCES_PATH"]
+        else
+            mkpath(ENV["RASTERDATASOURCES_PATH"])
+        end
     else
-        error("You must set `ENV[\"RASTERDATASOURCES_PATH\"]` to a path in your system")
+        error("You must set the `ENV[\"RASTERDATASOURCES_PATH\"] = "/path/to/your/data/dir"`. To be permanent, this can be put in your .julia/config/startup.jl file.")
     end
 end
 
