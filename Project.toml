@@ -1,6 +1,6 @@
 name = "RasterDataSources"
 uuid = "3cb90ccd-e1b6-4867-9617-4276c8b2ca36"
-authors = ["Timothée Poisot, Rafael Schouten"]
+authors = ["Rafael Schouten <rafaelschouten@gmail.com>", "Timothée Poisot <timothee.poisot@umontreal.ca>"]
 version = "0.3.0"
 
 [deps]
