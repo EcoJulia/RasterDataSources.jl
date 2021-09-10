@@ -1,3 +1,27 @@
+"""
+    getraster(T::Type, layers::Union{Tuple,Int,Symbol}; kw...)
+
+Download raster layers `layers` from the data source `T`,
+returning a `String` for a single layer, or a `NamedTuple`
+for a `Tuple` of layers. `layer` values are usually values of
+`Symbol`, but can also be `Int` for `BioClim` datasets.
+
+Keyword arguments depend on the specific data source. 
+The may modify the return value, following a pattern:
+- `month` keywords of `AbstractArray will return a `Vector{String}`
+    or `Vector{<:NamedTuple}`.
+- `date` keywords of `AbstractArray` will also return a `Vector{String}`,
+    `Vector{<:NamedTuple}`.
+
+Where `date` and `month` keywords coexist, `Vector{Vector{String}}` of
+`Vector{Vector{NamedTuple}}` is the result. `date` ranges are always
+the outer `Vector`, `month` the inner `Vector` with `layer` tuples as
+the inner `NamedTuple`. No other keywords can be `Vector`.
+
+This schema may be added to in future for datasets with additional axes,
+but should not change for the existing `RasterDataSource` types.
+"""
+function getraster end
 
 # Default assumption for `layerkeys` is that the layer
 # is the same as the layer key. This is not the case for
@@ -20,7 +44,7 @@ function _maybe_download(uri::URI, filepath)
     filepath
 end
 
-function rasterpath() 
+function rasterpath()
     if haskey(ENV, "RASTERDATASOURCES_PATH") && isdir(ENV["RASTERDATASOURCES_PATH"])
         ENV["RASTERDATASOURCES_PATH"]
     else
