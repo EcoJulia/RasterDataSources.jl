@@ -32,6 +32,6 @@
     @test getraster(ALWB{Values,Year}, :asce_pet; date=[DateTime(2018, 01, 01)]) == [raster_path]
     @test isfile(raster_path)
     raster_path = joinpath(alwb_path, "values", "year", "dd.nc")
-    @test getraster(ALWB{Values,Year}, (:dd,); date=DateTime(2018, 01, 01)) == (dd=raster_path,)
+    @test getraster(ALWB{Values,Year}, [:dd]; date=DateTime(2018, 01, 01)) == (dd=raster_path,)
     @test isfile(raster_path)
 end

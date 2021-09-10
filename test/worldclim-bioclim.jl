@@ -9,5 +9,6 @@
     @test rasterpath(WorldClim{BioClim}, 2; res="10m") == raster_file
     @test getraster(WorldClim{BioClim}, 2; res="10m") == raster_file
     @test getraster(WorldClim{BioClim}, (2,); res="10m") == (bio2=raster_file,)
+    @test getraster(WorldClim{BioClim}, [2]; res="10m") == (bio2=raster_file,)
     @test isfile(raster_file)
 end

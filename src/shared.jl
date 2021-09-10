@@ -10,8 +10,11 @@ Keyword arguments depend on the specific data source.
 The may modify the return value, following a pattern:
 - `month` keywords of `AbstractArray will return a `Vector{String}`
     or `Vector{<:NamedTuple}`.
-- `date` keywords of `AbstractArray` will also return a `Vector{String}`,
+- `date` keywords of `AbstractArray` will return a `Vector{String}` or
     `Vector{<:NamedTuple}`.
+- `date` keywords of `Tuple{start,end}` will take all the dates between the 
+    start and end dates, and also return `Vector{String}` or `Vector{<:NamedTuple}`.
+
 
 Where `date` and `month` keywords coexist, `Vector{Vector{String}}` of
 `Vector{Vector{NamedTuple}}` is the result. `date` ranges are always
@@ -22,6 +25,12 @@ This schema may be added to in future for datasets with additional axes,
 but should not change for the existing `RasterDataSource` types.
 """
 function getraster end
+# Vector layers are allowed, but converted to `Tuple` immediatedly.
+function getraster(T::Type, layers::AbstractArray; kw...)
+    getraster(T, (layers...,); kw...)
+end
+# Without a layers argument, all layers are downloaded
+getraster(T::Type; kw...) = getraster(T, layers(T); kw...)
 
 # Default assumption for `layerkeys` is that the layer
 # is the same as the layer key. This is not the case for

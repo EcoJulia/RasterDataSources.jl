@@ -11,5 +11,6 @@
     raster_path = joinpath(hh_path, "25km", "cv_25km.tif")
     @test getraster(EarthEnv{HabitatHeterogeneity}, :cv) == raster_path
     @test getraster(EarthEnv{HabitatHeterogeneity}, (:cv,)) == (cv=raster_path,)
+    @test getraster(EarthEnv{HabitatHeterogeneity}, [:cv]) == (cv=raster_path,)
     @test isfile(raster_path)
 end

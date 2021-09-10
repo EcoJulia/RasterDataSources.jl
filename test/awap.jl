@@ -14,6 +14,7 @@
     if Sys.islinux()
         @test getraster(AWAP, :vprpress09; date=DateTime(2001, 01, 01)) == raster_file
         @test getraster(AWAP, (:vprpress09,); date=DateTime(2001, 01, 01)) == (vprpress09=raster_file,)
+        @test getraster(AWAP, [:vprpress09]; date=DateTime(2001, 01, 01)) == (vprpress09=raster_file,)
         @test isfile(raster_file)
     end
 end

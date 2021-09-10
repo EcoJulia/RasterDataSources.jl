@@ -19,7 +19,9 @@ If the data is already downloaded the path will be returned.
 - `date`: A `Date` or `DateTime` object. Note that CHELSA CMIP5 only has two datasets,
     for the periods 2041-2060 and 2061-2080. Dates must fall in these ranges
 """
-function getraster(T::Type{<:CHELSA{<:Future{BioClim}}}, layers; date=Date(2050))
+function getraster(T::Type{<:CHELSA{<:Future{BioClim}}}, layers::Union{Tuple,Int,Symbol};
+    date=Date(2050)
+)
     _getraster(T, layers, date)
 end
 
@@ -37,7 +39,7 @@ If the data is already downloaded the path will be returned.
 - `month`: The month of the year, defaulting to all months, `1:12`.
 """
 function getraster(
-    T::Type{<:CHELSA{<:Future{Climate}}}, layers; date=Date(2050), month=months(Climate)
+    T::Type{<:CHELSA{<:Future{Climate}}}, layers::Union{Tuple,Symbol}; date=Date(2050), month=months(Climate)
 )
     _getraster(T, layers, date, month)
 end

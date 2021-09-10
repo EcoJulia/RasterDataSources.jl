@@ -20,7 +20,9 @@ Download [`EarthEnv`](@ref) habitat heterogeneity data.
 
 Returns the filepath/s of the downloaded or pre-existing files.
 """
-function getraster(T::Type{EarthEnv{HabitatHeterogeneity}}, layers=layers(T); res::String=defres(T))
+function getraster(T::Type{EarthEnv{HabitatHeterogeneity}}, layers::Union{Tuple,Symbol}; 
+    res::String=defres(T)
+)
     _getraster(T, layers, res)
 end
 

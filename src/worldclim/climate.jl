@@ -17,7 +17,9 @@ Download [`WorldClim`](@ref) [`Climate`](@ref) data.
 
 Returns the filepath/s of the downloaded or pre-existing files.
 """
-function getraster(T::Type{WorldClim{Climate}}, layers; month=months(Climate), res::String=defres(T))
+function getraster(T::Type{WorldClim{Climate}}, layers::Union{Tuple,Symbol}; 
+    month=months(Climate), res::String=defres(T)
+)
     _getraster(T, layers, month, res)
 end
 

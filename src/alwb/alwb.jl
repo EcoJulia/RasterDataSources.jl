@@ -95,7 +95,9 @@ julia> getraster(ALWB{Values,Year}, :ss_pct; date=Date(2001, 2))
 
 Returns the filepath/s of the downloaded or pre-existing files.
 """
-getraster(T::Type{<:ALWB}, layers; date) = _getraster(T, layers, date)
+function getraster(T::Type{<:ALWB}, layers::Union{Tuple,Symbol}; date)
+     _getraster(T, layers, date)
+end
 
 function _getraster(T::Type{<:ALWB{M,P}}, layers, dates::Tuple) where {M,P}
     _getraster(T, layers, _date_sequence(dates, P(1)))

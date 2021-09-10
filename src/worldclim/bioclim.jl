@@ -16,7 +16,7 @@ Download [`WorldClim`](@ref) [`BioClim`](@ref) data.
 
 Returns the filepath/s of the downloaded or pre-existing files.
 """
-function getraster(T::Type{WorldClim{BioClim}}, layers=layers(T); res::String=defres(T))
+function getraster(T::Type{WorldClim{BioClim}}, layers::Union{Tuple,Int}=layers(T); res::String=defres(T))
     _getraster(T, layers, res)
 end
 

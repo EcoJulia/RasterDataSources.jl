@@ -20,5 +20,6 @@
         raster_files = [joinpath(ENV["RASTERDATASOURCES_PATH"], "WorldClim", "Weather", "prec", "wc2.1_2.5m_prec_2001-$(lpad(string(x), 2, '0')).tif") for x in 1:12]
         @test getraster(WorldClim{Weather}, :prec; date=Date(2001):Month(1):Date(2001, 12)) == raster_files
         @test getraster(WorldClim{Weather}, (:prec,); date=Date(2001):Month(1):Date(2001, 12)) == map(f -> (prec=f,), raster_files)
+        @test getraster(WorldClim{Weather}, [:prec]; date=Date(2001):Month(1):Date(2001, 12)) == map(f -> (prec=f,), raster_files)
     end
 end

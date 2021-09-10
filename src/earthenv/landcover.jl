@@ -33,7 +33,9 @@ Download [`EarthEnv`](@ref) landcover data.
 
 Returns the filepath/s of the downloaded or pre-existing files.
 """
-getraster(T::Type{<:EarthEnv{<:LandCover}}, layers=layers(T)) = _getraster(T, layers)
+function getraster(T::Type{<:EarthEnv{<:LandCover}}, layers::Union{Tuple,Int})
+    _getraster(T, layers)
+end
 
 _getraster(T::Type{<:EarthEnv{<:LandCover}}, layers::Tuple) = _map_layers(T, layers)
 function _getraster(T::Type{<:EarthEnv{<:LandCover}}, layer::Integer)

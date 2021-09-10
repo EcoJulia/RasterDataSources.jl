@@ -13,7 +13,9 @@ Without a layer argument, all layers will be downloaded, and a tuple of paths re
 
 Returns the filepath/s of the downloaded or pre-existing files.
 """
-getraster(T::Type{WorldClim{Weather}}, layers; date) = _getraster(T, layers, date)
+function getraster(T::Type{WorldClim{Weather}}, layers::Union{Tuple,Symbol}; date)
+    _getraster(T, layers, date)
+end
 
 function _getraster(T::Type{WorldClim{Weather}}, layers, date::Tuple)
     _getraster(T, layers, _date_sequence(date, Month(1)))
