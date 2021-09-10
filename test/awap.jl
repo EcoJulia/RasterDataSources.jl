@@ -12,8 +12,8 @@
     @test zipname(AWAP, :vprpress09; date=Date(2001, 1)) == "20010101.grid.Z"
 
     if Sys.islinux()
-        date = DateTime(2001, 01, 01), DateTime(2001, 01, 02)
-        getraster(AWAP, :vprpress09; date)
+        @test getraster(AWAP, :vprpress09; date=DateTime(2001, 01, 01)) == raster_file
+        @test getraster(AWAP, (:vprpress09,); date=DateTime(2001, 01, 01)) == (vprpress09=raster_file,)
         @test isfile(raster_file)
     end
 end

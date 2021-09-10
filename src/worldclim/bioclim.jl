@@ -1,4 +1,5 @@
-layers(::Type{WorldClim{BioClim}}) = 1:19
+layers(::Type{WorldClim{BioClim}}) = layers(BioClim)
+layerkeys(T::Type{WorldClim{BioClim}}, args...) = layerkeys(BioClim, args...)
 
 """
     getraster(T::Type{WorldClim{BioClim}}, [layer::Union{Tuple,AbstractVector,Integer}]; res::String="10m") => Union{Tuple,AbstractVector,String}
@@ -15,10 +16,12 @@ Download [`WorldClim`](@ref) [`BioClim`](@ref) data.
 
 Returns the filepath/s of the downloaded or pre-existing files.
 """
-function getraster(T::Type{WorldClim{BioClim}}, layer::Integer; res::String=defres(T))
-    getraster(T, layer, res)
+function getraster(T::Type{WorldClim{BioClim}}, layers=layers(T); res::String=defres(T))
+    _getraster(T, layers, res)
 end
-function getraster(T::Type{WorldClim{BioClim}}, layer::Integer, res::String)
+
+_getraster(T::Type{WorldClim{BioClim}}, layers::Tuple, res) = _map_layers(T, layers, res)
+function _getraster(T::Type{WorldClim{BioClim}}, layer::Integer, res)
     _check_layer(T, layer)
     _check_res(T, res)
 

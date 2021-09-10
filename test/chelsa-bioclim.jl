@@ -1,5 +1,5 @@
 @testset "CHELSEA BioClim" begin
-    using RasterDataSources: rasterurl
+    using RasterDataSources: rasterurl, rasterpath
 
     @test rastername(CHELSA{BioClim}, 5) == "CHELSA_bio10_05.tif"
 
@@ -14,6 +14,6 @@
 
     raster_path = joinpath(bioclim_path, "CHELSA_bio10_05.tif")
     @test getraster(CHELSA{BioClim}, 5) == raster_path
-    @test getraster(CHELSA{BioClim}, (5,)) == (raster_path,)
+    @test getraster(CHELSA{BioClim}, (5,)) == (bio5=raster_path,)
     @test isfile(raster_path)
 end

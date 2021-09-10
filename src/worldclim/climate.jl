@@ -17,16 +17,17 @@ Download [`WorldClim`](@ref) [`Climate`](@ref) data.
 
 Returns the filepath/s of the downloaded or pre-existing files.
 """
-function getraster(T::Type{WorldClim{Climate}}, layer; month=1:12, res::String=defres(T))
-    getraster(T, layer, month, res)
+function getraster(T::Type{WorldClim{Climate}}, layers; month=months(Climate), res::String=defres(T))
+    _getraster(T, layers, month, res)
 end
-function getraster(T::Type{WorldClim{Climate}}, layers::Tuple, month, res::String)
-    map(l -> getraster(T, l, month, res), layers)
+
+function _getraster(T::Type{WorldClim{Climate}}, layers, month::AbstractArray, res::String)
+    _getraster.(T, Ref(layers), month, Ref(res))
 end
-function getraster(T::Type{WorldClim{Climate}}, layer::Symbol, month::AbstractArray, res::String)
-    getraster.(T, layer, month, Ref(res))
+function _getraster(T::Type{WorldClim{Climate}}, layers::Tuple, month::Integer, res::String)
+    _map_layers(T, layers, month, res)
 end
-function getraster(T::Type{WorldClim{Climate}}, layer::Symbol, month::Integer, res::String)
+function _getraster(T::Type{WorldClim{Climate}}, layer::Symbol, month::Integer, res::String)
     _check_layer(T, layer)
     _check_res(T, res)
     raster_path = rasterpath(T, layer; res, month)

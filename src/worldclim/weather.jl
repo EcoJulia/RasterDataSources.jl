@@ -13,13 +13,19 @@ Without a layer argument, all layers will be downloaded, and a tuple of paths re
 
 Returns the filepath/s of the downloaded or pre-existing files.
 """
-function getraster(T::Type{WorldClim{Weather}}, layer::Symbol; date)
-    getraster(T::Type{WorldClim{Weather}}, layer::Symbol, date)
+getraster(T::Type{WorldClim{Weather}}, layers; date) = _getraster(T, layers, date)
+
+function _getraster(T::Type{WorldClim{Weather}}, layers, date::Tuple)
+    _getraster(T, layers, _date_sequence(date, Month(1)))
 end
-function getraster(T::Type{WorldClim{Weather}}, layer::Symbol, date::Tuple)
-    getraster(T, layer, _date_sequence(date, Month(1)))
+function _getraster(T::Type{WorldClim{Weather}}, layers, dates::AbstractArray)
+    @show layers
+    _getraster.(T, Ref(layers), dates)
 end
-function getraster(T::Type{WorldClim{Weather}}, layer::Symbol, date::Dates.TimeType)
+function _getraster(T::Type{WorldClim{Weather}}, layers::Tuple, date::Dates.TimeType)
+    _map_layers(T, layers, date)
+end
+function _getraster(T::Type{WorldClim{Weather}}, layer::Symbol, date::Dates.TimeType)
     decadestart = Date.(1960:10:2020)
     for i in eachindex(decadestart[1:end-1])
         # At least one date is in the decade
@@ -38,9 +44,6 @@ function getraster(T::Type{WorldClim{Weather}}, layer::Symbol, date::Dates.TimeT
         return raster_path
     end
     error("Date $date not between 1960 and 2020")
-end
-function getraster(T::Type{WorldClim{Weather}}, layer::Symbol, dates::AbstractArray)
-    getraster.(T, layer, dates)
 end
 
 const WEATHER_DECADES = Dict(Date(1960) => "1960-1969",

@@ -1,10 +1,9 @@
 
-function getraster(T::Type{<:RasterDataSource}, layers=layers(T), args...; kw...)
-    map(layers) do l
-        _check_layer(T, l)
-        getraster(T, l, args...; kw...)
-    end
-end
+# Default assumption for `layerkeys` is that the layer
+# is the same as the layer key. This is not the case for
+# e.g. BioClim, where layers can be specified with Int.
+layerkeys(T::Type) = layers(T)
+layerkeys(T::Type, layers) = layers
 
 function _maybe_download(uri::URI, filepath)
     if !isfile(filepath)
@@ -50,3 +49,13 @@ _date_sequence(dates::AbstractArray, step) = dates
 _date_sequence(dates::NTuple{2}, step) = first(dates):step:last(dates)
 _date_sequence(date, step) = date:step:date
 
+# Inner map over layers Tuple - month/date maps earlier
+# so we get Vectors of NamedTuples of filenames
+function _map_layers(T, layers, args...; kw...)
+    filenames = map(layers) do l
+        _check_layer(T, l)
+        _getraster(T, l, args...; kw...)
+    end
+    keys = layerkeys(T, layers)
+    return NamedTuple{keys}(filenames)
+end

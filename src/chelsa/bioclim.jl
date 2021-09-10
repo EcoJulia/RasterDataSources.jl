@@ -1,4 +1,5 @@
-layers(::Type{CHELSA{BioClim}}) = 1:19
+layers(::Type{CHELSA{BioClim}}) = layers(BioClim)
+layerkeys(::Type{CHELSA{BioClim}}, args...) = layerkeys(BioClim, args...)
 
 """
     getraster(source::Type{CHELSA{BioClim}}, [layer::Union{Tuple,Integer}]) => Union{Tuple,String}
@@ -11,7 +12,10 @@ Download [`CHELSA`](@ref) [`BioClim`](@ref) data from [chelsa-climate.org](https
 
 Returns the filepath/s of the downloaded or pre-existing files.
 """
-function getraster(T::Type{CHELSA{BioClim}}, layer::Integer)
+getraster(T::Type{CHELSA{BioClim}}, layers::Tuple) = _map_layers(T, layers)
+getraster(T::Type{CHELSA{BioClim}}, layer::Integer) = _getraster(T, layer)
+
+function _getraster(T::Type{CHELSA{BioClim}}, layer::Integer)
     _check_layer(T, layer)
     path = rasterpath(T, layer)
     url = rasterurl(T, layer)

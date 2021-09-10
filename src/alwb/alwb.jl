@@ -95,20 +95,24 @@ julia> getraster(ALWB{Values,Year}, :ss_pct; date=Date(2001, 2))
 
 Returns the filepath/s of the downloaded or pre-existing files.
 """
-getraster(T::Type{<:ALWB}, layer::Symbol; date) = getraster(T, layer, date)
-function getraster(T::Type{<:ALWB{M,P}}, layer::Symbol, dates::Tuple) where {M,P}
-    getraster(T, layer, _date_sequence(dates, P(1)))
+getraster(T::Type{<:ALWB}, layers; date) = _getraster(T, layers, date)
+
+function _getraster(T::Type{<:ALWB{M,P}}, layers, dates::Tuple) where {M,P}
+    _getraster(T, layers, _date_sequence(dates, P(1)))
 end
-function getraster(T::Type{<:ALWB}, layer::Symbol, date::Dates.TimeType)
+function _getraster(T::Type{<:ALWB}, layers, dates::AbstractArray)
+    _getraster.(T, Ref(layers), dates)
+end
+function _getraster(T::Type{<:ALWB}, layers::Tuple, date::Dates.TimeType)
+    _map_layers(T, layers, date)
+end
+function _getraster(T::Type{<:ALWB}, layer::Symbol, date::Dates.TimeType)
     _check_layer(T, layer)
     mkpath(rasterpath(T))
     url = rasterurl(T, layer; date=date)
     path = rasterpath(T, layer; date=date)
     _maybe_download(url, path)
     path
-end
-function getraster(T::Type{<:ALWB}, layer::Symbol, dates::AbstractArray)
-    getraster.(T, layer, dates)
 end
 
 rastername(T::Type{<:ALWB{M,P}}, layer; date) where {M,P} =
@@ -123,7 +127,7 @@ rasterpath(T::Type{<:ALWB}, layer; date=nothing) =
 rasterurl(T::Type{<:ALWB{M,P}}, layer; date) where {M,P} =
     joinpath(ALWB_URI, _pathsegments(T)..., rastername(T, layer; date))
 
-# Utilitiy methods
+# Utility methods
 
 _pathsegments(::Type{ALWB{M,P}}) where {M,P} = _pathsegment(M), _pathsegment(P)
 _pathsegment(::Type{Values}) = "values"

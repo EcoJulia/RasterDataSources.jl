@@ -8,6 +8,8 @@
 
     @test rasterurl(EarthEnv{HabitatHeterogeneity}, :cv; res="1km") == 
         URI(scheme="https", host="data.earthenv.org", path="/habitat_heterogeneity/1km/cv_01_05_1km_uint16.tif")
-    getraster(EarthEnv{HabitatHeterogeneity}, :cv)
-    @test isfile(joinpath(hh_path, "25km", "cv_25km.tif"))
+    raster_path = joinpath(hh_path, "25km", "cv_25km.tif")
+    @test getraster(EarthEnv{HabitatHeterogeneity}, :cv) == raster_path
+    @test getraster(EarthEnv{HabitatHeterogeneity}, (:cv,)) == (cv=raster_path,)
+    @test isfile(raster_path)
 end
