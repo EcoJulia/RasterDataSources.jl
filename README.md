@@ -1,9 +1,9 @@
 # RasterDataSources.jl
 
-[![](https://img.shields.io/badge/docs-stable-blue.svg)](https://cesaraustralia.github.io/RasterDataSources.jl/stable)
-[![](https://img.shields.io/badge/docs-dev-blue.svg)](https://cesaraustralia.github.io/RasterDataSources.jl/dev)
-![CI](https://github.com/cesaraustralia/RasterDataSources.jl/workflows/CI/badge.svg)
-[![codecov.io](http://codecov.io/github/cesaraustralia/RasterDataSources.jl/coverage.svg?branch=master)](http://codecov.io/github/cesaraustralia/RasterDataSources.jl?branch=master)
+[![](https://img.shields.io/badge/docs-stable-blue.svg)](https://ecojulia.github.io/RasterDataSources.jl/stable)
+[![](https://img.shields.io/badge/docs-dev-blue.svg)](https://ecojulia.github.io/RasterDataSources.jl/dev)
+[![CI](https://github.com/EcoJulia/RasterDataSources.jl/actions/workflows/CI.yml/badge.svg)](https://github.com/EcoJulia/RasterDataSources.jl/actions/workflows/CI.yml)
+[![codecov.io](http://codecov.io/github/ecojulia/RasterDataSources.jl/coverage.svg?branch=master)](http://codecov.io/github/ecojulia/RasterDataSources.jl?branch=master)
 
 RasterDataSources downloads raster data for local use or for integration into other spatial data packages, like
 [GeoData.jl](https://github.com/rafaqz/GeoData.jl). The collection is largely focussed on datasets relevant
