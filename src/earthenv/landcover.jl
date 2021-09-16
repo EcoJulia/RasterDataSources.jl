@@ -1,4 +1,23 @@
-layers(::Type{<:EarthEnv{<:LandCover}}) = 1:12
+layers(::Type{<:EarthEnv{<:LandCover}}) = ntuple(identity, Val{12}())
+
+function layerkeys(::Type{<:EarthEnv{<:LandCover}}) 
+    (
+        :NeedleleafTrees,
+        :EvergreenBroadleafTrees,
+        :DeciduousBroadleafTrees,
+        :OtherTrees,
+        :Shrubs,
+        :Herbaceous,
+        :CultivatedAndManaged,
+        :RegularlyFlooded,
+        :UrbanBuiltup,
+        :SnowIce,
+        :Barren,
+        :OpenWater,
+    )
+end
+layerkeys(T::Type{<:EarthEnv{<:LandCover}}, layer::Int) = layerkeys(T)[layer]
+layerkeys(T::Type{<:EarthEnv{<:LandCover}}, layers) = map(l -> layerkeys(T, l), layers)
 
 """
     getraster(T::Type{EarthEnv{LandCover}}, [layer::Union{AbstractArray,Tuple,Integer}]; discover::Bool=false) => Union{Tuple,String}
@@ -14,7 +33,12 @@ Download [`EarthEnv`](@ref) landcover data.
 
 Returns the filepath/s of the downloaded or pre-existing files.
 """
-function getraster(T::Type{<:EarthEnv{<:LandCover}}, layer::Integer)
+function getraster(T::Type{<:EarthEnv{<:LandCover}}, layers::Union{Tuple,Int})
+    _getraster(T, layers)
+end
+
+_getraster(T::Type{<:EarthEnv{<:LandCover}}, layers::Tuple) = _map_layers(T, layers)
+function _getraster(T::Type{<:EarthEnv{<:LandCover}}, layer::Integer)
     _check_layer(T, layer)
     url = rasterurl(T, layer)
     path = rasterpath(T, layer)

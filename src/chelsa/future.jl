@@ -1,5 +1,7 @@
 
-layers(::Type{<:CHELSA{<:Future{BioClim}}}) = 1:19
+layers(::Type{<:CHELSA{<:Future{BioClim}}}) = layers(BioClim)
+layerkeys(T::Type{<:CHELSA{<:Future{BioClim}}}, args...) = layerkeys(BioClim, args...)
+
 layers(::Type{<:CHELSA{<:Future{Climate}}}) = (:prec, :temp, :tmin, :tmax)
 
 # A modified key is used in the file name, while the key is used as-is in the path
@@ -17,9 +19,12 @@ If the data is already downloaded the path will be returned.
 - `date`: A `Date` or `DateTime` object. Note that CHELSA CMIP5 only has two datasets,
     for the periods 2041-2060 and 2061-2080. Dates must fall in these ranges
 """
-function getraster(T::Type{<:CHELSA{<:Future{BioClim}}}, layer::Integer; date=Date(2050))
-    _getraster(T, layer; date)
+function getraster(T::Type{<:CHELSA{<:Future{BioClim}}}, layers::Union{Tuple,Int,Symbol};
+    date=Date(2050)
+)
+    _getraster(T, layers, date)
 end
+
 """
     getraster(T::Type{CHELSA{Future{Climate}}}, [layer::Integer]; date, month) => String
 
@@ -34,27 +39,37 @@ If the data is already downloaded the path will be returned.
 - `month`: The month of the year, defaulting to all months, `1:12`.
 """
 function getraster(
-    T::Type{<:CHELSA{<:Future{Climate}}}, layer::Symbol; date=Date(2050), month=1:12
+    T::Type{<:CHELSA{<:Future{Climate}}}, layers::Union{Tuple,Symbol}; date=Date(2050), month=months(Climate)
 )
-    _getraster(T, layer, date, month)
+    _getraster(T, layers, date, month)
 end
 
-function _getraster(T::Type{<:CHELSA{<:Future{Climate}}}, layer, date, months::AbstractArray)
-    map(month -> _getraster(T, layer, date, month), months)
-end
-function _getraster(T::Type{<:CHELSA{<:Future{Climate}}}, layer, dates::AbstractArray, month)
-    map(date -> _getraster(T, layer; date, month), dates)
+function _getraster(T::Type{<:CHELSA{<:Future{Climate}}}, layers, date, months::AbstractArray)
+    map(month -> _getraster(T, layers, date, month), months)
 end
 function _getraster(
-    T::Type{<:CHELSA{<:Future{Climate}}}, layer, dates::AbstractArray, months::AbstractArray
+    T::Type{<:CHELSA{<:Future{Climate}}}, layers, dates::AbstractArray, months::AbstractArray
 )
-    map(month -> _getraster(T, layer, dates, month), months)
+    map(date -> _getraster(T, layers, date, months), dates)
 end
-function _getraster(T::Type{<:CHELSA{<:Future{Climate}}}, layer, date, month)
-    _getraster(T, layer; date, month)
+function _getraster(T::Type{<:CHELSA{<:Future{Climate}}}, layers, dates::AbstractArray, month)
+    map(date -> _getraster(T, layers; date, month), dates)
+end
+function _getraster(T::Type{<:CHELSA{<:Future{Climate}}}, layers, date, month)
+    _getraster(T, layers; date, month)
+end
+function _getraster(T::Type{<:CHELSA{<:Future{BioClim}}}, layers, dates::AbstractArray)
+    map(date -> _getraster(T, layers, date), dates)
+end
+function _getraster(T::Type{<:CHELSA{<:Future{BioClim}}}, layers, date::TimeType)
+    _getraster(T, layers; date)
 end
 
-function _getraster(T::Type{<:CHELSA{<:Future}}, layer; kw...)
+# We have the extra args as keywords again to generalise rasterpath/rasterurl
+function _getraster(T::Type{<:CHELSA{<:Future}}, layers::Tuple; kw...)
+    _map_layers(T, layers; kw...)
+end
+function _getraster(T::Type{<:CHELSA{<:Future}}, layer::Union{Symbol,Integer}; kw...)
     _check_layer(T, layer)
     path = rasterpath(T, layer; kw...)
     url = rasterurl(T, layer; kw...)

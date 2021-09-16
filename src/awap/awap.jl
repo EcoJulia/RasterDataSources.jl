@@ -24,7 +24,6 @@ const AWAP_PATHSEGMENTS = (
 
 """
     getraster(source::Type{AWAP}, [layer::Union{Tuple,Symbol}]; date::Union{DateTime,Tuple,AbstractVector})
-    getraster(T::Type{AWAP}, layer::Symbol, date::Union{DateTime,Tuple,AbstractVector})
 
 Download data from the [`AWAP`](@ref) weather dataset, from
 [www.csiro.au/awap](http://www.csiro.au/awap/).
@@ -53,11 +52,18 @@ julia> getraster(AWAP, :rainfall; date=Date(2001, 1, 1):Day(1):Date(2001, 1, 31)
 
 Returns the filepath/s of the downloaded or pre-existing files.
 """
-getraster(T::Type{AWAP}, layer::Symbol; date) = getraster(T, layer, date)
-function getraster(T::Type{AWAP}, layer::Symbol, dates::Tuple)
-    getraster(T, layer, _date_sequence(dates, Day(1)))
+getraster(T::Type{AWAP}, layer::Union{Tuple,Symbol}; date) = _getraster(T, layer, date)
+
+function _getraster(T::Type{AWAP}, layer::Symbol, dates::Tuple{<:Any,<:Any})
+    _getraster(T, layer, _date_sequence(dates, Day(1)))
 end
-function getraster(T::Type{AWAP}, layer::Symbol, date::Dates.TimeType)
+function _getraster(T::Type{AWAP}, layers::Union{Tuple,Symbol}, dates::AbstractArray)
+    _getraster.(T, layers, dates)
+end
+function _getraster(T::Type{<:AWAP}, layers::Tuple, date::Dates.TimeType)
+    _map_layers(T, layers, date)
+end
+function _getraster(T::Type{AWAP}, layer::Symbol, date::Dates.TimeType)
     _check_layer(T, layer)
     mkpath(_rasterpath(T, layer))
     raster_path = rasterpath(T, layer; date=date)
@@ -67,9 +73,6 @@ function getraster(T::Type{AWAP}, layer::Symbol, date::Dates.TimeType)
         run(`uncompress $zip_path -f`)
     end
     return raster_path
-end
-function getraster(T::Type{AWAP}, layer::Symbol, dates::AbstractArray)
-    getraster.(T, layer, dates)
 end
 
 rasterpath(T::Type{AWAP}) = joinpath(rasterpath(), "AWAP")

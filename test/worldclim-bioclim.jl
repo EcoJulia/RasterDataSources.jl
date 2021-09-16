@@ -8,6 +8,7 @@
     raster_file = joinpath(ENV["RASTERDATASOURCES_PATH"], "WorldClim", "BioClim", "wc2.1_10m_bio_2.tif")
     @test rasterpath(WorldClim{BioClim}, 2; res="10m") == raster_file
     @test getraster(WorldClim{BioClim}, 2; res="10m") == raster_file
-    @test getraster(WorldClim{BioClim}, (2,), "10m") == (raster_file,)
+    @test getraster(WorldClim{BioClim}, (2,); res="10m") == (bio2=raster_file,)
+    @test getraster(WorldClim{BioClim}, [2]; res="10m") == (bio2=raster_file,)
     @test isfile(raster_file)
 end

@@ -20,6 +20,15 @@ BioClim datasets. Usually containing layers from 1:19. They do not usually use
 """
 struct BioClim <: RasterDataSet end
 
+# Bioclim has standardised layers for all data sources
+layers(::Type{BioClim}) = ntuple(identity, Val{19}())
+layerkeys(T::Type{BioClim}) = layerkeys(T, layers(T))
+layerkeys(T::Type{BioClim}, layers) = map(l -> bioclim_key(l), layers)
+
+bioclim_key(l::Symbol) = l
+bioclim_key(l::AbstractString) = Symbol(l)
+bioclim_key(l::Integer) = Symbol(string("bio", l))
+
 """
     Climate <: RasterDataSet
 
@@ -27,6 +36,8 @@ Climate datasets. These are usually months of the year, not specific dates,
 and use a `month` keyword in `getraster`. They may also use `date` in past/future scenarios.
 """
 struct Climate <: RasterDataSet end
+
+months(::Type{Climate}) = ntuple(identity, Val{12})
 
 """
     Weather <: RasterDataSet
