@@ -1,3 +1,6 @@
+using RasterDataSources, URIs, Test, Dates
+using RasterDataSources: rastername, rasterpath, rasterurl
+
 @testset "EarthEnv LandCover" begin
     using RasterDataSources: rastername, rasterurl, rasterpath
 

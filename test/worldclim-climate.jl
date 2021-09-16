@@ -1,6 +1,7 @@
+using RasterDataSources, URIs, Test, Dates
+using RasterDataSources: rastername, rasterpath, zipurl, zipname, zippath
 
 @testset "WorldClim Climate" begin
-    using RasterDataSources: rastername, rasterpath, zipurl, zipname, zippath
 
     zip_url = URI(scheme="https", host="biogeo.ucdavis.edu", path="/data/worldclim/v2.1/base/wc2.1_10m_wind.zip")
     @test zipurl(WorldClim{Climate}, :wind; res="10m") == zip_url

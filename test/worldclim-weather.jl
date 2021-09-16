@@ -1,7 +1,7 @@
+using RasterDataSources, URIs, Test, Dates
+using RasterDataSources: rastername, rasterpath, zipurl, zipname, zippath
+
 @testset "WorldClim Weather" begin
-
-    using RasterDataSources: rastername, rasterpath, zipurl, zipname, zippath
-
     raster_file = joinpath(ENV["RASTERDATASOURCES_PATH"], "WorldClim", "Weather", "prec", "wc2.1_2.5m_prec_2001-01.tif")
     @test rasterpath(WorldClim{Weather}, :prec; date=Date(2001, 1)) == raster_file
     @test rastername(WorldClim{Weather}, :prec; date=Date(2001, 1)) == "wc2.1_2.5m_prec_2001-01.tif"
