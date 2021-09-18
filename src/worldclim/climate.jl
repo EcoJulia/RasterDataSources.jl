@@ -1,14 +1,13 @@
 layers(::Type{WorldClim{Climate}}) = (:tmin, :tmax, :tavg, :prec, :srad, :wind, :vapr)
 
 """
-    getraster(T::Type{WorldClim{Climate}}, [layer::Union{Tuple,Symbol}]; month=1:12, res::String="10m") => Vector{String}
-    getraster(T::Type{WorldClim{Climate}}, layer::Symbol, month::Integer, res::String)
+    getraster(T::Type{WorldClim{Climate}}, [layer::Union{Tuple,Symbol}]; month, res::String="10m") => Vector{String}
 
 Download [`WorldClim`](@ref) [`Climate`](@ref) data. 
 
 # Arguments
 - `layer` `Symbol` or `Tuple` of `Symbol` from `$(layers(WorldClim{Climate}))`. 
-    Without a `layer` argument, all layers will be downloaded, and a tuple of paths returned.
+    Without a `layer` argument, all layers will be downloaded, and a `NamedTuple` of paths returned.
 
 # Keywords
 - `month`: `Integer` or `AbstractArray` of `Integer`. By default all months are downloaded,
@@ -18,7 +17,7 @@ Download [`WorldClim`](@ref) [`Climate`](@ref) data.
 Returns the filepath/s of the downloaded or pre-existing files.
 """
 function getraster(T::Type{WorldClim{Climate}}, layers::Union{Tuple,Symbol}; 
-    month=months(Climate), res::String=defres(T)
+    month, res::String=defres(T)
 )
     _getraster(T, layers, month, res)
 end

@@ -24,12 +24,23 @@ layers(::Type{<:ALWB}) = (
     :e0, :ma_wet, :pen_pet, :fao_pet, :asce_pet, :msl_wet, :dd
 )
 
+# Days are in 1 year nc files
+date_step(::Type{<:ALWB{<:Any,Day}}) = Year(1)
+# Months and years are in single files
+date_step(::Type{<:ALWB{<:Any,Month}}) = Year(100)
+date_step(::Type{<:ALWB{<:Any,Year}}) = Year(100)
+
+has_constant_dims(::Type{<:ALWB}) = false
+
 @doc """
     ALWB{Union{Deciles,Values},Union{Day,Month,Year}} <: RasterDataSource
 
 Data from the Australian Landscape Water Balance (ALWB) data source.
 
 See: [www.bom.gov.au/water/landscape](http://www.bom.gov.au/water/landscape)
+
+The dataset contains NetCDF files. They have a time dimension so that multiple
+dates are stored in each file. 
 
 The available layers are: `$(layers(ALWB))`, available in daily, monthly and 
 annual resolutions, and as `Values` or relative `Deciles`.
@@ -78,12 +89,12 @@ deciles with timesteps of `Day`, `Month` or `Year`.
 
 # Arguments
 - `layer`: `Symbol` or `Tuple` of `Symbol` from `$(layers(ALWB))`. Without a 
-    `layer` argument, all layers will be downloaded, and a `Vector` of paths returned.
+    `layer` argument, all layers will be downloaded, and a `NamedTuple` of paths returned.
 
 # Keywords
 - `date`: a `DateTime`, `AbstractVector` of `DateTime` or a `Tuple` of start and end dates.
-    For multiple dates, multiple filenames will be returned. AWAP is available with a daily
-    timestep.
+    For multiple dates, a `Vector` of multiple filenames will be returned.
+    ALWB is available with a daily, monthly, and yearly, timestep.
 
 # Example
 This will return the file containing annual averages, including your date:
@@ -100,7 +111,7 @@ function getraster(T::Type{<:ALWB}, layers::Union{Tuple,Symbol}; date)
 end
 
 function _getraster(T::Type{<:ALWB{M,P}}, layers, dates::Tuple) where {M,P}
-    _getraster(T, layers, _date_sequence(dates, P(1)))
+    _getraster(T, layers, date_sequence(T, dates))
 end
 function _getraster(T::Type{<:ALWB}, layers, dates::AbstractArray)
     _getraster.(T, Ref(layers), dates)

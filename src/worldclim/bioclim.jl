@@ -3,13 +3,12 @@ layerkeys(T::Type{WorldClim{BioClim}}, args...) = layerkeys(BioClim, args...)
 
 """
     getraster(T::Type{WorldClim{BioClim}}, [layer::Union{Tuple,AbstractVector,Integer}]; res::String="10m") => Union{Tuple,AbstractVector,String}
-    getraster(T::Type{WorldClim{BioClim}}, layer::Integer, res::String)
 
 Download [`WorldClim`](@ref) [`BioClim`](@ref) data.
 
 # Arguments
 - `layer`: `Integer` or tuple/range of `Integer` from `$(layers(WorldClim{BioClim}))`. 
-    Without a `layer` argument, all layers will be downloaded, and a `Vector` of paths returned.
+    Without a `layer` argument, all layers will be downloaded, and a `NamedTuple` of paths returned.
 
 # Keywords
 - `res`: `String` chosen from $(resolutions(WorldClim{BioClim})), "10m" by default.

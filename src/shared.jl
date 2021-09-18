@@ -38,6 +38,17 @@ getraster(T::Type; kw...) = getraster(T, layers(T); kw...)
 layerkeys(T::Type) = layers(T)
 layerkeys(T::Type, layers) = layers
 
+has_matching_layer_size(T) = true
+has_constant_dims(T) = true
+has_constant_metadata(T) = true
+
+date_sequence(T::Type, dates) = date_sequence(date_step(T), dates)
+date_sequence(step, date) = _date_sequence(step, date)
+
+_date_sequence(step, dates::AbstractArray) = dates
+_date_sequence(step, dates::NTuple{2}) = first(dates):step:last(dates)
+_date_sequence(step, date) = date:step:date
+
 function _maybe_download(uri::URI, filepath)
     if !isfile(filepath)
         mkpath(dirname(filepath))
@@ -77,10 +88,6 @@ _check_layer(T, layer) =
 
 _date2string(t, date) = Dates.format(date, _dateformat(t))
 _string2date(t, d::AbstractString) = Date(d, _dateformat(t))
-
-_date_sequence(dates::AbstractArray, step) = dates
-_date_sequence(dates::NTuple{2}, step) = first(dates):step:last(dates)
-_date_sequence(date, step) = date:step:date
 
 # Inner map over layers Tuple - month/date maps earlier
 # so we get Vectors of NamedTuples of filenames

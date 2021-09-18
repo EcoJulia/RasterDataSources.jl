@@ -1,15 +1,16 @@
 layers(::Type{WorldClim{Weather}}) = (:tmin, :tmax, :prec)
+date_step(::Type{WorldClim{Weather}}) = Month(1)
 
 """
     getraster(T::Type{WorldClim{Weather}}, [layer::Union{Tuple,Symbol}]; date) => Union{String,Tuple{String},Vector{String}}
-    getraster(T::Type{WorldClim{Weather}}, layer::Symbol, date)
 
 Download [`WorldClim`](@ref) [`Weather`](@ref) data, for `layer`/s in: `$(layers(WorldClim{Weather}))`.
-Without a layer argument, all layers will be downloaded, and a tuple of paths returned. 
+Without a layer argument, all layers will be downloaded, and a `NamedTuple` of paths returned. 
 
 # Keywords
-- `date`: a `DateTime` or iterable of `DateTime`. For multiple dates, multiple 
-    filenames will be returned. WorldClim Weather is available with a daily timestep. 
+
+- `date`: a `Date` or `DateTime` object, a `Vector` of dates, or `Tuple` of start/end dates.
+    WorldClim Weather is available with a daily timestep. 
 
 Returns the filepath/s of the downloaded or pre-existing files.
 """
@@ -18,7 +19,7 @@ function getraster(T::Type{WorldClim{Weather}}, layers::Union{Tuple,Symbol}; dat
 end
 
 function _getraster(T::Type{WorldClim{Weather}}, layers, date::Tuple)
-    _getraster(T, layers, _date_sequence(date, Month(1)))
+    _getraster(T, layers, date_sequence(T, date))
 end
 function _getraster(T::Type{WorldClim{Weather}}, layers, dates::AbstractArray)
     @show layers

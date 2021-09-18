@@ -7,5 +7,5 @@ makedocs(
 )
 
 deploydocs(
-    repo = "github.com/cesaraustralia/RasterDataSources.jl.git",
+    repo = "github.com/EcoJulia/RasterDataSources.jl.git",
 )
