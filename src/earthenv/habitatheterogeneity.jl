@@ -7,13 +7,12 @@ layers(::Type{EarthEnv{HabitatHeterogeneity}}) = (
 
 """
     getraster(source::Type{EarthEnv{HabitatHeterogeneity}}, [layer]; res="25km")
-    getraster(source::Type{EarthEnv{HabitatHeterogeneity}}, layer, res)
 
 Download [`EarthEnv`](@ref) habitat heterogeneity data.
 
 # Arguments
 - `layer`: `Symbol` or `Tuple` of `Symbol` from `$(layers(EarthEnv{HabitatHeterogeneity}))`.
-    Without a `layer` argument, all layers will be downloaded, and a tuple of paths returned.
+    Without a `layer` argument, all layers will be downloaded, and a `NamedTuple` of paths returned.
 
 # Keywords
 - `res`: `String` chosen from `$(resolutions(EarthEnv{HabitatHeterogeneity}))`, defaulting to "25km".

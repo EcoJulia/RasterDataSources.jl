@@ -2,6 +2,11 @@ struct AWAP <: RasterDataSource end
 
 layers(::Type{AWAP}) = (:solar, :rainfall, :vprpress09, :vprpress15, :tmin, :tmax)
 
+date_step(::Type{<:AWAP}) = Day(1) 
+
+# AWAP files dont all have matching extents.
+has_matching_layer_size(::Type{<:AWAP}) = false
+
 @doc """
 AWAP <: RasterDataSource
 
@@ -26,18 +31,23 @@ const AWAP_PATHSEGMENTS = (
     getraster(source::Type{AWAP}, [layer::Union{Tuple,Symbol}]; date::Union{DateTime,Tuple,AbstractVector})
 
 Download data from the [`AWAP`](@ref) weather dataset, from
-[www.csiro.au/awap](http://www.csiro.au/awap/).
+[www.csiro.au/awap](http://www.csiro.au/awap/). 
+
+The AWAP dataset contains ASCII `.grid` files.
 
 # Arguments
+
 - `layer` `Symbol` or `Tuple` of `Symbol` for `layer`s in `$(layers(AWAP))`. Without a 
-    `layer` argument, all layers will be downloaded, and a tuple of paths returned.
+    `layer` argument, all layers will be downloaded, and a `NamedTuple` of paths returned.
 
 # Keywords
+
 - `date`: a `DateTime`, `AbstractVector` of `DateTime` or a `Tuple` of start and end dates.
-    For multiple dates, multiple filenames will be returned. AWAP is available with a daily
-    timestep.
+    For multiple dates, A `Vector` of multiple filenames will be returned.
+    AWAP is available with a daily timestep.
 
 # Example
+
 Download rainfall for the first month of 2001:
 
 ```julia
@@ -54,11 +64,11 @@ Returns the filepath/s of the downloaded or pre-existing files.
 """
 getraster(T::Type{AWAP}, layer::Union{Tuple,Symbol}; date) = _getraster(T, layer, date)
 
-function _getraster(T::Type{AWAP}, layer::Symbol, dates::Tuple{<:Any,<:Any})
-    _getraster(T, layer, _date_sequence(dates, Day(1)))
+function _getraster(T::Type{AWAP}, layer::Union{Tuple,Symbol}, dates::Tuple{<:Any,<:Any})
+    _getraster(T, layer, date_sequence(T, dates))
 end
 function _getraster(T::Type{AWAP}, layers::Union{Tuple,Symbol}, dates::AbstractArray)
-    _getraster.(T, layers, dates)
+    _getraster.(T, Ref(layers), dates)
 end
 function _getraster(T::Type{<:AWAP}, layers::Tuple, date::Dates.TimeType)
     _map_layers(T, layers, date)

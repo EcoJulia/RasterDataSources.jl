@@ -22,7 +22,7 @@ Currently sources include :
 Please open an issue if you need more datasets added, or (even better) open a pull request 
 following the form of the other datasets where possible.
 
-## Retreiving data
+## Retrieving data
 
 Usage is generally via the `getraster` method - which will download the
 raster data source if it isn't available locally, or simply return the path/s
@@ -31,7 +31,7 @@ of the raster file/s:
 ```julia
 julia> using RasterDataSources
 
-julia> getraster(WorldClim{Climate}, :wind)
+julia> getraster(WorldClim{Climate}, :wind; month=1:12)
 12-element Array{String,1}:
  "/home/user/Data/WorldClim/Climate/wind/wc2.1_10m_wind_01.tif"
  "/home/user/Data/WorldClim/Climate/wind/wc2.1_10m_wind_02.tif"

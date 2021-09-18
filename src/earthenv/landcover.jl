@@ -20,14 +20,13 @@ layerkeys(T::Type{<:EarthEnv{<:LandCover}}, layer::Int) = layerkeys(T)[layer]
 layerkeys(T::Type{<:EarthEnv{<:LandCover}}, layers) = map(l -> layerkeys(T, l), layers)
 
 """
-    getraster(T::Type{EarthEnv{LandCover}}, [layer::Union{AbstractArray,Tuple,Integer}]; discover::Bool=false) => Union{Tuple,String}
-    getraster(T::Type{EarthEnv{LandCover}}, layer::Integer, discover::Bool) => String
+    getraster(T::Type{EarthEnv{LandCover}}, [layer]; discover::Bool=false) => Union{Tuple,String}
 
 Download [`EarthEnv`](@ref) landcover data.
 
 # Arguments
 - `layer`: `Integer` or tuple/range of `Integer` from `$(layers(EarthEnv{LandCover}))`.
-    Without a `layer` argument, all layers will be downloaded, and a tuple of paths returned.
+    Without a `layer` argument, all layers will be downloaded, and a `NamedTuple` of paths returned.
 
 `LandCover` may also be `LandCover{:DISCover} to download the dataset that integrates the DISCover model.
 

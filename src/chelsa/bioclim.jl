@@ -8,7 +8,7 @@ Download [`CHELSA`](@ref) [`BioClim`](@ref) data from [chelsa-climate.org](https
 
 # Arguments
 - `layer`: `Integer` or tuple/range of `Integer` from `$(layers(CHELSA{BioClim}))`. 
-    Without a `layer` argument, all layers will be downloaded, and a `Vector` of paths returned.
+    Without a `layer` argument, all layers will be downloaded, and a `NamedTuple` of paths returned.
 
 Returns the filepath/s of the downloaded or pre-existing files.
 """

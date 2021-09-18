@@ -4,6 +4,9 @@ layerkeys(T::Type{<:CHELSA{<:Future{BioClim}}}, args...) = layerkeys(BioClim, ar
 
 layers(::Type{<:CHELSA{<:Future{Climate}}}) = (:prec, :temp, :tmin, :tmax)
 
+date_step(::Type{<:CHELSA{<:Future{Climate,CMIP5}}}) = Year(20) 
+date_step(::Type{<:CHELSA{<:Future{Climate,CMIP6}}}) = Year(30) 
+
 # A modified key is used in the file name, while the key is used as-is in the path
 const CHELSAKEY = (prec="pr", temp="tas", tmin="tasmin", tmax="tasmax", bio="bio")
 
@@ -12,15 +15,17 @@ const CHELSAKEY = (prec="pr", temp="tas", tmin="tasmin", tmax="tasmax", bio="bio
 
 Download CHELSA BioClim data, choosing layers from: `$(layers(CHELSA{BioClim}))`.
 
-Without a layer argument, all layers will be downloaded, and a tuple of paths is returned.
-If the data is already downloaded the path will be returned.
+Without a layer argument, all layers will be downloaded, and a `NamedTuple` of paths 
+returned.
 
 ## Keywords
-- `date`: A `Date` or `DateTime` object. Note that CHELSA CMIP5 only has two datasets,
-    for the periods 2041-2060 and 2061-2080. Dates must fall in these ranges
+
+- `date`: a `Date` or `DateTime` object, a Vector, or Tuple of start/end dates.
+    Note that CHELSA CMIP5 only has two datasets, for the periods 2041-2060 and
+    2061-2080. Dates must fall within these ranges.
 """
-function getraster(T::Type{<:CHELSA{<:Future{BioClim}}}, layers::Union{Tuple,Int,Symbol};
-    date=Date(2050)
+function getraster(
+    T::Type{<:CHELSA{<:Future{BioClim}}}, layers::Union{Tuple,Int,Symbol}; date
 )
     _getraster(T, layers, date)
 end
@@ -30,16 +35,17 @@ end
 
 Download CHELSA BioClim data, choosing layers from: `$(layers(CHELSA{BioClim}))`.
 
-Without a layer argument, all layers will be downloaded, and a tuple of paths is returned.
-If the data is already downloaded the path will be returned.
+Without a layer argument, all layers will be downloaded, and a `NamedTuple` of paths returned.
 
 ## Keywords
-- `date`: A `Date` or `DateTime` object. Note that CHELSA CMIP5 only has two datasets,
-    for the periods 2041-2060 and 2061-2080. Dates must fall in these ranges
-- `month`: The month of the year, defaulting to all months, `1:12`.
+
+- `date`: a `Date` or `DateTime` object, a Vector, or Tuple of start/end dates.
+    Note that CHELSA CMIP5 only has two datasets, for the periods 2041-2060 and
+    2061-2080. Dates must fall within these ranges.
+- `month`: the month of the year, from 1 to 12, or a array or range of months like `1:12`.
 """
 function getraster(
-    T::Type{<:CHELSA{<:Future{Climate}}}, layers::Union{Tuple,Symbol}; date=Date(2050), month=months(Climate)
+    T::Type{<:CHELSA{<:Future{Climate}}}, layers::Union{Tuple,Symbol}; date, month
 )
     _getraster(T, layers, date, month)
 end
@@ -54,6 +60,12 @@ function _getraster(
 end
 function _getraster(T::Type{<:CHELSA{<:Future{Climate}}}, layers, dates::AbstractArray, month)
     map(date -> _getraster(T, layers; date, month), dates)
+end
+function _getraster(T::Type{<:CHELSA{<:Future{Climate}}}, layers, dates::Tuple, months::AbstractArray)
+    _getraster(T, layers, date_sequence(T, dates), months)
+end
+function _getraster(T::Type{<:CHELSA{<:Future{Climate}}}, layers, dates::Tuple, month)
+    _getraster(T, layers, date_sequence(T, dates), month)
 end
 function _getraster(T::Type{<:CHELSA{<:Future{Climate}}}, layers, date, month)
     _getraster(T, layers; date, month)
@@ -158,7 +170,7 @@ end
 
 function _date_string(::Type{CMIP6}, date)
     if date < DateTime(1981)
-        _cmip5_date_error(date)
+        _cmip6_date_error(date)
     elseif date < DateTime(2011)
         "1981-2010"
     elseif date < DateTime(2041)
@@ -172,8 +184,8 @@ function _date_string(::Type{CMIP6}, date)
     end
 end
 
-_cmip5_date_error(date) = error("CMIP5 covers the period from 2041-2080, not $date")
-_cmip6_date_error(date) = error("CMIP6 covers the period from 1981-2100, not $date")
+_cmip5_date_error(date) = error("CMIP5 covers the period from 2041-2080, not including $date")
+_cmip6_date_error(date) = error("CMIP6 covers the period from 1981-2100, not including $date")
 
 _dataset(::Type{<:CHELSA{F}}) where F<:Future = _dataset(F)
 _phase(::Type{<:CHELSA{F}}) where F<:Future = _phase(F)
