@@ -14,11 +14,12 @@ using RasterDataSources: rastername, rasterpath, rasterurl
     without_discover_path = joinpath(landcover_path, "without_DISCover", "Consensus_reduced_class_2.tif")
     with_discover_path = joinpath(landcover_path, "with_DISCover", "consensus_full_class_2.tif")
     @test getraster(EarthEnv{LandCover{:DISCover}}, 2) == with_discover_path
-    @test getraster(EarthEnv{LandCover{:DISCover}}, 2) == (EvergreenBroadleafTrees=with_discover_path)
     @test isfile(with_discover_path)
-    @test getraster(EarthEnv{LandCover}, 2) == without_discover_path
-    @test getraster(EarthEnv{LandCover}, (2,)) == (EvergreenBroadleafTrees=without_discover_path,)
-    @test getraster(EarthEnv{LandCover}, [2]) == (EvergreenBroadleafTrees=without_discover_path,)
+    @test getraster(EarthEnv{LandCover}, :evergreen_broadleaf_trees) == without_discover_path
+    @test getraster(EarthEnv{LandCover}, (2,)) == (evergreen_broadleaf_trees=without_discover_path,)
+    @test getraster(EarthEnv{LandCover}, (:evergreen_broadleaf_trees,)) == (evergreen_broadleaf_trees=without_discover_path,)
+    @test getraster(EarthEnv{LandCover}, 2:2) == (evergreen_broadleaf_trees=without_discover_path,)
+    @test getraster(EarthEnv{LandCover}, [:evergreen_broadleaf_trees]) == (evergreen_broadleaf_trees=without_discover_path,)
     @test isfile(without_discover_path)
     for layer in RasterDataSources.layers(EarthEnv{LandCover})
         getraster(EarthEnv{LandCover{:DISCover}}, layer)

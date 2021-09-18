@@ -93,7 +93,6 @@ _string2date(t, d::AbstractString) = Date(d, _dateformat(t))
 # so we get Vectors of NamedTuples of filenames
 function _map_layers(T, layers, args...; kw...)
     filenames = map(layers) do l
-        _check_layer(T, l)
         _getraster(T, l, args...; kw...)
     end
     keys = layerkeys(T, layers)
