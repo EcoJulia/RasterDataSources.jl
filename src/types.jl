@@ -21,13 +21,41 @@ BioClim datasets. Usually containing layers from 1:19. They do not usually use
 struct BioClim <: RasterDataSet end
 
 # Bioclim has standardised layers for all data sources
-layers(::Type{BioClim}) = ntuple(identity, Val{19}())
-layerkeys(T::Type{BioClim}) = layerkeys(T, layers(T))
-layerkeys(T::Type{BioClim}, layers) = map(l -> bioclim_key(l), layers)
+layers(::Type{BioClim}) = values(bioclim_lookup)
+layerkeys(T::Type{BioClim}) = keys(bioclim_lookup)
+layerkeys(T::Type{BioClim}, layer) = bioclim_key(layer)
+layerkeys(T::Type{BioClim}, layers::Tuple) = map(l -> bioclim_key(l), layers)
 
-bioclim_key(l::Symbol) = l
-bioclim_key(l::AbstractString) = Symbol(l)
-bioclim_key(l::Integer) = Symbol(string("bio", l))
+const bioclim_lookup = (
+    bio1 = 1,
+    bio2 = 2,
+    bio3 = 3,
+    bio4 = 4,
+    bio5 = 5,
+    bio6 = 6,
+    bio7 = 7,
+    bio8 = 8,
+    bio9 = 9,
+    bio10 = 10,
+    bio11 = 11,
+    bio12 = 12,
+    bio13 = 13,
+    bio14 = 14,
+    bio15 = 15,
+    bio16 = 16,
+    bio17 = 17,
+    bio18 = 18,
+    bio19 = 19,
+)
+
+# We allow a range of bioclim keys, as they are listed with 
+# a lot of variants on CHELSA and WorldClim
+bioclim_key(k::Symbol) = bioclim_key(string(k))
+bioclim_key(k::AbstractString) = Symbol(replace(lowercase(k), "_" => ""))
+bioclim_key(k::Integer) = keys(bioclim_lookup)[k]
+
+bioclim_int(k::Integer) = k
+bioclim_int(k::Symbol) = bioclim_lookup[bioclim_key(k)]
 
 """
     Climate <: RasterDataSet

@@ -1,9 +1,31 @@
 resolutions(::Type{EarthEnv{HabitatHeterogeneity}}) = ("1km", "5km", "25km")
 defres(::Type{EarthEnv{HabitatHeterogeneity}}) = "25km"
-layers(::Type{EarthEnv{HabitatHeterogeneity}}) = (
-    :cv, :evenness, :range, :shannon, :simpson, :std, :Contrast, :Correlation,
-    :Dissimilarity, :Entropy, :Homogeneity, :Maximum, :Uniformity, :Variance
+layers(::Type{EarthEnv{HabitatHeterogeneity}}) = values(heterogeneity_lookup)
+layerkeys(::Type{EarthEnv{HabitatHeterogeneity}}) = keys(heterogeneity_lookup)
+layerkeys(T::Type{EarthEnv{HabitatHeterogeneity}}, layers) = map(l -> layerkeys(T, l), layers)
+function layerkeys(::Type{EarthEnv{HabitatHeterogeneity}}, layer::Symbol)
+    Symbol(lowercase(string(layer)))
+end
+
+# Yes, they randomly chose cases
+const heterogeneity_lookup = (
+    cv = :cv,
+    evenness = :evenness,
+    range = :range,
+    shannon = :shannon,
+    simpson = :simpson,
+    std = :std,
+    contrast = :Contrast,
+    correlation = :Correlation,
+    dissimilarity = :Dissimilarity,
+    entropy = :Entropy,
+    homogeneity = :Homogeneity,
+    maximum = :Maximum,
+    uniformity = :Uniformity,
+    variance = :Variance,
 )
+
+heterogeneity_layer(x::Symbol) = heterogeneity_lookup[Symbol(lowercase(string(x)))]
 
 """
     getraster(source::Type{EarthEnv{HabitatHeterogeneity}}, [layer]; res="25km")
@@ -19,7 +41,7 @@ Download [`EarthEnv`](@ref) habitat heterogeneity data.
 
 Returns the filepath/s of the downloaded or pre-existing files.
 """
-function getraster(T::Type{EarthEnv{HabitatHeterogeneity}}, layers::Union{Tuple,Symbol}; 
+function getraster(T::Type{EarthEnv{HabitatHeterogeneity}}, layers::Union{Tuple,Symbol};
     res::String=defres(T)
 )
     _getraster(T, layers, res)
@@ -29,6 +51,7 @@ function _getraster(T::Type{EarthEnv{HabitatHeterogeneity}}, layers::Tuple, res:
     return _map_layers(T, layers, res)
 end
 function _getraster(T::Type{EarthEnv{HabitatHeterogeneity}}, layer::Symbol, res::String)
+    layer = heterogeneity_layer(layer)
     _check_layer(T, layer)
     _check_res(T, res)
     path = rasterpath(T, layer; res)

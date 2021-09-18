@@ -7,14 +7,16 @@ layerkeys(::Type{CHELSA{BioClim}}, args...) = layerkeys(BioClim, args...)
 Download [`CHELSA`](@ref) [`BioClim`](@ref) data from [chelsa-climate.org](https://chelsa-climate.org/).
 
 # Arguments
-- `layer`: `Integer` or tuple/range of `Integer` from `$(layers(CHELSA{BioClim}))`. 
-    Without a `layer` argument, all layers will be downloaded, and a `NamedTuple` of paths returned.
+- `layer`: `Integer` or tuple/range of `Integer` from `$(layers(BioClim))`, 
+    or `Symbol`s form `$(layerkeys(BioClim))`. Without a `layer` argument, all layers
+    will be downloaded, and a `NamedTuple` of paths returned.
 
 Returns the filepath/s of the downloaded or pre-existing files.
 """
-getraster(T::Type{CHELSA{BioClim}}, layers::Tuple) = _map_layers(T, layers)
-getraster(T::Type{CHELSA{BioClim}}, layer::Integer) = _getraster(T, layer)
+getraster(T::Type{CHELSA{BioClim}}, layer::Union{Tuple,Int,Symbol}) = _getraster(T, layer)
 
+_getraster(T::Type{CHELSA{BioClim}}, layers::Tuple) = _map_layers(T, layers)
+_getraster(T::Type{CHELSA{BioClim}}, layer::Symbol) = _getraster(T, bioclim_int(layer))
 function _getraster(T::Type{CHELSA{BioClim}}, layer::Integer)
     _check_layer(T, layer)
     path = rasterpath(T, layer)

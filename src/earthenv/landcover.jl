@@ -1,23 +1,24 @@
 layers(::Type{<:EarthEnv{<:LandCover}}) = ntuple(identity, Val{12}())
 
-function layerkeys(::Type{<:EarthEnv{<:LandCover}}) 
-    (
-        :NeedleleafTrees,
-        :EvergreenBroadleafTrees,
-        :DeciduousBroadleafTrees,
-        :OtherTrees,
-        :Shrubs,
-        :Herbaceous,
-        :CultivatedAndManaged,
-        :RegularlyFlooded,
-        :UrbanBuiltup,
-        :SnowIce,
-        :Barren,
-        :OpenWater,
-    )
-end
-layerkeys(T::Type{<:EarthEnv{<:LandCover}}, layer::Int) = layerkeys(T)[layer]
+layerkeys(::Type{<:EarthEnv{<:LandCover}}) = keys(landcover_lookup)
 layerkeys(T::Type{<:EarthEnv{<:LandCover}}, layers) = map(l -> layerkeys(T, l), layers)
+layerkeys(T::Type{<:EarthEnv{<:LandCover}}, layer::Int) = layerkeys(T)[layer]
+layerkeys(T::Type{<:EarthEnv{<:LandCover}}, layer::Symbol) = layer
+
+const landcover_lookup = (
+    needleleaf_trees = 1,
+    evergreen_broadleaf_trees = 2,
+    deciduous_broadleaf_trees = 3,
+    other_trees = 4,
+    shrubs = 5,
+    herbaceous = 6,
+    cultivated_and_managed = 7,
+    regularly_flooded = 8,
+    urban_builtup = 9,
+    snow_ice = 10,
+    barren = 11,
+    open_water = 12,
+)
 
 """
     getraster(T::Type{EarthEnv{LandCover}}, [layer]; discover::Bool=false) => Union{Tuple,String}
@@ -25,18 +26,21 @@ layerkeys(T::Type{<:EarthEnv{<:LandCover}}, layers) = map(l -> layerkeys(T, l), 
 Download [`EarthEnv`](@ref) landcover data.
 
 # Arguments
-- `layer`: `Integer` or tuple/range of `Integer` from `$(layers(EarthEnv{LandCover}))`.
-    Without a `layer` argument, all layers will be downloaded, and a `NamedTuple` of paths returned.
+
+- `layer`: `Integer` or tuple/range of `Integer` from `$(layers(EarthEnv{LandCover}))`,
+    or `$(layerkeys(EarthEnv{LandCover}))`. Without a `layer` argument, all layers will
+    be downloaded, and a `NamedTuple` of paths returned.
 
 `LandCover` may also be `LandCover{:DISCover} to download the dataset that integrates the DISCover model.
 
 Returns the filepath/s of the downloaded or pre-existing files.
 """
-function getraster(T::Type{<:EarthEnv{<:LandCover}}, layers::Union{Tuple,Int})
+function getraster(T::Type{<:EarthEnv{<:LandCover}}, layers::Union{Tuple,Int,Symbol})
     _getraster(T, layers)
 end
 
 _getraster(T::Type{<:EarthEnv{<:LandCover}}, layers::Tuple) = _map_layers(T, layers)
+_getraster(T::Type{<:EarthEnv{<:LandCover}}, layer::Symbol) = _getraster(T, landcover_lookup[layer])
 function _getraster(T::Type{<:EarthEnv{<:LandCover}}, layer::Integer)
     _check_layer(T, layer)
     url = rasterurl(T, layer)

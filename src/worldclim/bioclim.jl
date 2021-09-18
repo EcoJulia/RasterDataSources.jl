@@ -7,19 +7,25 @@ layerkeys(T::Type{WorldClim{BioClim}}, args...) = layerkeys(BioClim, args...)
 Download [`WorldClim`](@ref) [`BioClim`](@ref) data.
 
 # Arguments
-- `layer`: `Integer` or tuple/range of `Integer` from `$(layers(WorldClim{BioClim}))`. 
-    Without a `layer` argument, all layers will be downloaded, and a `NamedTuple` of paths returned.
+
+- `layer`: `Integer` or tuple/range of `Integer` from `$(layers(BioClim))`. 
+    or `Symbol`s from `$(layerkeys(BioClim))`. Without a `layer` argument, all layers
+    will be downloaded, and a `NamedTuple` of paths returned.
 
 # Keywords
+
 - `res`: `String` chosen from $(resolutions(WorldClim{BioClim})), "10m" by default.
 
 Returns the filepath/s of the downloaded or pre-existing files.
 """
-function getraster(T::Type{WorldClim{BioClim}}, layers::Union{Tuple,Int}=layers(T); res::String=defres(T))
+function getraster(T::Type{WorldClim{BioClim}}, layers::Union{Tuple,Int,Symbol}; 
+    res::String=defres(T)
+)
     _getraster(T, layers, res)
 end
 
 _getraster(T::Type{WorldClim{BioClim}}, layers::Tuple, res) = _map_layers(T, layers, res)
+_getraster(T::Type{WorldClim{BioClim}}, layer::Symbol, res) = _getraster(T, bioclim_int(layer), res)
 function _getraster(T::Type{WorldClim{BioClim}}, layer::Integer, res)
     _check_layer(T, layer)
     _check_res(T, res)
