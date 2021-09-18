@@ -11,7 +11,7 @@ date_step(::Type{<:CHELSA{<:Future{Climate,CMIP6}}}) = Year(30)
 const CHELSAKEY = (prec="pr", temp="tas", tmin="tasmin", tmax="tasmax", bio="bio")
 
 """
-    getraster(T::Type{CHELSA{Future{BioClim}}}, [layer::Integer]; date) => String
+    getraster(T::Type{CHELSA{Future{BioClim}}}, [layer]; date) => String
 
 Download CHELSA BioClim data, choosing layers from: `$(layers(CHELSA{BioClim}))`.
 
@@ -31,7 +31,7 @@ function getraster(
 end
 
 """
-    getraster(T::Type{CHELSA{Future{Climate}}}, [layer::Integer]; date, month) => String
+    getraster(T::Type{CHELSA{Future{Climate}}}, [layer]; date, month) => String
 
 Download CHELSA BioClim data, choosing layers from: `$(layers(CHELSA{BioClim}))`.
 

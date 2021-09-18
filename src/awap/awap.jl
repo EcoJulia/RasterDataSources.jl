@@ -28,7 +28,7 @@ const AWAP_PATHSEGMENTS = (
 # Add ndvi monthly?  ndvi, ndviave, month
 
 """
-    getraster(source::Type{AWAP}, [layer::Union{Tuple,Symbol}]; date::Union{DateTime,Tuple,AbstractVector})
+    getraster(source::Type{AWAP}, [layer]; date)
 
 Download data from the [`AWAP`](@ref) weather dataset, from
 [www.csiro.au/awap](http://www.csiro.au/awap/). 

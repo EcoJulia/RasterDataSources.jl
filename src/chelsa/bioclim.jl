@@ -2,7 +2,7 @@ layers(::Type{CHELSA{BioClim}}) = layers(BioClim)
 layerkeys(::Type{CHELSA{BioClim}}, args...) = layerkeys(BioClim, args...)
 
 """
-    getraster(source::Type{CHELSA{BioClim}}, [layer::Union{Tuple,Integer}]) => Union{Tuple,String}
+    getraster(source::Type{CHELSA{BioClim}}, [layer]) => Union{Tuple,String}
 
 Download [`CHELSA`](@ref) [`BioClim`](@ref) data from [chelsa-climate.org](https://chelsa-climate.org/).
 
