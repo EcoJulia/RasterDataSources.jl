@@ -52,7 +52,6 @@ _date_sequence(step, date) = date:step:date
 function _maybe_download(uri::URI, filepath)
     if !isfile(filepath)
         mkpath(dirname(filepath))
-        println("Starting download for $uri")
         try
             HTTP.download(string(uri), filepath)
         catch e
