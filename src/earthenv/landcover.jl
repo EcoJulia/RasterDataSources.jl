@@ -28,8 +28,8 @@ Download [`EarthEnv`](@ref) landcover data.
 # Arguments
 
 - `layer`: `Integer` or tuple/range of `Integer` from `$(layers(EarthEnv{LandCover}))`,
-    or `$(layerkeys(EarthEnv{LandCover}))`. Without a `layer` argument, all layers will
-    be downloaded, and a `NamedTuple` of paths returned.
+    or `Symbol`s from `$(layerkeys(EarthEnv{LandCover}))`. Without a `layer` argument,
+    all layers will be downloaded, and a `NamedTuple` of paths returned.
 
 `LandCover` may also be `LandCover{:DISCover} to download the dataset that integrates the DISCover model.
 

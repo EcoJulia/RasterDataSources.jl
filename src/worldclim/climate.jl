@@ -10,8 +10,7 @@ Download [`WorldClim`](@ref) [`Climate`](@ref) data.
     Without a `layer` argument, all layers will be downloaded, and a `NamedTuple` of paths returned.
 
 # Keywords
-- `month`: `Integer` or `AbstractArray` of `Integer`. By default all months are downloaded,
-    but can be chosen from `1:12`.
+- `month`: `Integer` or `AbstractArray` of `Integer`. Chosen from `1:12`.
 - `res`: `String` chosen from $(resolutions(WorldClim{Climate})), "10m" by default.
 
 Returns the filepath/s of the downloaded or pre-existing files.

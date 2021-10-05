@@ -13,7 +13,9 @@ const CHELSAKEY = (prec="pr", temp="tas", tmin="tasmin", tmax="tasmax", bio="bio
 """
     getraster(T::Type{CHELSA{Future{BioClim}}}, [layer]; date) => String
 
-Download CHELSA BioClim data, choosing layers from: `$(layers(CHELSA{BioClim}))`.
+Download CHELSA [`BioClim`](@ref) data, choosing layers from: `$(layers(CHELSA{BioClim}))`.
+
+See the docs for [`Future`](@ref) for model choices.
 
 Without a layer argument, all layers will be downloaded, and a `NamedTuple` of paths 
 returned.
@@ -33,7 +35,9 @@ end
 """
     getraster(T::Type{CHELSA{Future{Climate}}}, [layer]; date, month) => String
 
-Download CHELSA BioClim data, choosing layers from: `$(layers(CHELSA{BioClim}))`.
+Download CHELSA [`Climate`](@ref) data, choosing layers from: `$(layers(CHELSA{BioClim}))`.
+
+See the docs for [`Future`](@ref) for model choices.
 
 Without a layer argument, all layers will be downloaded, and a `NamedTuple` of paths returned.
 

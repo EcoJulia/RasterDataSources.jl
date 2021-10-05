@@ -15,8 +15,16 @@ abstract type RasterDataSet end
 """
     BioClim <: RasterDataSet
 
-BioClim datasets. Usually containing layers from 1:19. They do not usually use
-`month` or `date` keywords, but may use `date` in past/future scenarios. 
+BioClim datasets. Usually containing layers from `1:19`. 
+These can also be accessed with `:bioX`, e.g. `:bio5`.
+
+They do not usually use `month` or `date` keywords, but may use
+`date` in past/future scenarios. 
+
+Currently implemented for WorldClim and CHELSA as `WorldClim{BioClim}`,
+`CHELSA{BioClim}` and `CHELSA{Future{BioClim, args..}}`.
+
+See the [`getraster`](@ref) docs for implementation details.
 """
 struct BioClim <: RasterDataSet end
 
@@ -61,7 +69,12 @@ bioclim_int(k::Symbol) = bioclim_lookup[bioclim_key(k)]
     Climate <: RasterDataSet
 
 Climate datasets. These are usually months of the year, not specific dates,
-and use a `month` keyword in `getraster`. They may also use `date` in past/future scenarios.
+and use a `month` keyword in `getraster`. They also use `date` in past/future scenarios.
+
+Currently implemented for WorldClim and CHELSA as `WorldClim{Climate}`,
+`CHELSA{Climate}` and `CHELSA{Future{Climate, args..}}`.
+
+See the [`getraster`](@ref) docs for implementation details.
 """
 struct Climate <: RasterDataSet end
 
@@ -72,6 +85,11 @@ months(::Type{Climate}) = ntuple(identity, Val{12})
 
 Weather datasets. These are usually large time-series of specific dates,
 and use a `date` keyword in `getraster`.
+
+Currently implemented for WorldClim and CHELSA as `WorldClim{Weather}`,
+and `CHELSA{Weather}`
+
+See the [`getraster`](@ref) docs for implementation details.
 """
 struct Weather <: RasterDataSet end
 
@@ -79,6 +97,10 @@ struct Weather <: RasterDataSet end
     LandCover <: RasterDataSet
 
 Land-cover datasets.
+
+Currently implemented for EarthEnv as `EarchEnv{LandCover}`.
+
+See the [`getraster`](@ref) docs for implementation details.
 """
 struct LandCover{X} <: RasterDataSet end
 
@@ -86,6 +108,10 @@ struct LandCover{X} <: RasterDataSet end
     HabitatHeterogeneity <: RasterDataSet
 
 Habitat heterogeneity datasets.
+
+Currently implemented for EarchEnv as `EarchEnv{HabitatHeterogeneity}`.
+
+See the [`getraster`](@ref) docs for implementation details.
 """
 struct HabitatHeterogeneity <: RasterDataSet end
 
@@ -141,6 +167,14 @@ struct MRIESM2 <: ClimateModel end
 struct UKESM <: ClimateModel end
 struct MPIESMHR <: ClimateModel end
 
+"""
+    CMIPphase 
+
+Abstract supertype for phases of the CMIP,
+the Coupled Model Intercomparison Project.
+
+Subtypes are `CMIP5` and `CMIP6`.
+"""
 abstract type CMIPphase end
 
 """
@@ -158,11 +192,20 @@ The Coupled Model Intercomparison Project, Phase 6.
 struct CMIP6 <: CMIPphase end
 
 """
+    ClimateScenario 
+
+Abstract supertype for scenarios used in [`CMIPphase`](@ref) models.
+"""
+abstract type ClimateScenario end
+
+"""
     RepresentativeConcentrationPathway
 
-Abstract supertype for Representative Concentration Pathways (RCPs)
+Abstract supertype for Representative Concentration Pathways (RCPs) for [`CMIP5`](@ref).
+
+Subtypes are: `RCP26`, `RCP45`, `RCP60`, `RCP85`
 """
-abstract type RepresentativeConcentrationPathway end
+abstract type RepresentativeConcentrationPathway <: ClimateScenario end
 
 struct RCP26 <: RepresentativeConcentrationPathway end
 struct RCP45 <: RepresentativeConcentrationPathway end
@@ -172,22 +215,69 @@ struct RCP85 <: RepresentativeConcentrationPathway end
 """
     SharedSocioeconomicPathway
 
-Abstract supertype for Shared Socio-economic Pathways (SSPs)
+Abstract supertype for Shared Socio-economic Pathways (SSPs) for [`CMIP6`](@ref).
+
+Subtypes are: `SSP126`, `SSP245`, SSP370`, SSP585`
 """
-abstract type SharedSocioeconomicPathway end
+abstract type SharedSocioeconomicPathway <: ClimateScenario end
 
 struct SSP126 <: SharedSocioeconomicPathway end
 struct SSP245 <: SharedSocioeconomicPathway end
 struct SSP370 <: SharedSocioeconomicPathway end
 struct SSP585 <: SharedSocioeconomicPathway end
 
-# A ClimateScenario can be a RCP or a SSP
-const ClimateScenario = Union{RepresentativeConcentrationPathway, SharedSocioeconomicPathway}
-
 """
-    Future{D<:RasterDataSet,M<:ClimateModel,S<:ClimateScenario}
+    Future{<:RasterDataSet,<:CMIPphase,<:ClimateModel,<:ClimateScenario}
 
-Future climate dataset: specified by a dataset, model, and scenario.
+Future climate datasets specified with a dataset, phase, model, and scenario.
+
+## Type Parameters
+
+#### `RasterDataSet`
+
+Currently [`BioClim`](@ref) and [`Climate`](@ref) are implemented
+for the [`CHELSA`](@ref) data source.
+
+#### `CMIPphase`
+
+Can be either [`CMIP5`](@ref) or [`CMIP6`](@ref).
+
+#### `ClimateModel`
+
+Climate models can be chosen from: 
+
+`ACCESS1`, `BNUESM`, `CCSM4`, `CESM1BGC`, `CESM1CAM5`, `CMCCCMS`, `CMCCCM`,
+`CNRMCM5`, `CSIROMk3`, `CanESM2`, `FGOALS`, `FIOESM`, `GFDLCM3`, `GFDLESM2G`,
+`GFDLESM2M`, `GISSE2HCC`, `GISSE2H`, `GISSE2RCC`, `GISSE2R`, `HadGEM2AO`,
+`HadGEM2CC`, `IPSLCM5ALR`, `IPSLCM5AMR`, `MIROCESMCHEM`, `MIROCESM`, `MIROC5`,
+`MPIESMLR`, `MPIESMMR`, `MRICGCM3`, `MRIESM1`, `NorESM1M`, `BCCCSM1`, `Inmcm4`,
+`BCCCSM2MR`, `CNRMCM61`, `CNRMESM21`, `CanESM5`, `GFDLESM4`, `IPSLCM6ALR`,
+`MIROCES2L`, `MIROC6`, `MRIESM2`, `UKESM`, `MPIESMHR`
+
+Note: not all of these will be available for both `CMIP5` and `CMIP6`.
+
+#### `ClimateScenario`
+
+CMIP5 Climate scenarios are all [`RepresentativeConcentrationPathway`](@ref)
+and can be chosen from: `RCP26`, `RCP45`, `RCP60`, `RCP85`
+
+CMIP6 Climate scenarios are all [`SharedSocioeconomicPathway`](@ref) and
+can be chosen from: `SSP126`, `SSP245`, SSP370`, SSP585`
+
+## Example
+
+```jldoctest future
+using RasterDataSources
+dataset = Future{BioClim, CMIP5, BNUESM, RCP45}
+# output
+Future{BioClim, CMIP5, BNUESM, RCP45}
+```
+Currently `Future` is only implented for `CHELSA`
+
+```jldoctest future
+datasource = CHELSA{Future{BioClim, CMIP5, BNUESM, RCP45}}
+```
+
 """
 struct Future{D<:RasterDataSet,C<:CMIPphase,M<:ClimateModel,S<:ClimateScenario} end
 

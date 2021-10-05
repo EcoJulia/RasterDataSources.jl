@@ -17,6 +17,7 @@ Get the dataset in relative deciles.
 """
 struct Deciles <: DataMode end
 
+# Docs below
 struct ALWB{M<:DataMode,D<:Union{Day,Month,Year}} <: RasterDataSource end
 
 layers(::Type{<:ALWB}) = (
@@ -46,6 +47,8 @@ The available layers are: `$(layers(ALWB))`, available in daily, monthly and
 annual resolutions, and as `Values` or relative `Deciles`.
 
 `getraster` for `ALWB` must use a `date` keyword to specify the date to download.
+
+See the [`getraster`](@ref) docs for implementation details.
 """ ALWB
 
 # http://www.bom.gov.au/jsp/awra/thredds/fileServer/AWRACMS/values/day/rain_day_2017.nc
