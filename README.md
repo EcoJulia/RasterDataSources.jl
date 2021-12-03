@@ -6,7 +6,7 @@
 [![codecov.io](http://codecov.io/github/ecojulia/RasterDataSources.jl/coverage.svg?branch=master)](http://codecov.io/github/ecojulia/RasterDataSources.jl?branch=master)
 
 RasterDataSources downloads raster data for local use or for integration into other spatial data packages, like
-[GeoData.jl](https://github.com/rafaqz/GeoData.jl). The collection is largely focussed on datasets relevant
+[Rasters.jl](https://github.com/rafaqz/Rasters.jl). The collection is largely focussed on datasets relevant
 to ecology, but will have a lot of crossover with other sciences.
 
 Currently sources include :
