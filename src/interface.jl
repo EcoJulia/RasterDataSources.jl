@@ -7,7 +7,7 @@
 and return the filename/s of the selected files.
 
 RasterDataSources.jl aims to standardise an API for downloading many kinds of raster files
-from many sources, that can be wrapped by other packages (such as GeoData.jl and
+from many sources, that can be wrapped by other packages (such as Rasters.jl and
 SimpleSDMLayers.jl) in a simple, regular way. As much as possible it will move towards
 having less source-specific keywords wherever possible. Similar datasets will behave in the
 same way so that they can be used interchangeably in the same code.
