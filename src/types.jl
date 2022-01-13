@@ -8,7 +8,7 @@ abstract type RasterDataSource end
 """
     RasterDataSet
 
-Abstract supertye for datasets that belong to a [`RasterDataSource`](@ref).
+Abstract supertype for datasets that belong to a [`RasterDataSource`](@ref).
 """
 abstract type RasterDataSet end
 
