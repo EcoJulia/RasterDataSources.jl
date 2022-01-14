@@ -20,3 +20,4 @@ end
 @time @safetestset "worldclim bioclim" begin include("worldclim-bioclim.jl") end
 @time @safetestset "worldclim climate" begin include("worldclim-climate.jl") end
 @time @safetestset "worldclim weather" begin include("worldclim-weather.jl") end
+@time @safetestset "srtm" begin include("srtm.jl") end
