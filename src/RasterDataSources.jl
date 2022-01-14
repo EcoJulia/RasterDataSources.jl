@@ -10,7 +10,7 @@ using Dates,
       URIs,
       ZipFile
 
-export WorldClim, CHELSA, EarthEnv, AWAP, ALWB
+export WorldClim, CHELSA, EarthEnv, AWAP, ALWB, SRTM
 
 export BioClim, Climate, Weather, LandCover, HabitatHeterogeneity
 
@@ -54,5 +54,7 @@ include("earthenv/habitatheterogeneity.jl")
 include("awap/awap.jl")
 
 include("alwb/alwb.jl")
+
+include("srtm/srtm.jl")
 
 end # module
