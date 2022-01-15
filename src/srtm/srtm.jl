@@ -53,11 +53,10 @@ function bounds_to_tile_indices(::Type{SRTM}, bounds::NTuple{4,Real})
     _min:_max
 end
 
-#rasterpath(::Type{SRTM}) = joinpath(rasterpath(), "SRTM")
 
 for op = (:getraster, :rastername, :rasterpath, :zipname, :zipurl, :zippath)
     _op = Symbol('_', op) # Name of internal function
-    eval(quote
+    @eval begin
         # Broadcasting function dispatch
         $_op(T::Type{SRTM}, tile_index::CartesianIndices) = $(_op).(T, tile_index)
         # Bounds to tile indices dispatch
@@ -76,5 +75,5 @@ for op = (:getraster, :rastername, :rasterpath, :zipname, :zipurl, :zippath)
                 return $_op(T, tile_index === nothing ? bounds : tile_index)
             end
         end
-    end)
+    end
 end
