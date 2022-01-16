@@ -54,7 +54,7 @@ function bounds_to_tile_indices(::Type{SRTM}, bounds::NTuple{4,Real})
 end
 
 
-for op = (:getraster, :rastername, :rasterpath, :zipname, :zipurl, :zippath)
+for op in (:getraster, :rastername, :rasterpath, :zipname, :zipurl, :zippath)
     _op = Symbol('_', op) # Name of internal function
     @eval begin
         # Broadcasting function dispatch
@@ -63,16 +63,16 @@ for op = (:getraster, :rastername, :rasterpath, :zipname, :zipurl, :zippath)
         $_op(T::Type{SRTM}, bounds::NTuple{4,Real}) = $_op(T, bounds_to_tile_indices(T, bounds))
 
         # Public function definition with key-word arguments
-        function $op(T::Type{SRTM}; bounds = nothing, tile_index = nothing)
-            if (bounds === nothing) & (tile_index === nothing)
+        function $op(T::Type{SRTM}; bounds=nothing, tile_index=nothing)
+            if isnothing(bounds) & isnothing(tile_index)
                 :op === :getraster || return joinpath(rasterpath(), "SRTM")
                 throw(ArgumentError("One of `bounds` or `tile_index` kwarg must be specified"))
-            elseif (bounds !== nothing) & (tile_index !== nothing)
+            elseif !isnothing(bounds) & !isnothing(tile_index)
                 throw(ArgumentError("Only on of `bounds` or `tile_index` should be specified. " *
                                     "found `bounds`=$bounds and `tile_index`=$tile_index"))
             else
                 # Call the internal function without key-word arguments
-                return $_op(T, tile_index === nothing ? bounds : tile_index)
+                return $_op(T, isnothing(tile_index) ? bounds : tile_index)
             end
         end
     end
