@@ -68,7 +68,7 @@ for op in (:getraster, :rastername, :rasterpath, :zipname, :zipurl, :zippath)
                 :op === :getraster || return joinpath(rasterpath(), "SRTM")
                 throw(ArgumentError("One of `bounds` or `tile_index` kwarg must be specified"))
             elseif !isnothing(bounds) & !isnothing(tile_index)
-                throw(ArgumentError("Only on of `bounds` or `tile_index` should be specified. " *
+                throw(ArgumentError("Only one of `bounds` or `tile_index` should be specified. " *
                                     "found `bounds`=$bounds and `tile_index`=$tile_index"))
             else
                 # Call the internal function without key-word arguments
