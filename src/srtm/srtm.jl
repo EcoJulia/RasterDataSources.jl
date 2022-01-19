@@ -14,7 +14,7 @@ _rasterpath(T::Type{SRTM}, tile_index::CartesianIndex{2}) = joinpath(rasterpath(
 
 _zipname(::Type{SRTM}, tile_index::CartesianIndex{2}) = _raster_tile_stem(tile_index) * ".zip"
 _zipurl(T::Type{SRTM}, tile_index::CartesianIndex{2}) = joinpath(SRTM_URI, _zipname(T, tile_index))
-_zippath(T::Type{SRTM}, tile_index::CartesianIndex{2}) = joinpath(rasterpath(), "SRTM", "zips", zipname(T, tile_index))
+_zippath(T::Type{SRTM}, tile_index::CartesianIndex{2}) = joinpath(rasterpath(), "SRTM", "zips", _zipname(T, tile_index))
 
 
 function _getraster(T::Type{SRTM}, tile_index::CartesianIndex{2})
