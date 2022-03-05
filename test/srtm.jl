@@ -18,9 +18,9 @@ using RasterDataSources: rasterpath, zipurl, zipname
     @test isfile(raster_path1)
 
     lon1, lat1 = -180, 55       # Coordinates of [0, 0] pixel of tile x=1, y=2
-    @test RasterDataSources._wgs84_to_tile_index(lon1, lat1) == tile_index1
-    @test getraster(SRTM; bounds = (lon1, lat1, lon1, lat1)) == reshape([raster_path1], 1, 1)
+    @test 
+    getraster(SRTM; bounds=(lon1, lat1, lon1, lat1))
+    == reshape([raster_path1], 1, 1)
     lon2, lat2 = -172.5, 52.5   # Coordinates of [3000, 3000] pixel of tile x=2, y=2
-    @test RasterDataSources._wgs84_to_tile_index(lon2, lat2) == tile_index2
-    @test getraster(SRTM; bounds = (lon1, lat1, lon2, lat2)) == reshape([raster_path1, raster_path2], 1, 2)
+    @test getraster(SRTM; bounds=(lon1, lat1, lon2, lat2)) == reshape([raster_path1, raster_path2], 1, 2)
 end
