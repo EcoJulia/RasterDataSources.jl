@@ -21,7 +21,7 @@ const landcover_lookup = (
 )
 
 """
-    getraster(T::Type{EarthEnv{LandCover}}, [layer]; discover::Bool=false) => Union{Tuple,String}
+    getraster(T::Type{EarthEnv{LandCover}}, [layer]; discover=false) => Union{Tuple,String}
 
 Download [`EarthEnv`](@ref) landcover data.
 
@@ -31,7 +31,9 @@ Download [`EarthEnv`](@ref) landcover data.
     or `Symbol`s from `$(layerkeys(EarthEnv{LandCover}))`. Without a `layer` argument,
     all layers will be downloaded, and a `NamedTuple` of paths returned.
 
-`LandCover` may also be `LandCover{:DISCover} to download the dataset that integrates the DISCover model.
+# Keywords
+
+- `discover::Bool`: whether to download the dataset that integrates the DISCover model.
 
 Returns the filepath/s of the downloaded or pre-existing files.
 """
