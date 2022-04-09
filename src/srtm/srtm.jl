@@ -77,12 +77,14 @@ function bounds_to_tile_indices(::Type{SRTM}, bounds::NTuple{4,Real})
     bounds_to_tile_indices(SRTM, ((bounds[1], bounds[3]), (bounds[2], bounds[4])))
 end
 function bounds_to_tile_indices(::Type{SRTM}, (xs, ys)::NTuple{2,NTuple{2,Real}})
-    t_xs = _sort(_wgs84_to_tile_x.(xs))
-    t_ys = _sort(_wgs84_to_tile_y.(ys))
+    t_xs = _wgs84_to_tile_x.(xs)
+    t_ys = _wgs84_to_tile_y.(ys)
+    _check_order(t_xs)
+    _check_order(t_ys)
     return CartesianIndices((t_ys[1]:(t_ys[2]), t_xs[1]:(t_xs[2])))
 end
 
-_sort((a, b)) = a <= b ? (a, b) : (b, a)
+_check_order((a, b)) = a < b && throw(ArgumentError("Upper bound $b less than lower bound $a"))
 
 for op in (:getraster, :rastername, :rasterpath, :zipname, :zipurl, :zippath)
     _op = Symbol('_', op) # Name of internal function
