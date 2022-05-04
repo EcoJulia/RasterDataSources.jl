@@ -19,5 +19,5 @@ using RasterDataSources: rasterpath, zipurl, zipname
     lon1, lat1 = -175, 60       # Coordinates of [0, 0] pixel of tile x=2, y=1
     @test getraster(SRTM; bounds=((lon1, lon1), (lat1, lat1))) == reshape([raster_path1], 1, 1)
     lon2, lat2 = -171, 55   # Coordinates of [3000, 3000] pixel of tile x=2, y=2
-    @test getraster(SRTM; bounds=((lon1, lon2), (lat2, lat1))) == [raster_path1; raster_path2;;]
+    @test getraster(SRTM; bounds=((lon1, lon2), (lat2, lat1))) == permutedims([raster_path1 raster_path2])
 end
