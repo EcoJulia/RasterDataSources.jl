@@ -33,7 +33,8 @@ function modis_request(
     from,
     to
 )
-    base_uri = joinpath(string(MODIS_URI), product(T), "subset")
+    # using joinpath here is more readable but works only for UNIX based OS, :'(
+    base_uri = join([string(MODIS_URI), product(T), "subset"], "/")
     query = string(URI(; query = Dict(
         "latitude" => string(lat),
         "longitude" => string(lon),
