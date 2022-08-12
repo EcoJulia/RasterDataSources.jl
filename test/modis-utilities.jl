@@ -25,6 +25,6 @@ using DataFrames
         @test round.(RasterDataSources.maybe_build_gt(155555, 266666, 100, 142.4), digits = 1) == [1.4, 0.0, 0.0, 2.5, 0.0, -0.0]
         # request to MODIS and process it
         @test ncol(simple_request) == 15
-        @test length(RasterDataSources.process_subset(MOD13Q1, simple_request)) == 1
+        @test typeof(RasterDataSources.process_subset(MOD13Q1, simple_request)) == String
     end
 end

@@ -21,3 +21,5 @@ end
 @time @safetestset "worldclim climate" begin include("worldclim-climate.jl") end
 @time @safetestset "worldclim weather" begin include("worldclim-weather.jl") end
 @time @safetestset "srtm" begin include("srtm.jl") end
+@time @safetestset "modis utilities" begin include("modis-utilities.jl") end
+@time @safetestset "modis product info" begin include("modis-products.jl") end
