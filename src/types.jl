@@ -284,3 +284,50 @@ _dataset(::Type{<:Future{D}}) where D = D
 _phase(::Type{<:Future{<:Any,P}}) where P = P
 _model(::Type{<:Future{<:Any,<:Any,M}}) where M = M
 _scenario(::Type{<:Future{<:Any,<:Any,<:Any,S}}) where S = S
+
+
+"""
+    Abstract supertype for MODIS/VIIRS products
+"""
+abstract type ModisProduct <: RasterDataSet end
+
+struct ECO4ESIPTJPL <: ModisProduct end
+struct ECO4WUE <: ModisProduct end
+struct GEDI03 <: ModisProduct end
+struct GEDI04_B <: ModisProduct end
+struct MCD12Q1 <: ModisProduct end
+struct MCD12Q2 <: ModisProduct end
+struct MCD15A2H <: ModisProduct end
+struct MCD15A3H <: ModisProduct end
+struct MCD19A3 <: ModisProduct end
+struct MCD43A <: ModisProduct end
+struct MCD43A1 <: ModisProduct end
+struct MCD43A4 <: ModisProduct end
+struct MCD64A1 <: ModisProduct end
+struct MOD09A1 <: ModisProduct end
+struct MOD11A2 <: ModisProduct end
+struct MOD13Q1 <: ModisProduct end
+struct MOD14A2 <: ModisProduct end
+struct MOD15A2H <: ModisProduct end
+struct MOD16A2 <: ModisProduct end
+struct MOD17A2H <: ModisProduct end
+struct MOD17A3HGF <: ModisProduct end
+struct MOD21A2 <: ModisProduct end
+struct MOD44B <: ModisProduct end
+struct MYD09A1 <: ModisProduct end
+struct MYD11A2 <: ModisProduct end
+struct MYD13Q1 <: ModisProduct end
+struct MYD14A2 <: ModisProduct end
+struct MYD15A2H <: ModisProduct end
+struct MYD16A2 <: ModisProduct end
+struct MYD17A2H <: ModisProduct end
+struct MYD17A3HGF <: ModisProduct end
+struct MYD21A2 <: ModisProduct end
+struct SIF005 <: ModisProduct end
+struct SIF_ANN <: ModisProduct end
+struct VNP09A1 <: ModisProduct end
+struct VNP09H1 <: ModisProduct end
+struct VNP13A1 <: ModisProduct end
+struct VNP15A2H <: ModisProduct end
+struct VNP21A2 <: ModisProduct end
+struct VNP22Q2 <: ModisProduct end
