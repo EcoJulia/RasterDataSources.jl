@@ -66,7 +66,7 @@ function modis_request(
         subset.pixel = 1:nrow(subset)
 
         # this thing here could be prettier..
-
+        println(metadata[1, :])
         subset.cellsize .= metadata[i, :cellsize]
         subset.latitude .= metadata[i, :latitude]
         subset.longitude .= metadata[i, :longitude]
