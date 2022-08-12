@@ -60,6 +60,12 @@ getraster(T::Type{WorldClim{Weather}}, layers::Union{Tuple,Symbol}; date)
 getraster(T::Type{WorldClim{Climate}}, layers::Union{Tuple,Symbol}; month, res)
 ```
 
+## MODIS
+
+```
+# WIP
+```
+
 # Datasets
 
 ```@docs
