@@ -8,14 +8,14 @@ using DataFrames
         @test RasterDataSources.meters_to_latlon(111000, 0)[1] ≈ 1.0 rtol = 0.01
     end
     @testset "Low-level MODIS functions" begin
-        # example request : the Crozon peninsula in western France
+        # example request : the middle of Crozon peninsula in western France
         simple_request = RasterDataSources.modis_request(
             MOD13Q1,
             "250m_16_days_EVI",
             48.24,
             -4.5,
-            10,
-            10,
+            1,
+            1,
             "A2002033",
             "A2002033"
         )
