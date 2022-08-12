@@ -63,18 +63,18 @@ function modis_request(
     for i in 1:nrow(metadata) # for each (band, time)
 
         subset = DataFrame(body["subset"][i])
-        subset.pixel = 1:nrow(subset)
+        n = nrow(subset)
+        subset.pixel = 1:n
 
         # this thing here could be prettier..
-        println(metadata[1, :])
-        subset.cellsize .= metadata[i, :cellsize]
-        subset.latitude .= metadata[i, :latitude]
-        subset.longitude .= metadata[i, :longitude]
-        subset.ncols .= metadata[i, :ncols]
-        subset.nrows .= metadata[i, :nrows]
-        subset.xllcorner .= metadata[i, :xllcorner]
-        subset.yllcorner .= metadata[i, :yllcorner]
-        subset.header .= metadata[i, :header]
+        subset.cellsize = repeat([metadata[i, :cellsize]], n)
+        subset.latitude = repeat([metadata[i, :latitude]], n)
+        subset.longitude = repeat([metadata[i, :longitude]], n)
+        subset.ncols  = repeat([metadata[i, :ncols]], n)
+        subset.nrows = repeat([metadata[i, :nrows]], n)
+        subset.xllcorner = repeat([metadata[i, :xllcorner]], n)
+        subset.yllcorner = repeat([metadata[i, :yllcorner]], n)
+        subset.header = repeat([metadata[i, :header]], n)
 
         out = [out; subset]
     end
