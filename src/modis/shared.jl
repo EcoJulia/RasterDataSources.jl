@@ -26,7 +26,7 @@ function layerkeys(T::Type{MODIS{X}}) where X
         beginning = true
         for w in words # keep only "clean" words
             if beginning
-                if match(r"^[0-9]|days|m|meters", w) === nothing
+                if match(r"^[0-9]|^days|^m|^meters", w) === nothing
                     push!(newname, w)
                     beginning = false # added one word: no more checks
                 end
