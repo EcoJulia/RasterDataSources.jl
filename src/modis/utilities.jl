@@ -138,7 +138,7 @@ function maybe_build_gt(
         rasterpath(),
         "MODIS",
         "geotransforms",
-        string(xllcorner) * "," * string(yllcorner) * "," * string(cellsize) * ".csv"
+        string(xllcorner) * "," * string(yllcorner) * "," * string(cellsize) * "," *string(nrows) * ".csv"
     )
 
     if isfile(filepath)
@@ -165,7 +165,7 @@ function maybe_build_gt(
             lon - resolution[2]/2, # left longitude
             resolution[2], # lon resolution in degrees
             0.0, # no rotation
-            lat + nrows*resolution[1] - resolution[1]/2, # up latitude
+            lat + nrows*resolution[1] + resolution[1]/2, # up latitude
             0.0, # no rotation (yes, this order)
             -resolution[1] # lat resolution in degrees, negative because the data
             # matrix is south-up oriented
