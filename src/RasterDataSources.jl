@@ -78,5 +78,6 @@ include("srtm/srtm.jl")
 include("modis/shared.jl")
 include("modis/products.jl")
 include("modis/utilities.jl")
+include("modis/examples.jl")
 
 end # module
