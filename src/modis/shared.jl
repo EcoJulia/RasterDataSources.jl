@@ -188,8 +188,25 @@ function _getrasterchunk(T::Type{<:ModisProduct}, layer::Int;
     return out
 end
 
-function rasterpath(T::Type{<:ModisProduct})
+function rasterpath(T::Type{<:ModisProduct}, layer; kwargs...)
+    return joinpath(_rasterpath(T, layer), rastername(T; kwargs...))
+end
+
+function _rasterpath(T::Type{<:ModisProduct})
     return joinpath(rasterpath(), "MODIS", string(nameof(T)))
+end
+
+function _rasterpath(T::Type{<:ModisProduct}, layer::Int)
+    return joinpath(_rasterpath(T), list_layers(T)[layer])
+end
+
+function _rasterpath(T::Type{<:ModisProduct}, layer::Symbol)
+    return joinpath(_rasterpath(T), list_layers(T)[modis_int(T, layer)])
+end
+
+function _rasterpath(T::Type{<:ModisProduct}, layer::String)
+    layer in list_layers(T) && (return joinpath(_rasterpath(T), layer))
+    throw("Unknow layer in product $(string(T))")
 end
 
 function rastername(T::Type{<:ModisProduct}, layer::Int; kwargs...)

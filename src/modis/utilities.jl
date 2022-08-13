@@ -231,17 +231,9 @@ function process_subset(T::Type{<:ModisProduct}, df::DataFrame)
 
     gt = maybe_build_gt(xllcorner, yllcorner, nrows, cellsize)
 
-    raster_path = rasterpath(T)
-
     path_out = String[]
 
     for d in eachindex(dates)
-
-        raster_name = rastername(T;
-            lat = gt[4],
-            lon = gt[1],
-            date = dates[d]
-        )
 
         ar = Array{Float64}(undef, nrows, ncols, length(bands))
         
@@ -254,7 +246,11 @@ function process_subset(T::Type{<:ModisProduct}, df::DataFrame)
             
             mat = Matrix{Float64}(undef, nrows, ncols)
 
-            filepath = joinpath(raster_path, bands[b], raster_name)
+            filepath = rasterpath(T, bands[b];
+                lat = gt[4],
+                lon = gt[1],
+                date = dates[d]
+            )
 
             # fill matrix row by row
             count = 1
@@ -292,7 +288,7 @@ function process_subset(T::Type{<:ModisProduct}, df::DataFrame)
                 @info "Raster file $(basename(filepath)) already exists in $(dirname(filepath))"
             end
 
-            push!(path_out, joinpath(raster_path, bands[b], raster_name))
+            push!(path_out, filepath)
 
         end
     end
