@@ -62,8 +62,11 @@ getraster(T::Type{WorldClim{Climate}}, layers::Union{Tuple,Symbol}; month, res)
 
 ## MODIS
 
-```
-# WIP
+```@docs
+MODIS
+getraster(T::Type{<:ModisProduct})
+ModisProduct
+RasterDataSources.layerkeys(T::Type{<:ModisProduct})
 ```
 
 # Datasets
@@ -104,8 +107,34 @@ internally consistent. Any new sources added to the package should use these
 methods in a consistent way for readability, consistency and the potential to use
 them for other things later.
 
-```@autodocs
-Modules = [RasterDataSources]
-Public = false
-Order = [:function]
+```@docs
+RasterDataSources.layerkeys
+RasterDataSources.rastername
+RasterDataSources.rasterpath
+RasterDataSources.rasterurl
+RasterDataSources.zipname
+RasterDataSources.zippath
+RasterDataSources.zipurl
+```
+
+# Internal MODIS interface
+
+Unlike all the other currently supported data sources, MODIS data is not
+available online in raster file format. Building rasters out of the
+available information therefore requires internal functions that are not
+exported. They might be extended as needed if other similar sources get
+supported.
+
+### Requesting to server and building raster files
+
+```@docs
+RasterDataSources.modis_request
+RasterDataSources.process_subset
+```
+
+### Miscellaneous
+
+```@docs
+RasterDataSources.product
+RasterDataSources.sin_to_ll
 ```

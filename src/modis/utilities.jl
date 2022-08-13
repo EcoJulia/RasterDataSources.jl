@@ -9,7 +9,10 @@ adds more dependencies..
 """
 
 """
-    Convert layer key Symbol to integer
+    modis_int(T::Type{<:ModisProduct}, l::Symbol)
+
+Converts Symbol `l` to the corresponding integer if `l` is in the
+layer keys of the required `ModisProduct` `T`.
 """
 function modis_int(T::Type{<:ModisProduct}, l::Symbol)
     keys = layerkeys(T)
@@ -28,9 +31,19 @@ const MODIS_URI = URI(
 )
 
 """
-    Lowest level function for requests to modis server.
+    modis_request(T::Type{<:ModisProduct}, args...)
 
-All arguments are assumed of correct types
+Lowest level function for requests to modis server. All arguments are assumed of correct types
+
+# Arguments
+
+ - `layer`: `String` matching the "exact" layer name (i.e. as it is written in the MODIS dataset itself) for the given product. e.g. `"250m_16_days_EVI"`.
+
+ - `lat`, `lon`, `km_ab`, `km_lr` in correct types
+
+ - `from`, `to`: `String`s of astronomical dates for start and end dates of downloaded data, e.g. `"A2002033"` for "2002-02-02"
+
+Returns a `DataFrame` with all requested data directly downloaded from MODIS. The `DataFrame` will almost always directly be passed to [`RasterDataSources.process_subset`](@ref)
 """
 function modis_request(
     T::Type{<:ModisProduct},
@@ -93,11 +106,11 @@ function modis_request(
 end
  
 """
-    Convert x and y in sinusoidal projection to lat and lon in dec. degrees
+    sin_to_ll(x::Real, y::Real)    
 
-The EPSG.io API (https://github.com/maptiler/epsg.io) takes care of coordinate
-conversions. This is not ideal in terms of network use but at least the
-coordinates are correct.
+Convert x and y in sinusoidal projection to lat and lon in dec. degrees
+
+The ![EPSG.io API](https://github.com/maptiler/epsg.io) takes care of coordinate conversions. This is not ideal in terms of network use but guarantees that the coordinates are correct.
 """
 function sin_to_ll(x::Real, y::Real)
 
@@ -193,11 +206,15 @@ function maybe_build_gt(
 end
 
 """
-    Process a raw subset dataframe and create several rasters
+    process_subset(T::Type{<:ModisProduct}, df::DataFrame)    
 
-For each band, a separate folder is created, containing a file for each of
-the required dates. This is inspired by the way WorldClim{Climate} treats the
-problem of possibly having to download several dates AND bands.
+Process a raw subset dataframe and create several raster files. Any already existing file is not overwritten.
+
+For each band, a separate folder is created, containing a file for each of the required dates. This is inspired by the way WorldClim{Climate} treats the problem of possibly having to download several dates AND bands.
+
+Can theoretically be used for `DataFrame`s of MODIS data that do not directly come from [`RasterDataSources.modis_request`](@ref), but caution is advised.
+
+Returns the filepath/s of the created or pre-existing files.
 """
 function process_subset(T::Type{<:ModisProduct}, df::DataFrame)
     

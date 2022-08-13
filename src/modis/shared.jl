@@ -1,9 +1,9 @@
 """
     MODIS{ModisProduct} <: RasterDataSource
 
-MODIS/VIIRS Land Product Database. Vegetation indices, surface reflectance, and more land cover data.
+MODIS/VIIRS Land Product Database. Vegetation indices, surface reflectance, and more land cover data. Data from [`ModisProduct`](@ref)s datasets. 
 
-See [modis.ornl.gov](https://modis.ornl.gov/)
+See: [modis.ornl.gov](https://modis.ornl.gov/)
 """
 struct MODIS{X} <: RasterDataSource end
 
@@ -33,6 +33,13 @@ function layerkeys(T::Type{MODIS{X}}) where X
     return Tuple(collect(keys)) # build tuple from Array{Symbol}
 end
 
+"""
+    layerkeys(T::Type{<:ModisProduct}) => Tuple
+
+`Tuple` of `Symbol`s corresponding to the available layers for a given product.
+May issue a request to MODIS server to get the layers list, or might just read
+this information if the correctly named file is available.
+"""
 layerkeys(T::Type{<:ModisProduct}) = layerkeys(MODIS{T})
 
 function layerkeys(T::Type{<:MODIS{X}}, layers::Tuple) where X
@@ -58,6 +65,27 @@ function getraster(T::Type{<:MODIS{X}}, args...; kwargs...) where X
         throw("Unrecognized MODIS product.")
 end 
 
+"""
+    getraster(T::Union{Type{<:ModisProduct}, Type{MODIS{X}}}, [layer::Union{Tuple,AbstractVector,Integer, Symbol}]; kwargs...) => Union{String, AbstractVector, NamedTuple}
+
+Download [`MODIS`](@ref) data for a given [`ModisProduct`](@ref).
+
+# Arguments
+
+- `layer`: `Integer` or tuple/range of `Integer` or `Symbol`s. Without a `layer` argument, all layers will be downloaded, and a `NamedTuple` of paths returned.
+
+Available layers for a given product can be looked up using [`RasterDataSources.layerkeys(T::Type{<:ModisProduct})`](@ref).
+
+# Keywords
+
+- `lat` and `lon`: Coordinates in decimal degrees of the approximate center of the raster. The MODIS API will try to match its pixel grid system as close as possible to those coordinates.
+
+- `km_ab` and `km_lr``: Half-width and half-height of the raster in kilometers. Currently only `Integer` values are supported.
+
+- `from` and `to`: `String` or `Date` in format YYYY-MM-DD for required start and end dates of raster download. Will download several files, one for each date.
+
+Returns the filepath/s of the downloaded or pre-existing files.
+"""
 function getraster(T::Type{<:ModisProduct}, layer::Union{Tuple, Symbol, Int}=layerkeys(T);
     lat::Real,
     lon::Real,
@@ -131,7 +159,16 @@ function _getraster(T::Type{<:ModisProduct}, layer::Int;
     return files
 end
 
-# this should always receive less than 10 dates
+"""
+    _getrasterchunk(T::Type{<:ModisProduct}, layer::Int; dates::Vector{String}, kwargs...)
+
+Internal calls of [`RasterDataSources.modis_request`](@ref) and [`RasterDataSources.process_subset`](@ref): fetch data from server,
+write a raster `.tif` file.
+
+The MODIS API only allows requests for ten or less dates.
+
+Returns the filepath/s of the downloaded or pre-existing files.
+"""
 function _getrasterchunk(T::Type{<:ModisProduct}, layer::Int;
     dates::Vector{String},
     kwargs...

@@ -6,7 +6,9 @@ same layers.
 """
 
 """
-    Extracts product name as a `String`
+    product(T::Type{<:ModisProduct})
+
+Extracts `ModisProduct` product name as a `String`
 """
 function product(T::Type{<:ModisProduct})
     return String(nameof(T))

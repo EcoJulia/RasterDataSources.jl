@@ -287,7 +287,9 @@ _scenario(::Type{<:Future{<:Any,<:Any,<:Any,S}}) where S = S
 
 
 """
-    Abstract supertype for MODIS/VIIRS products
+    ModisProduct <: RasterDataSet
+
+Abstract supertype for [`MODIS`](@ref)/VIIRS products
 """
 abstract type ModisProduct <: RasterDataSet end
 
