@@ -7,12 +7,6 @@ See [modis.ornl.gov](https://modis.ornl.gov/)
 """
 struct MODIS{X} <: RasterDataSource end
 
-const MODIS_URI = URI(
-    scheme = "https",
-    host = "modis.ornl.gov",
-    path = "/rst/api/v1"
-)
-
 function layerkeys(T::Type{MODIS{X}}) where X 
     layernames = list_layers(X)
 
@@ -64,7 +58,7 @@ function getraster(T::Type{<:MODIS{X}}, args...; kwargs...) where X
         throw("Unrecognized MODIS product.")
 end 
 
-function getraster(T::Type{<:ModisProduct}, layer::Union{Tuple, Symbol, Int};
+function getraster(T::Type{<:ModisProduct}, layer::Union{Tuple, Symbol, Int}=layerkeys(T);
     lat::Real,
     lon::Real,
     km_ab::Int,

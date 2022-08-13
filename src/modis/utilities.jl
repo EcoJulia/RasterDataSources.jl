@@ -19,6 +19,15 @@ function modis_int(T::Type{<:ModisProduct}, l::Symbol)
 end
 
 """
+    MODIS API address
+"""
+const MODIS_URI = URI(
+    scheme = "https",
+    host = "modis.ornl.gov",
+    path = "/rst/api/v1"
+)
+
+"""
     Lowest level function for requests to modis server.
 
 All arguments are assumed of correct types
