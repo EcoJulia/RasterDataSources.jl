@@ -142,9 +142,13 @@ function _getraster(T::Type{<:ModisProduct}, layer::Int;
         # take "chunk" subsets of dates 10 by 10
         n_chunks = div(length(dates), 10) +1
         chunks = [dates[1+10*k:(k == n_chunks -1 ? end : 10*k+10)] for k in 0:(n_chunks-1)]
+        
+        # remove empty end chunk
+        # (happens when length(dates) is divisible by 10)
+        length(chunks[end]) == 0 && (chunks = chunks[1:(end-1)]) 
 
         files = map(chunks) do c
-            length(c) > 0 && _getrasterchunk(T, layer;
+            _getrasterchunk(T, layer;
                 dates = c,
                 lat = lat,
                 lon = lon,
