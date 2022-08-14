@@ -94,6 +94,18 @@ function getraster(T::Type{<:ModisProduct}, layer::Union{Tuple, Symbol, Int}=lay
     from::Union{String, Date},
     to::Union{String, Date}
 )
+    # first check all arguments
+    check_layers(T, layer)
+    check_kwargs(T; 
+        lat = lat,
+        lon = lon,
+        km_ab = km_ab,
+        km_lr = km_lr,
+        from = from,
+        to = to
+    )
+
+    # then pass them to internal functions
     _getraster(T, layer;
         lat = lat,
         lon = lon,
@@ -189,6 +201,9 @@ function _getrasterchunk(T::Type{<:ModisProduct}, layer::Int;
 end
 
 function rasterpath(T::Type{<:ModisProduct}, layer; kwargs...)
+    # argument checks
+    check_layers(T, layer)
+    check_kwargs(T; kwargs...)
     return joinpath(_rasterpath(T, layer), rastername(T; kwargs...))
 end
 
@@ -210,6 +225,7 @@ function _rasterpath(T::Type{<:ModisProduct}, layer::String)
 end
 
 function rastername(T::Type{<:ModisProduct}; kwargs...)
+    check_kwargs(T; kwargs...)
     name = "$(round(kwargs[:lat], digits = 4))_$(round(kwargs[:lon], digits = 4))_$(kwargs[:date]).tif"
     return name
 end
