@@ -209,11 +209,6 @@ function _rasterpath(T::Type{<:ModisProduct}, layer::String)
     throw("Unknow layer in product $(string(T))")
 end
 
-function rastername(T::Type{<:ModisProduct}, layer::Int; kwargs...)
-    name = "$(layerkeys(T)[layer])_$(kwargs[:lat])_$(kwargs[:lon])_$(kwargs[:date]).tif"
-    return name
-end
-
 function rastername(T::Type{<:ModisProduct}; kwargs...)
     name = "$(round(kwargs[:lat], digits = 4))_$(round(kwargs[:lon], digits = 4))_$(kwargs[:date]).tif"
     return name

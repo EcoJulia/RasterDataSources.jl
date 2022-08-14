@@ -31,7 +31,7 @@ const britanny = (
 )
 
 """
-        Three years of a single MODIS pixel in Broceliande forest
+        Two years of a single MODIS pixel in Broceliande forest
 """
 const broceliande = (
     lat = 48.02458,
@@ -39,6 +39,6 @@ const broceliande = (
     km_ab = 0,
     km_lr = 0,
     from = "2002-02-02",
-    to = "2005-02-02"
+    to = "2004-02-02"
 )
 
