@@ -1,4 +1,4 @@
-using RasterDataSources
+using RasterDataSources, Test
 
 @testset verbose = true "MODIS product information functions" begin
     # product name

@@ -82,17 +82,16 @@ Available layers for a given product can be looked up using [`RasterDataSources.
 
 - `km_ab` and `km_lr``: Half-width and half-height of the raster in kilometers. Currently only `Integer` values are supported.
 
-- `from` and `to`: `String` or `Date` in format YYYY-MM-DD for required start and end dates of raster download. Will download several files, one for each date.
+- `date`: `String`, `Date`, `DateTime`, `AbstractVector` or `Tuple` of dates for the request. If `date` is iterable and of length 2, it is considered to contain the start and the end date of the request. `String`s should be in format YYYY-MM-DD but can be in similar formats as long as they are comprehensible by `Dates.Date`. The available date interval for MODIS is 16 days.
 
-Returns the filepath/s of the downloaded or pre-existing files.
+Will download several files, one for each date, and returns the filepath/s of the downloaded or pre-existing files.
 """
 function getraster(T::Type{<:ModisProduct}, layer::Union{Tuple, Symbol, Int}=layerkeys(T);
     lat::Real,
     lon::Real,
     km_ab::Int,
     km_lr::Int,
-    from::Union{String, Date},
-    to::Union{String, Date}
+    date::Union{Tuple, AbstractVector, String, Date, DateTime}
 )
     # first check all arguments
     check_layers(T, layer)
@@ -101,45 +100,84 @@ function getraster(T::Type{<:ModisProduct}, layer::Union{Tuple, Symbol, Int}=lay
         lon = lon,
         km_ab = km_ab,
         km_lr = km_lr,
-        from = from,
-        to = to
+        date = date
     )
 
     # then pass them to internal functions
-    _getraster(T, layer;
+    _getraster(T, layer, date;
         lat = lat,
         lon = lon,
         km_ab = km_ab,
-        km_lr = km_lr,
-        from = from,
-        to = to
+        km_lr = km_lr
     )
 end
 
 # if layer is a tuple, get them all using _map_layers
-function _getraster(T::Type{<:ModisProduct}, layers::Tuple; kwargs...)
-    _map_layers(T, layers; kwargs...)
+function _getraster(T::Type{<:ModisProduct}, layers::Tuple, date; kwargs...)
+    _map_layers(T, layers, date; kwargs...)
 end
 
 # convert layer symbols to int
-function _getraster(T::Type{<:ModisProduct}, layer::Symbol; kwargs...)
-    _getraster(T, modis_int(T, layer); kwargs...)
+function _getraster(T::Type{<:ModisProduct}, layer::Symbol, date; kwargs...)
+    _getraster(T, modis_int(T, layer), date; kwargs...)
 end
 
-function _getraster(T::Type{<:ModisProduct}, layer::Int;
+# Tuple to AbstractVector
+function _getraster(T::Type{<:ModisProduct}, layer::Int, date::Tuple;
+    kwargs...)
+    _getraster(T, layer, [date...]; kwargs...)
+end
+
+# Handle vectors : date by date if length != 2, as start and end otherwise
+function _getraster(T::Type{<:ModisProduct}, layer::Int,
+    date::AbstractVector;
+    kwargs...
+)
+    if length(date) != 2
+        out = String[]
+        for d in eachindex(date)
+            push!(out, _getraster(T, layer, date[d]; kwargs...))
+        end
+        return out
+    else
+        _getraster(T, layer, kwargs[:lat], kwargs[:lon], kwargs[:km_ab], kwargs[:km_lr], string(Date(date[1])), string(Date(date[2])))
+    end
+end
+
+# single date : from = to = string(Date(date))
+function _getraster(T::Type{<:ModisProduct}, layer::Int,
+    date::Union{Dates.TimeType, String};
+    kwargs...
+)
+    _getraster(T, layer, kwargs[:lat], kwargs[:lon], kwargs[:km_ab], kwargs[:km_lr], string(Date(date)), string(Date(date)))
+end
+
+
+"""
+    _getraster(T::Type{<:ModisProduct}, layer::Int, lat::Real, lon::Real, km_ab::Int, km_lr::Int, from::String, to::String) => Union{String, Vector{String}}
+
+Modis requests always have an internal start and end date: using from and to in internal arguments makes more sense. `date` argument is converted by various
+_getraster dispatches before calling this.
+"""
+function _getraster(T::Type{<:ModisProduct}, layer::Int,
     lat::Real,
     lon::Real,
     km_ab::Int,
     km_lr::Int,
-    from::Union{String, Date},
-    to::Union{String, Date}
+    from::String,
+    to::String
 )
+    # accessing dates in a format readable by the MODIS API
     dates = list_dates(T;
         lat = lat,
         lon = lon,
         format = "ModisDate",
         from = from,
         to = to
+    )
+
+    length(dates) == 0 && throw(
+        "No available $T data at $lat , $lon from $from to $to"
     )
 
     if length(dates) <= 10

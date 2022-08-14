@@ -1,4 +1,4 @@
-using RasterDataSources
+using RasterDataSources, Test
 using DataFrames
 
 @testset verbose = true "MODIS utility functions" begin

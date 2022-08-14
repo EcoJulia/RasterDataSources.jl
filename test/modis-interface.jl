@@ -3,7 +3,7 @@ using RasterDataSources: rastername, rasterpath, zipurl, zipname, zippath, layer
 
 @testset "MODIS interface functions" begin
     @test rastername(
-        MOD13Q1; RasterDataSources.crozon..., date = "2002-02-02"
+        MOD13Q1; RasterDataSources.crozon...
     ) == "48.24_-4.5_2002-02-02.tif"
 
     raster_file = joinpath(

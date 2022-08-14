@@ -392,6 +392,13 @@ function check_kwargs(T::Type{<:ModisProduct}; kwargs...)
         )
     end
 
+    if :date in symbols
+        _check_date(kwargs[:date]) || push!(
+            errors,
+            "Unsupported date(s) in date=$(kwargs[:date])"
+        )
+    end
+
     if length(errors) > 0
         if length(errors) == 1
             throw(ArgumentError(errors[1]))
@@ -403,4 +410,18 @@ function check_kwargs(T::Type{<:ModisProduct}; kwargs...)
     end
 
     return nothing
+end
+
+_check_date(d::AbstractVector) = all(b -> b == true, map(_check_date, d))
+_check_date(d::Tuple) = all(b -> b == true, map(_check_date, d))
+_check_date(d::String) = _check_date(Date(d))
+"""
+    _check_date(d::Dates.TimeType)
+
+Does not check if `d` is available, only checks if `d` makes sense, i.e if `d` **could** be available.
+
+Returns `true` for good dates, `false` for bad ones.
+"""
+function _check_date(d::Dates.TimeType)
+    return !(d < Date(2000) || d > Dates.now())
 end

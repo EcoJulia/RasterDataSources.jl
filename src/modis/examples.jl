@@ -12,8 +12,7 @@ const crozon = (
     lon = -4.5,
     km_ab = 1,
     km_lr = 1,
-    from = "2002-02-02",
-    to = "2002-02-02"
+    date = "2002-02-02"
 )
 
 """
@@ -26,8 +25,7 @@ const britanny = (
     lon = -3.5,
     km_ab = 100,
     km_lr = 100,
-    from = "2002-02-02",
-    to = "2002-02-02"
+    date = Date("2002-02-02")
 )
 
 """
@@ -38,7 +36,6 @@ const broceliande = (
     lon = -2.24057,
     km_ab = 0,
     km_lr = 0,
-    from = "2002-02-02",
-    to = "2004-02-02"
+    date = [Date("2002-02-02"), Date("2004-02-02")]
 )
 
