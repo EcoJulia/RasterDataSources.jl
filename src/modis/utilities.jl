@@ -295,3 +295,112 @@ function process_subset(T::Type{<:ModisProduct}, df::DataFrame)
 
     return (length(path_out) == 1 ? path_out[1] : path_out)
 end
+
+"""
+    check_layers(T::Type{<:ModisProduct}, layers::Union{Tuple, AbstractVector, Symbol, String, Int}) => nothing
+
+Checks if required layers make sense for the MODIS product T.
+"""
+function check_layers(T::Type{<:ModisProduct}, layers::Union{Tuple, AbstractVector, Symbol, String, Int})
+    if typeof(layers) <: Tuple || typeof(layers) <: AbstractVector
+        for l in layers
+            _check_layer(T::Type{<:ModisProduct}, l)
+        end
+    else
+        _check_layer(T::Type{<:ModisProduct}, layers)
+    end
+end
+
+function _check_layer(T::Type{<:ModisProduct}, layer::Symbol)
+    !(layer in layerkeys(T)) && throw(ArgumentError(
+        "Invalid layer $layer for product $T.\nAvailable layers are $(layerkeys(T))"
+    ))
+    return nothing
+end
+
+function _check_layer(T::Type{<:ModisProduct}, layer::Int)
+    !(layer in layers(T)) && throw(ArgumentError(
+        "Invalid layer $layer for product $T.\nAvailable layers are $(layers(T))"
+    ))
+    return nothing
+end
+
+function _check_layer(T::Type{<:ModisProduct}, layer::String)
+    !(layer in list_layers(T)) && throw(ArgumentError(
+        "Invalid layer $layer for product $T.\nAvailable layers are $(list_layers(T)).\nProceed with caution while using `String` layers. You might want to use their `Symbol` counterparts."
+    ))
+end
+
+"""
+    check_kwargs(T::Type{ModisProduct}; kwargs...) => nothing
+
+"Never trust user input". Checks all keyword arguments that might be used in internal calls.
+"""
+function check_kwargs(T::Type{<:ModisProduct}; kwargs...)
+    symbols = keys(kwargs)
+    errors = String[]
+
+    # check lat
+    if :lat in symbols
+        (kwargs[:lat] < -90 || kwargs[:lat] > 90) && push!(
+            errors,
+            "Latitude lat=$(kwargs[:lat]) must be between -90 and 90."
+        )
+    end
+
+    # check lon
+    if :lon in symbols
+        (kwargs[:lon] < -180 || kwargs[:lon] > 180) && push!(
+            errors,
+            "Longitude lon=$(kwargs[:lon]) must be between -180 and 180."
+        )
+    end
+
+    # check km_ab
+    if :km_ab in symbols
+        (kwargs[:km_ab] < 0 || kwargs[:km_ab] > 100) && push!(
+            errors,
+            "Km above and below km_ab=$(kwargs[:km_ab]) must be between 0 and 100."
+        )
+    end
+
+    # check km_lr
+    if :km_lr in symbols
+        (kwargs[:km_lr] < 0 || kwargs[:km_lr] > 100) && push!(
+            errors,
+            "Km left and right km_lr=$(kwargs[:km_lr]) must be between 0 and 100."
+        )
+    end
+
+    # check from
+    if :from in symbols
+        # check if conversion works
+        from = Date(kwargs[:from])
+        (from < Date(2000) || from > Dates.now()) && push!(
+            errors,
+            "Unsupported date for from=$(from)"
+        )
+    end
+
+    # check to
+    if :to in symbols
+        # check if conversion works
+        to = Date(kwargs[:to])
+        (to < Date(2000) || to > Dates.now()) && push!(
+            errors,
+            "Unsupported date for to=$(to)"
+        )
+    end
+
+    if length(errors) > 0
+        if length(errors) == 1
+            throw(ArgumentError(errors[1]))
+        else
+            throw(ArgumentError(
+                join(["Several wrong arguments.";errors], "\n")
+            ))
+        end
+    end
+
+    return nothing
+end
