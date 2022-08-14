@@ -1,5 +1,5 @@
 using RasterDataSources, Test
-using RasterDataSources: rastername, rasterpath, zipurl, zipname, zippath
+using RasterDataSources: rastername, rasterpath, zipurl, zipname, zippath, layers
 
 @testset "MODIS interface functions" begin
     @test rastername(
