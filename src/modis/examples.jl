@@ -39,3 +39,13 @@ const broceliande = (
     date = [Date("2002-02-02"), Date("2004-02-02")]
 )
 
+"""
+        Three dates in Crozon
+"""
+const crozon2 = (
+    lat = 48.24,
+    lon = -4.5,
+    km_ab = 1,
+    km_lr = 1,
+    date = ("2002-02-02", "2003-02-02", "2004-02-02")
+)

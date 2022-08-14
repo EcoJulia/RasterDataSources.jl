@@ -18,11 +18,18 @@ using RasterDataSources: rastername, rasterpath, zipurl, zipname, zippath, layer
     @test getraster(MOD13Q1, (:NDVI,); RasterDataSources.crozon...) == (NDVI = raster_file,)
     @test getraster(MOD13Q1, [:NDVI]; RasterDataSources.crozon...) == (NDVI = raster_file,)
     @test isfile(raster_file)
+
     ## covers three different use cases :
     # - more than 10 dates
     # - MODIS{ModisProduct}
     # - integer layer
     @test length(getraster(MODIS{MOD13Q1}, 3; RasterDataSources.broceliande...)) > 10
+
+    ## covers three use cases:
+    # - iterable `date` of length > 2
+    # - integer layer
+    # - `date` is a 
+    @test length(getraster(MOD13Q1, 3; RasterDataSources.crozon2...)) == 3
     @test layers(MOD13Q1) == Tuple(1:12)
 
 end
