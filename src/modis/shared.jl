@@ -272,5 +272,24 @@ date_step(T::Type{<:ModisProduct}) = Day(16)
 date_step(T::Type{MODIS{X}}) where X = date_step(X)
 
 
+function date_sequence(T::Type{<:MODIS{X}}, dates; kw...) where X
+    date_sequence(X, dates; kw...)
+end
 
+"""
+    date_sequence(T::Type{<:ModisProduct}, dates::NTuple{2})
 
+Asks list_dates for a list of required dates
+"""
+function date_sequence(T::Type{<:ModisProduct}, dates::NTuple{2}; kwargs...)
+    if !haskey(kwargs, :lat) || !haskey(kwargs, :lon)
+        throw(ArgumentError("`lat` and `lon` must be provided to correctly build the date sequence."))
+    end
+
+    # get the dates
+    sequence = Date.(list_dates(
+        T, lat = kwargs[:lat], lon = kwargs[:lon],
+        from = dates[1], to = dates[2]
+    ))
+    return sequence
+end
