@@ -293,3 +293,8 @@ function date_sequence(T::Type{<:ModisProduct}, dates::NTuple{2}; kwargs...)
     ))
     return sequence
 end
+
+# disable metadata copy to avoid building "duplicate" series
+# (see issue #294 of Rasters.jl)
+has_constant_metadata(T::Type{MODIS{X}}) where X = false
+has_constant_metadata(T::Type{<:ModisProduct}) = false
