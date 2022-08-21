@@ -42,7 +42,7 @@ has_matching_layer_size(T) = true
 has_constant_dims(T) = true
 has_constant_metadata(T) = true
 
-date_sequence(T::Type, dates) = date_sequence(date_step(T), dates)
+date_sequence(T::Type, dates; kw...) = date_sequence(date_step(T), dates)
 date_sequence(step, date) = _date_sequence(step, date)
 
 _date_sequence(step, dates::AbstractArray) = dates

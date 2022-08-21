@@ -64,8 +64,8 @@ end
 function list_dates(T::Type{<:ModisProduct};
     lat::Real,
     lon::Real,
-    from::String = "all", # might be handy
-    to::String = "all",
+    from::Union{String, Date} = "all", # might be handy
+    to::Union{String, Date} = "all",
     format::String = "Date")
 
     prod = product(T)

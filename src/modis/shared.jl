@@ -122,26 +122,26 @@ function _getraster(T::Type{<:ModisProduct}, layer::Symbol, date; kwargs...)
     _getraster(T, modis_int(T, layer), date; kwargs...)
 end
 
-# Tuple to AbstractVector
+# Tuple : start and end date
 function _getraster(T::Type{<:ModisProduct}, layer::Int, date::Tuple;
     kwargs...)
-    _getraster(T, layer, [date...]; kwargs...)
+    _getraster(
+        T, layer, kwargs[:lat], kwargs[:lon],
+        kwargs[:km_ab], kwargs[:km_lr], string(Date(date[1])),
+        string(Date(date[2]))
+    )
 end
 
-# Handle vectors : date by date if length != 2, as start and end otherwise
+# Handle vectors : map over dates
 function _getraster(T::Type{<:ModisProduct}, layer::Int,
     date::AbstractVector;
     kwargs...
 )
-    if length(date) != 2
-        out = String[]
-        for d in eachindex(date)
-            push!(out, _getraster(T, layer, date[d]; kwargs...))
-        end
-        return out
-    else
-        _getraster(T, layer, kwargs[:lat], kwargs[:lon], kwargs[:km_ab], kwargs[:km_lr], string(Date(date[1])), string(Date(date[2])))
+    out = String[]
+    for d in eachindex(date)
+        push!(out, _getraster(T, layer, date[d]; kwargs...))
     end
+    return out
 end
 
 # single date : from = to = string(Date(date))
@@ -267,6 +267,9 @@ function rastername(T::Type{<:ModisProduct}; kwargs...)
     name = "$(round(kwargs[:lat], digits = 4))_$(round(kwargs[:lon], digits = 4))_$(kwargs[:date]).tif"
     return name
 end
+
+date_step(T::Type{<:ModisProduct}) = Day(16)
+date_step(T::Type{MODIS{X}}) where X = date_step(X)
 
 
 
