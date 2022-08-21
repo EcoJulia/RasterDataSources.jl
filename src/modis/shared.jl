@@ -291,8 +291,10 @@ function rastername(T::Type{<:ModisProduct}; kwargs...)
     return name
 end
 
-date_step(T::Type{<:ModisProduct}) = Day(16)
-date_step(T::Type{MODIS{X}}) where {X} = date_step(X)
+# date_sequence does not use a date step because MODIS dates may vary from a
+# strict 16-day sequence (mostly because of the 1st of January reset)
+# date_step(T::Type{<:ModisProduct}) = Day(16)
+# date_step(T::Type{MODIS{X}}) where {X} = date_step(X)
 
 
 function date_sequence(T::Type{MODIS{X}}, dates; kw...) where {X}
