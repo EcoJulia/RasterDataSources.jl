@@ -1,4 +1,4 @@
-using RasterDataSources, Test
+using RasterDataSources, Test, Dates
 using RasterDataSources: rastername, rasterpath, zipurl, zipname, zippath, layers
 
 @testset verbose = true "MODIS interface functions" begin
