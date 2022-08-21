@@ -17,18 +17,14 @@ layer keys of the required `ModisProduct` `T`.
 function modis_int(T::Type{<:ModisProduct}, l::Symbol)
     keys = layerkeys(T)
     for i in eachindex(keys)
-        keys[i] === l && return(i)
-    end 
+        keys[i] === l && return (i)
+    end
 end
 
 """
     MODIS API address
 """
-const MODIS_URI = URI(
-    scheme = "https",
-    host = "modis.ornl.gov",
-    path = "/rst/api/v1"
-)
+const MODIS_URI = URI(scheme = "https", host = "modis.ornl.gov", path = "/rst/api/v1")
 
 """
     modis_request(T::Type{<:ModisProduct}, args...)
@@ -45,33 +41,24 @@ Lowest level function for requests to modis server. All arguments are assumed co
 
 Returns a `DataFrame` with all requested data directly downloaded from MODIS. The `DataFrame` will almost always directly be passed to [`RasterDataSources.process_subset`](@ref)
 """
-function modis_request(
-    T::Type{<:ModisProduct},
-    layer,
-    lat,
-    lon,
-    km_ab,
-    km_lr,
-    from,
-    to
-)
+function modis_request(T::Type{<:ModisProduct}, layer, lat, lon, km_ab, km_lr, from, to)
     # using joinpath here is more readable but works only for UNIX based OS, :'(
     base_uri = join([string(MODIS_URI), product(T), "subset"], "/")
-    query = string(URI(; query = Dict(
-        "latitude" => string(lat),
-        "longitude" => string(lon),
-        "startDate" => string(from),
-        "endDate" => string(to),
-        "kmAboveBelow" => string(km_ab),
-        "kmLeftRight" => string(km_lr),
-        "band" => string(layer)
-    )))
-
-    r = HTTP.request(
-        "GET",
-        URI(base_uri * query),
-        ["Accept" => "application/json"]
+    query = string(
+        URI(;
+            query = Dict(
+                "latitude" => string(lat),
+                "longitude" => string(lon),
+                "startDate" => string(from),
+                "endDate" => string(to),
+                "kmAboveBelow" => string(km_ab),
+                "kmLeftRight" => string(km_lr),
+                "band" => string(layer),
+            ),
+        ),
     )
+
+    r = HTTP.request("GET", URI(base_uri * query), ["Accept" => "application/json"])
 
     body = JSON.parse(String(r.body))
 
@@ -83,7 +70,7 @@ function modis_request(
 
     out = DataFrame()
 
-    for i in 1:nrow(metadata) # for each (band, time)
+    for i = 1:nrow(metadata) # for each (band, time)
 
         subset = DataFrame(body["subset"][i])
         n = nrow(subset)
@@ -93,7 +80,7 @@ function modis_request(
         subset.cellsize = repeat([metadata[i, :cellsize]], n)
         subset.latitude = repeat([metadata[i, :latitude]], n)
         subset.longitude = repeat([metadata[i, :longitude]], n)
-        subset.ncols  = repeat([metadata[i, :ncols]], n)
+        subset.ncols = repeat([metadata[i, :ncols]], n)
         subset.nrows = repeat([metadata[i, :nrows]], n)
         subset.xllcorner = repeat([metadata[i, :xllcorner]], n)
         subset.yllcorner = repeat([metadata[i, :yllcorner]], n)
@@ -104,7 +91,7 @@ function modis_request(
 
     return out
 end
- 
+
 """
     sin_to_ll(x::Real, y::Real)    
 
@@ -122,14 +109,10 @@ function sin_to_ll(x::Real, y::Real)
         "x" => string(x),
         "y" => string(y),
         "s_srs" => "53008", # sinusoidal
-        "t_srs" => "4326" # WGS84
+        "t_srs" => "4326", # WGS84
     )
 
-    r = HTTP.request(
-        "GET",
-        url;
-        query = query
-    )
+    r = HTTP.request("GET", url; query = query)
 
     body = JSON.parse(String(r.body))
 
@@ -144,23 +127,25 @@ const EARTH_EQ_RADIUS = 6378137
 const EARTH_POL_RADIUS = 6356752
 
 function meters_to_latlon(d::Real, lat::Real)
-    dlon = asind(d/(cosd(lat)*EARTH_EQ_RADIUS))
+    dlon = asind(d / (cosd(lat) * EARTH_EQ_RADIUS))
     dlat = d * 180 / (π * EARTH_POL_RADIUS)
 
     return (dlat, dlon)
 end
 
-function maybe_build_gt(
-    xllcorner::Real,
-    yllcorner::Real,
-    nrows::Int,
-    cellsize::Real
-)
+function maybe_build_gt(xllcorner::Real, yllcorner::Real, nrows::Int, cellsize::Real)
     filepath = joinpath(
         rasterpath(),
         "MODIS",
         "geotransforms",
-        string(xllcorner) * "," * string(yllcorner) * "," * string(cellsize) * "," *string(nrows) * ".csv"
+        string(xllcorner) *
+        "," *
+        string(yllcorner) *
+        "," *
+        string(cellsize) *
+        "," *
+        string(nrows) *
+        ".csv",
     )
 
     if isfile(filepath)
@@ -175,21 +160,18 @@ function maybe_build_gt(
         lat, lon = sin_to_ll(xllcorner, yllcorner)
 
         # convert cell size in meters to degress in lat and lon directions
-        resolution = meters_to_latlon(
-            cellsize,
-            lat
-        ) # watch out, this is a Tuple{Float64, Float64}
+        resolution = meters_to_latlon(cellsize, lat) # watch out, this is a Tuple{Float64, Float64}
 
         # build the geotransform 
         # (https://yeesian.com/ArchGDAL.jl/stable/quickstart/#Dataset-Georeferencing)
 
         gt = [
-            lon - resolution[2]/2, # left longitude
+            lon - resolution[2] / 2, # left longitude
             resolution[2], # lon resolution in degrees
             0.0, # no rotation
-            lat + nrows*resolution[1] + resolution[1]/2, # up latitude
+            lat + nrows * resolution[1] + resolution[1] / 2, # up latitude
             0.0, # no rotation (yes, this order)
-            -resolution[1] # lat resolution in degrees, negative because the data
+            -resolution[1], # lat resolution in degrees, negative because the data
             # matrix is south-up oriented
         ]
 
@@ -217,7 +199,7 @@ Can theoretically be used for `DataFrame`s of MODIS data that do not directly co
 Returns the filepath/s of the created or pre-existing files.
 """
 function process_subset(T::Type{<:ModisProduct}, df::DataFrame)
-    
+
     dates = unique(df[:, :calendar_date])
     bands = unique(df[:, :band])
 
@@ -236,32 +218,29 @@ function process_subset(T::Type{<:ModisProduct}, df::DataFrame)
     for d in eachindex(dates)
 
         ar = Array{Float64}(undef, nrows, ncols, length(bands))
-        
+
         for b in eachindex(bands)
 
-            sub_df = subset(df,
+            sub_df = subset(
+                df,
                 :calendar_date => x -> x .== dates[d],
-                :band => y -> y .== bands[b]
+                :band => y -> y .== bands[b],
             )
-            
+
             mat = Matrix{Float64}(undef, nrows, ncols)
 
-            filepath = rasterpath(T, bands[b];
-                lat = gt[4],
-                lon = gt[1],
-                date = dates[d]
-            )
+            filepath = rasterpath(T, bands[b]; lat = gt[4], lon = gt[1], date = dates[d])
 
             # fill matrix row by row
             count = 1
-            for j in 1:ncols
-                for i in 1:nrows
-                    mat[i,j] = float(sub_df[count, :data])
+            for j = 1:ncols
+                for i = 1:nrows
+                    mat[i, j] = float(sub_df[count, :data])
                     count += 1
                 end
             end
 
-            ar[:,:,b] = mat
+            ar[:, :, b] = mat
 
             mkpath(dirname(filepath))
 
@@ -273,15 +252,20 @@ function process_subset(T::Type{<:ModisProduct}, df::DataFrame)
                     width = ncols,
                     height = nrows,
                     nbands = 1,
-                    dtype = Float32
+                    dtype = Float32,
                 ) do dataset
                     # add data to object
                     ArchGDAL.write!(dataset, mat, 1)
                     # set geotransform
                     ArchGDAL.setgeotransform!(dataset, gt)
                     # set crs
-                    ArchGDAL.setproj!(dataset, ArchGDAL.toWKT(
-                        ArchGDAL.importPROJ4("+proj=latlong +ellps=WGS84 +datum=WGS84 +no_defs"))
+                    ArchGDAL.setproj!(
+                        dataset,
+                        ArchGDAL.toWKT(
+                            ArchGDAL.importPROJ4(
+                                "+proj=latlong +ellps=WGS84 +datum=WGS84 +no_defs",
+                            ),
+                        ),
                     )
                 end
             else
@@ -301,7 +285,10 @@ end
 
 Checks if required layers make sense for the MODIS product T.
 """
-function check_layers(T::Type{<:ModisProduct}, layers::Union{Tuple, AbstractVector, Symbol, String, Int})
+function check_layers(
+    T::Type{<:ModisProduct},
+    layers::Union{Tuple,AbstractVector,Symbol,String,Int},
+)
     if typeof(layers) <: Tuple || typeof(layers) <: AbstractVector
         for l in layers
             _check_layer(T::Type{<:ModisProduct}, l)
@@ -312,23 +299,29 @@ function check_layers(T::Type{<:ModisProduct}, layers::Union{Tuple, AbstractVect
 end
 
 function _check_layer(T::Type{<:ModisProduct}, layer::Symbol)
-    !(layer in layerkeys(T)) && throw(ArgumentError(
-        "Invalid layer $layer for product $T.\nAvailable layers are $(layerkeys(T))"
-    ))
+    !(layer in layerkeys(T)) && throw(
+        ArgumentError(
+            "Invalid layer $layer for product $T.\nAvailable layers are $(layerkeys(T))",
+        ),
+    )
     return nothing
 end
 
 function _check_layer(T::Type{<:ModisProduct}, layer::Int)
-    !(layer in layers(T)) && throw(ArgumentError(
-        "Invalid layer $layer for product $T.\nAvailable layers are $(layers(T))"
-    ))
+    !(layer in layers(T)) && throw(
+        ArgumentError(
+            "Invalid layer $layer for product $T.\nAvailable layers are $(layers(T))",
+        ),
+    )
     return nothing
 end
 
 function _check_layer(T::Type{<:ModisProduct}, layer::String)
-    !(layer in list_layers(T)) && throw(ArgumentError(
-        "Invalid layer $layer for product $T.\nAvailable layers are $(list_layers(T)).\nProceed with caution while using `String` layers. You might want to use their `Symbol` counterparts."
-    ))
+    !(layer in list_layers(T)) && throw(
+        ArgumentError(
+            "Invalid layer $layer for product $T.\nAvailable layers are $(list_layers(T)).\nProceed with caution while using `String` layers. You might want to use their `Symbol` counterparts.",
+        ),
+    )
 end
 
 """
@@ -342,25 +335,21 @@ function check_kwargs(T::Type{<:ModisProduct}; kwargs...)
 
     # check lat
     if :lat in symbols
-        (kwargs[:lat] < -90 || kwargs[:lat] > 90) && push!(
-            errors,
-            "Latitude lat=$(kwargs[:lat]) must be between -90 and 90."
-        )
+        (kwargs[:lat] < -90 || kwargs[:lat] > 90) &&
+            push!(errors, "Latitude lat=$(kwargs[:lat]) must be between -90 and 90.")
     end
 
     # check lon
     if :lon in symbols
-        (kwargs[:lon] < -180 || kwargs[:lon] > 180) && push!(
-            errors,
-            "Longitude lon=$(kwargs[:lon]) must be between -180 and 180."
-        )
+        (kwargs[:lon] < -180 || kwargs[:lon] > 180) &&
+            push!(errors, "Longitude lon=$(kwargs[:lon]) must be between -180 and 180.")
     end
 
     # check km_ab
     if :km_ab in symbols
         (kwargs[:km_ab] < 0 || kwargs[:km_ab] > 100) && push!(
             errors,
-            "Km above and below km_ab=$(kwargs[:km_ab]) must be between 0 and 100."
+            "Km above and below km_ab=$(kwargs[:km_ab]) must be between 0 and 100.",
         )
     end
 
@@ -368,7 +357,7 @@ function check_kwargs(T::Type{<:ModisProduct}; kwargs...)
     if :km_lr in symbols
         (kwargs[:km_lr] < 0 || kwargs[:km_lr] > 100) && push!(
             errors,
-            "Km left and right km_lr=$(kwargs[:km_lr]) must be between 0 and 100."
+            "Km left and right km_lr=$(kwargs[:km_lr]) must be between 0 and 100.",
         )
     end
 
@@ -376,36 +365,28 @@ function check_kwargs(T::Type{<:ModisProduct}; kwargs...)
     if :from in symbols
         # check if conversion works
         from = Date(kwargs[:from])
-        (from < Date(2000) || from > Dates.now()) && push!(
-            errors,
-            "Unsupported date for from=$(from)"
-        )
+        (from < Date(2000) || from > Dates.now()) &&
+            push!(errors, "Unsupported date for from=$(from)")
     end
 
     # check to
     if :to in symbols
         # check if conversion works
         to = Date(kwargs[:to])
-        (to < Date(2000) || to > Dates.now()) && push!(
-            errors,
-            "Unsupported date for to=$(to)"
-        )
+        (to < Date(2000) || to > Dates.now()) &&
+            push!(errors, "Unsupported date for to=$(to)")
     end
 
     if :date in symbols
-        _check_date(kwargs[:date]) || push!(
-            errors,
-            "Unsupported date(s) in date=$(kwargs[:date])"
-        )
+        _check_date(kwargs[:date]) ||
+            push!(errors, "Unsupported date(s) in date=$(kwargs[:date])")
     end
 
     if length(errors) > 0
         if length(errors) == 1
             throw(ArgumentError(errors[1]))
         else
-            throw(ArgumentError(
-                join(["Several wrong arguments.";errors], "\n")
-            ))
+            throw(ArgumentError(join(["Several wrong arguments."; errors], "\n")))
         end
     end
 
