@@ -33,7 +33,7 @@ const MODIS_URI = URI(
 """
     modis_request(T::Type{<:ModisProduct}, args...)
 
-Lowest level function for requests to modis server. All arguments are assumed of correct types
+Lowest level function for requests to modis server. All arguments are assumed correct.
 
 # Arguments
 

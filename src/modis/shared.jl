@@ -80,11 +80,24 @@ Available layers for a given product can be looked up using [`RasterDataSources.
 
 - `lat` and `lon`: Coordinates in decimal degrees of the approximate center of the raster. The MODIS API will try to match its pixel grid system as close as possible to those coordinates.
 
-- `km_ab` and `km_lr``: Half-width and half-height of the raster in kilometers. Currently only `Integer` values are supported.
+- `km_ab` and `km_lr``: Half-width and half-height of the raster in kilometers. Currently only `Integer` values are supported, up to 100.
 
-- `date`: `String`, `Date`, `DateTime`, `AbstractVector` or `Tuple` of dates for the request. If `date` is iterable and of length 2, it is considered to contain the start and the end date of the request. `String`s should be in format YYYY-MM-DD but can be in similar formats as long as they are comprehensible by `Dates.Date`. The available date interval for MODIS is 16 days.
+- `date`: `String`, `Date`, `DateTime`, `AbstractVector` of dates or `Tuple` of a start and end date for the request. `String`s should be in format YYYY-MM-DD but can be in similar formats as long as they are comprehensible by `Dates.Date`. The available date interval for MODIS is 16 days, reset every first of January.
 
-Will download several files, one for each date, and returns the filepath/s of the downloaded or pre-existing files.
+# Examples
+
+Download 250m NDVI in the western part of Britanny, France, from winter to late spring, 2002:
+
+```julia
+julia> getraster(MOD13Q1, :NDVI; lat = 48.25, lon = -4, km_ab = 50, km_lr = 50, date = (Date(2002,1,1), Date(2002,6,1)))
+
+    10-element Vector{String}:
+    "/your/path/MODIS/MOD13Q1/250m_16_days_NDVI/48.6696_-4.5914_2002-01-01.tif"
+    ...
+    "/your/path/MODIS/MOD13Q1/250m_16_days_NDVI/48.6696_-4.5914_2002-05-25.tif"
+```
+
+Will download several files, one for each date, and returns the filepath/s of the downloaded or pre-existing files. Coordinates in the file names correspond to the upper-left corner of the raster.
 """
 function getraster(T::Type{<:ModisProduct}, layer::Union{Tuple, Symbol, Int}=layerkeys(T);
     lat::Real,
@@ -272,7 +285,7 @@ date_step(T::Type{<:ModisProduct}) = Day(16)
 date_step(T::Type{MODIS{X}}) where X = date_step(X)
 
 
-function date_sequence(T::Type{<:MODIS{X}}, dates; kw...) where X
+function date_sequence(T::Type{MODIS{X}}, dates; kw...) where X
     date_sequence(X, dates; kw...)
 end
 

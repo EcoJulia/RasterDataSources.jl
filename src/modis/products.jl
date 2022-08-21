@@ -15,7 +15,7 @@ function product(T::Type{<:ModisProduct})
 end
 
 """
-    Lists availabe layers for a given MODIS Product
+    Lists available layers for a given MODIS Product
 
 Looks in `joinpath(ENV["RASTERDATASOURCES_PATH"]/MODIS/layers` for
 a file with the right name. If not found, sends a request to the server
