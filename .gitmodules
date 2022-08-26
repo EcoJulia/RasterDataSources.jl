@@ -1,0 +1,3 @@
+[submodule "dev/ASCIIrasters"]
+	path = dev/ASCIIrasters
+	url = https://github.com/rafaqz/ASCIIrasters.jl
