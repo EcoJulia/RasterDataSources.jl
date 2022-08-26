@@ -86,37 +86,61 @@ function list_dates(
 
         # parse
         body = JSON.parse(String(r.body))
-
+        
         # prebuild columns
-        df = DataFrame(calendar_date = String[], modis_date = String[])
+        calendardates = String[]
+        modisdates = String[]
 
         # fill the DataFrame
         for date in body["dates"]
-            push!(df, date; cols = :subset)
+            push!(calendardates, date["calendar_date"])
+            push!(modisdates, date["modis_date"])
         end
 
-        # write to disk
-        CSV.write(filepath, df)
+        open(filepath, "w") do f
+            writedlm(f, [calendardates modisdates], ',')
+        end
     else # a file with dates is already downloaded
-        df = CSV.read(filepath, DataFrame; header = 1, types = String) # we simply read the file
+        # we simply read the file
+        mat = readdlm(filepath, ',', String)
+        calendardates = mat[:, 1]
+        modisdates = mat[:, 2]
     end
 
     ## Filter for dates between from and to arguments
 
-    df.calendar_date = Date.(df.calendar_date)
+    calendardates = Date.(calendardates)
 
-    from == "all" && (from = df[1, :calendar_date])
-    to == "all" && (to = df[end, :calendar_date])
+    from == "all" && (from = calendardates[1])
+    to == "all" && (to = calendardates[end])
 
-    df = subset(
-        df,
-        :calendar_date => d -> Date(to) .>= d,
-        :calendar_date => d -> d .>= Date(from),
-    )
+    startfound, endfound = false, false
+    bounds = [0,0]
+    i = 1
+    while !endfound
+        # two ways to find the end:
+        if i == length(calendardates) # end of vector reached
+            endfound = true
+            bounds[2] = i
+        elseif calendardates[i] > Date(to) && i > 1 # to reached
+            # if dates[i] is just over "to", dates[i-1] is the margin
+            endfound = true
+            bounds[2] = i-1
+        end
+
+        if !startfound
+            if calendardates[i] >= Date(from)
+                startfound = true
+                bounds[1] = i
+            end
+        end
+
+        i += 1
+    end
 
     if format == "ModisDate"
-        return df[:, :modis_date]
+        return modisdates[bounds[1]:bounds[2]]
     else
-        return df[:, :calendar_date]
+        return calendardates[bounds[1]:bounds[2]]
     end
 end
