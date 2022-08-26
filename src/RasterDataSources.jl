@@ -9,9 +9,10 @@ using Dates,
       HTTP,
       URIs,
       ZipFile,
-      JSON.Parser,
       ASCIIrasters,
       DelimitedFiles
+
+import JSON.Parser as JP
 
 export WorldClim, CHELSA, EarthEnv, AWAP, ALWB, SRTM, MODIS
 
