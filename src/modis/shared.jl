@@ -67,7 +67,7 @@ end
 """
     getraster(T::Union{Type{<:ModisProduct}, Type{MODIS{X}}}, [layer::Union{Tuple,AbstractVector,Integer, Symbol}]; kwargs...) => Union{String, AbstractVector, NamedTuple}
 
-Download [`MODIS`](@ref) data for a given [`ModisProduct`](@ref).
+Download [`MODIS`](@ref) data for a given [`ModisProduct`](@ref) as ASCII raster(s).
 
 # Arguments
 
@@ -91,12 +91,12 @@ Download 250m NDVI in the western part of Britanny, France, from winter to late 
 julia> getraster(MOD13Q1, :NDVI; lat = 48.25, lon = -4, km_ab = 50, km_lr = 50, date = (Date(2002,1,1), Date(2002,6,1)))
 
     10-element Vector{String}:
-    "/your/path/MODIS/MOD13Q1/250m_16_days_NDVI/48.6696_-4.5914_2002-01-01.tif"
+    "/your/path/MODIS/MOD13Q1/250m_16_days_NDVI/47.8313_-4.5899_2002-01-01.asc"
     ...
-    "/your/path/MODIS/MOD13Q1/250m_16_days_NDVI/48.6696_-4.5914_2002-05-25.tif"
+    "/your/path/MODIS/MOD13Q1/250m_16_days_NDVI/47.8313_-4.5899_2002-05-25.asc"
 ```
 
-Will attempt to download several files, one for each date and layer combination, and returns the filepath/s of the downloaded or pre-existing files. Coordinates in the file names correspond to the upper-left corner of the raster.
+Will attempt to download several files, one for each date and layer combination, and returns the filepath/s of the downloaded or pre-existing files. Coordinates in the file names correspond to the lower-left corner of the raster.
 """
 function getraster(
     T::Type{<:ModisProduct},
@@ -287,7 +287,7 @@ end
 
 function rastername(T::Type{<:ModisProduct}; kwargs...)
     check_kwargs(T; kwargs...)
-    name = "$(round(kwargs[:lat], digits = 4))_$(round(kwargs[:lon], digits = 4))_$(kwargs[:date]).tif"
+    name = "$(round(kwargs[:lat], digits = 4))_$(round(kwargs[:lon], digits = 4))_$(kwargs[:date]).asc"
     return name
 end
 

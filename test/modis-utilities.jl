@@ -22,7 +22,7 @@ using DataFrames
         # look for a layer by its name
         @test RasterDataSources.modis_int(VNP21A2, :Emis_15) == 2
         # build a geotransform
-        @test round.(RasterDataSources.maybe_build_gt(155555, 266666, 100, 142.4), digits = 1) == [1.4, 0.0, 0.0, 2.5, 0.0, -0.0]
+        @test RasterDataSources._maybe_prepare_params(155555, 266666, 100, 142.4) == (xll = 1.4001660509018832, yll = 2.398184953639242, dx = 0.0012803223271200504, dy = 0.0012835043749800093)
         # request to MODIS and process it
         @test ncol(simple_request) == 15
         @test typeof(RasterDataSources.process_subset(MOD13Q1, simple_request)) == String

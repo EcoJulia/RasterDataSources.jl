@@ -187,6 +187,47 @@ function maybe_build_gt(xllcorner::Real, yllcorner::Real, nrows::Int, cellsize::
     return gt
 end
 
+function _maybe_prepare_params(xllcorner::Real, yllcorner::Real, nrows::Int, cellsize::Real)
+    filepath = joinpath(
+        rasterpath(),
+        "MODIS",
+        "headers",
+        string(xllcorner) *
+        "," *
+        string(yllcorner) *
+        "," *
+        string(cellsize) *
+        "," *
+        string(nrows) *
+        ".csv",
+    )
+
+    if isfile(filepath)
+        pars_str = open(filepath, "r") do f
+            readline(f)
+        end
+        pars = parse.(Float64, split(pars_str, ","))
+    else
+        # coordinates in sin projection ; we want upper-left in WGS84
+        # convert coordinates
+        yll, xll = sin_to_ll(xllcorner, yllcorner)
+
+        # convert cell size in meters to degrees in lat and lon directions
+        dy, dx = meters_to_latlon(cellsize, yll) # watch out, this is a Tuple{Float64, Float64}
+
+        pars = [xll, yll, dx, dy]
+        # store in file
+        pars_str = join(string.(pars), ",")
+        mkpath(dirname(filepath))
+        open(filepath, "w") do f
+            write(f, pars_str)
+        end
+    end
+
+    # return a NamedTuple
+    return (xll = pars[1], yll = pars[2], dx = pars[3], dy = pars[4])
+end
+
 """
     process_subset(T::Type{<:ModisProduct}, df::DataFrame)    
 
@@ -211,13 +252,11 @@ function process_subset(T::Type{<:ModisProduct}, df::DataFrame)
     xllcorner = parse(Float64, df[1, :xllcorner])
     yllcorner = parse(Float64, df[1, :yllcorner])
 
-    gt = maybe_build_gt(xllcorner, yllcorner, nrows, cellsize)
+    pars = _maybe_prepare_params(xllcorner, yllcorner, nrows, cellsize)
 
     path_out = String[]
 
     for d in eachindex(dates)
-
-        ar = Array{Float64}(undef, nrows, ncols, length(bands))
 
         for b in eachindex(bands)
 
@@ -229,7 +268,7 @@ function process_subset(T::Type{<:ModisProduct}, df::DataFrame)
 
             mat = Matrix{Float64}(undef, nrows, ncols)
 
-            filepath = rasterpath(T, bands[b]; lat = gt[4], lon = gt[1], date = dates[d])
+            filepath = rasterpath(T, bands[b]; lat = pars[:yll], lon = pars[:xll], date = dates[d])
 
             # fill matrix row by row
             count = 1
@@ -240,34 +279,11 @@ function process_subset(T::Type{<:ModisProduct}, df::DataFrame)
                 end
             end
 
-            ar[:, :, b] = mat
-
             mkpath(dirname(filepath))
 
             if !isfile(filepath)
                 @info "Creating raster file $(basename(filepath)) in $(dirname(filepath))"
-                ArchGDAL.create(
-                    filepath,
-                    driver = ArchGDAL.getdriver("GTiff"),
-                    width = ncols,
-                    height = nrows,
-                    nbands = 1,
-                    dtype = Float32,
-                ) do dataset
-                    # add data to object
-                    ArchGDAL.write!(dataset, mat, 1)
-                    # set geotransform
-                    ArchGDAL.setgeotransform!(dataset, gt)
-                    # set crs
-                    ArchGDAL.setproj!(
-                        dataset,
-                        ArchGDAL.toWKT(
-                            ArchGDAL.importPROJ4(
-                                "+proj=latlong +ellps=WGS84 +datum=WGS84 +no_defs",
-                            ),
-                        ),
-                    )
-                end
+                write_ascii(filepath, mat; ncols = ncols, nrows = nrows, nodatavalue = -9999, pars...)
             else
                 @info "Raster file $(basename(filepath)) already exists in $(dirname(filepath))"
             end

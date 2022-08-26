@@ -11,8 +11,8 @@ using Dates,
       ZipFile,
       JSON,
       DataFrames,
-      ArchGDAL,
-      CSV
+      CSV,
+      ASCIIrasters
 
 export WorldClim, CHELSA, EarthEnv, AWAP, ALWB, SRTM, MODIS
 
