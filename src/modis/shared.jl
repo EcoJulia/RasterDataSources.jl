@@ -245,7 +245,7 @@ function _getrasterchunk(
 )
     length(dates) > 10 && throw("Too many dates provided. Use from and to arguments")
 
-    df = modis_request(
+    subset, pars = modis_request(
         T,
         list_layers(T)[layer],
         kwargs[:lat],
@@ -256,7 +256,7 @@ function _getrasterchunk(
         dates[end],
     )
 
-    out = process_subset(T, df)
+    out = process_subset(T, subset, pars)
 
     return out
 end

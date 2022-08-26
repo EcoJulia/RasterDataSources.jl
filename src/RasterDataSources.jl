@@ -9,8 +9,7 @@ using Dates,
       HTTP,
       URIs,
       ZipFile,
-      JSON,
-      DataFrames,
+      JSON.Parser,
       ASCIIrasters,
       DelimitedFiles
 

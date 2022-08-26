@@ -4,8 +4,7 @@
 MODIS data is not available in .tif format so we need a bit more
 steps before storing the retrieved data and we can't download() it.
 
-Data parsing is way easier using JSON.jl and DataFrames.jl but it
-adds more dependencies..
+Data parsing is way easier using JSON.jl but it adds a dependency
 """
 
 """
@@ -39,7 +38,7 @@ Lowest level function for requests to modis server. All arguments are assumed co
 
  - `from`, `to`: `String`s of astronomical dates for start and end dates of downloaded data, e.g. `"A2002033"` for "2002-02-02"
 
-Returns a `DataFrame` with all requested data directly downloaded from MODIS. The `DataFrame` will almost always directly be passed to [`RasterDataSources.process_subset`](@ref)
+Returns a `NamedTuple` of information relevant to build a raster header, and a `Vector` of `Dict`s containing raster data, directly downloaded from MODIS. Those will almost always directly be passed to [`RasterDataSources.process_subset`](@ref)
 """
 function modis_request(T::Type{<:ModisProduct}, layer, lat, lon, km_ab, km_lr, from, to)
     # using joinpath here is more readable but works only for UNIX based OS, :'(
@@ -60,36 +59,25 @@ function modis_request(T::Type{<:ModisProduct}, layer, lat, lon, km_ab, km_lr, f
 
     r = HTTP.request("GET", URI(base_uri * query), ["Accept" => "application/json"])
 
-    body = JSON.parse(String(r.body))
+    body = JSON.Parser.parse(String(r.body))
 
     # The server outputs data in a nested JSON array that we can
     # parse manually : the highest level is a metadata array with
     # a "subset" column containing pixel array for each (band, timepoint)
 
-    metadata = DataFrame(body)[:, Not(:subset)]
+    # the header information is in the top-level of the request
+    pars = (
+        nrows = body["nrows"],
+        ncols = body["ncols"],
+        xll = body["xllcorner"],
+        yll = body["yllcorner"],
+        cellsize = body["cellsize"]
+    )
 
-    out = DataFrame()
+    # data is in the subset field
+    subset = body["subset"]
 
-    for i = 1:nrow(metadata) # for each (band, time)
-
-        subset = DataFrame(body["subset"][i])
-        n = nrow(subset)
-        subset.pixel = 1:n
-
-        # this thing here could be prettier..
-        subset.cellsize = repeat([metadata[i, :cellsize]], n)
-        subset.latitude = repeat([metadata[i, :latitude]], n)
-        subset.longitude = repeat([metadata[i, :longitude]], n)
-        subset.ncols = repeat([metadata[i, :ncols]], n)
-        subset.nrows = repeat([metadata[i, :nrows]], n)
-        subset.xllcorner = repeat([metadata[i, :xllcorner]], n)
-        subset.yllcorner = repeat([metadata[i, :yllcorner]], n)
-        subset.header = repeat([metadata[i, :header]], n)
-
-        out = [out; subset]
-    end
-
-    return out
+    return subset, pars
 end
 
 """
@@ -131,60 +119,6 @@ function meters_to_latlon(d::Real, lat::Real)
     dlat = d * 180 / (π * EARTH_POL_RADIUS)
 
     return (dlat, dlon)
-end
-
-function maybe_build_gt(xllcorner::Real, yllcorner::Real, nrows::Int, cellsize::Real)
-    filepath = joinpath(
-        rasterpath(),
-        "MODIS",
-        "geotransforms",
-        string(xllcorner) *
-        "," *
-        string(yllcorner) *
-        "," *
-        string(cellsize) *
-        "," *
-        string(nrows) *
-        ".csv",
-    )
-
-    if isfile(filepath)
-        gt_str = open(filepath) do f
-            readline(f)
-        end
-        gt = parse.(Float64, split(gt_str, ","))
-    else ## Build geotransform : modis provides lower-left corner 
-        # coordinates in sin projection ; we want upper-left in WGS84
-
-        # convert coordinates
-        lat, lon = sin_to_ll(xllcorner, yllcorner)
-
-        # convert cell size in meters to degress in lat and lon directions
-        resolution = meters_to_latlon(cellsize, lat) # watch out, this is a Tuple{Float64, Float64}
-
-        # build the geotransform 
-        # (https://yeesian.com/ArchGDAL.jl/stable/quickstart/#Dataset-Georeferencing)
-
-        gt = [
-            lon - resolution[2] / 2, # left longitude
-            resolution[2], # lon resolution in degrees
-            0.0, # no rotation
-            lat + nrows * resolution[1] + resolution[1] / 2, # up latitude
-            0.0, # no rotation (yes, this order)
-            -resolution[1], # lat resolution in degrees, negative because the data
-            # matrix is south-up oriented
-        ]
-
-        # store gt
-
-        gt_str = join(string.(gt), ",")
-        mkpath(dirname(filepath))
-        open(filepath, "w") do f
-            write(f, gt_str)
-        end
-    end
-
-    return gt
 end
 
 function _maybe_prepare_params(xllcorner::Real, yllcorner::Real, nrows::Int, cellsize::Real)
@@ -229,68 +163,59 @@ function _maybe_prepare_params(xllcorner::Real, yllcorner::Real, nrows::Int, cel
 end
 
 """
-    process_subset(T::Type{<:ModisProduct}, df::DataFrame)    
+    process_subset(T::Type{<:ModisProduct}, subset::Vector{Any}, pars::NamedTuple)    
 
-Process a raw subset dataframe and create several raster files. Any already existing file is not overwritten.
+Process a raw subset and argument parameters and create several raster files. Any already existing file is not overwritten.
 
 For each band, a separate folder is created, containing a file for each of the required dates. This is inspired by the way WorldClim{Climate} treats the problem of possibly having to download several dates AND bands.
 
-Can theoretically be used for `DataFrame`s of MODIS data that do not directly come from [`RasterDataSources.modis_request`](@ref), but caution is advised.
+Can theoretically be used for MODIS data that does not directly come from [`RasterDataSources.modis_request`](@ref), but caution is advised.
 
 Returns the filepath/s of the created or pre-existing files.
 """
-function process_subset(T::Type{<:ModisProduct}, df::DataFrame)
+function process_subset(T::Type{<:ModisProduct}, subset::Vector{Any}, pars::NamedTuple)
 
-    dates = unique(df[:, :calendar_date])
-    bands = unique(df[:, :band])
+    # coerce parameters from String to correct types
+    ncols = pars[:ncols]
+    nrows = pars[:nrows]
 
-    ncols = df[1, :ncols]
-    nrows = df[1, :nrows]
+    cellsize = pars[:cellsize]
 
-    cellsize = df[1, :cellsize]
+    xll = parse(Float64, pars[:xll])
+    yll = parse(Float64, pars[:yll])
 
-    xllcorner = parse(Float64, df[1, :xllcorner])
-    yllcorner = parse(Float64, df[1, :yllcorner])
-
-    pars = _maybe_prepare_params(xllcorner, yllcorner, nrows, cellsize)
+    pars = _maybe_prepare_params(xll, yll, nrows, cellsize)
 
     path_out = String[]
 
-    for d in eachindex(dates)
+    for i in eachindex(subset) # for each (date, band)
+        date = subset[i]["calendar_date"]
+        band = subset[i]["band"]
 
-        for b in eachindex(bands)
+        filepath = rasterpath(T, band; lat = pars[:yll], lon = pars[:xll], date = date)
 
-            sub_df = subset(
-                df,
-                :calendar_date => x -> x .== dates[d],
-                :band => y -> y .== bands[b],
-            )
+        mat = Matrix{Float64}(undef, nrows, ncols)
 
-            mat = Matrix{Float64}(undef, nrows, ncols)
-
-            filepath = rasterpath(T, bands[b]; lat = pars[:yll], lon = pars[:xll], date = dates[d])
-
-            # fill matrix row by row
-            count = 1
-            for j = 1:ncols
-                for i = 1:nrows
-                    mat[i, j] = float(sub_df[count, :data])
-                    count += 1
-                end
+        # fill matrix row by row
+        count = 1
+        for c = 1:ncols
+            for r = 1:nrows
+                mat[r, c] = float(subset[i]["data"][count])
+                count += 1
             end
-
-            mkpath(dirname(filepath))
-
-            if !isfile(filepath)
-                @info "Creating raster file $(basename(filepath)) in $(dirname(filepath))"
-                write_ascii(filepath, mat; ncols = ncols, nrows = nrows, nodatavalue = -9999, pars...)
-            else
-                @info "Raster file $(basename(filepath)) already exists in $(dirname(filepath))"
-            end
-
-            push!(path_out, filepath)
-
         end
+
+        mkpath(dirname(filepath))
+
+        if !isfile(filepath)
+            @info "Creating raster file $(basename(filepath)) in $(dirname(filepath))"
+            write_ascii(filepath, mat; ncols = ncols, nrows = nrows, nodatavalue = -9999, pars...)
+        else
+            @info "Raster file $(basename(filepath)) already exists in $(dirname(filepath))"
+        end
+
+        push!(path_out, filepath)
+
     end
 
     return (length(path_out) == 1 ? path_out[1] : path_out)

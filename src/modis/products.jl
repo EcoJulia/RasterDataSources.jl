@@ -91,7 +91,7 @@ function list_dates(
         calendardates = String[]
         modisdates = String[]
 
-        # fill the DataFrame
+        # fill the vectors
         for date in body["dates"]
             push!(calendardates, date["calendar_date"])
             push!(modisdates, date["modis_date"])
