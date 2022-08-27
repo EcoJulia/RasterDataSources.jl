@@ -2,7 +2,7 @@ using SafeTestsets, Aqua, RasterDataSources, Pkg
 
 # as long as ASCIIrasters is not registered we have to
 # install it manually from ./dev
-Pkg.develop(path="../dev/ASCIIrasters")
+Pkg.develop(path="../dev/ASCIIrasters.jl")
 
 if VERSION >= v"1.5.0"
     # HTTP.jl `write` is full of ambiguities

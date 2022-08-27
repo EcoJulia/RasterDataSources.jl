@@ -4,6 +4,7 @@ authors = ["Rafael Schouten <rafaelschouten@gmail.com>", "Timothée Poisot <timo
 version = "0.5.4"
 
 [deps]
+ASCIIrasters = "81770e7c-c736-4fa5-8129-46dd21831640"
 Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
 DelimitedFiles = "8bb1440f-4735-579b-a4ab-409b98df4dab"
 HTTP = "cd3eb016-35fb-5094-929b-558a96fad6f3"

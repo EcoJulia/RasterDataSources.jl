@@ -24,11 +24,13 @@ jobs:
           - x64
     steps:
       - uses: actions/checkout@v2
+        with:
+          submodules: recursive
       - uses: julia-actions/setup-julia@v1
         with:
           version: ${{ matrix.version }}
           arch: ${{ matrix.arch }}
-      - uses: julia-actions/julia-buildpkg@latest
+      - uses: jguerber/julia-buildpkg@custom
       - uses: julia-actions/julia-runtest@latest
         env:
           RASTERDATASOURCES_PATH: "."
