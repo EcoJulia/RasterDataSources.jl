@@ -85,7 +85,7 @@ function list_dates(
         )
 
         # parse
-        body = JSON.parse(String(r.body))
+        body = JP.parse(String(r.body))
         
         # prebuild columns
         calendardates = String[]
