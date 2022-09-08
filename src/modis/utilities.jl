@@ -194,7 +194,7 @@ function process_subset(T::Type{<:ModisProduct}, subset::Vector{Any}, pars::Name
 
         filepath = rasterpath(T, band; lat = pars[:yll], lon = pars[:xll], date = date)
 
-        mat = Matrix{Float64}(undef, nrows, ncols)
+        mat = Matrix{Float32}(undef, nrows, ncols)
 
         # fill matrix row by row
         count = 1
@@ -209,7 +209,7 @@ function process_subset(T::Type{<:ModisProduct}, subset::Vector{Any}, pars::Name
 
         if !isfile(filepath)
             @info "Creating raster file $(basename(filepath)) in $(dirname(filepath))"
-            write_ascii(filepath, mat; ncols = ncols, nrows = nrows, nodatavalue = -9999, pars...)
+            write_ascii(filepath, mat; ncols = ncols, nrows = nrows, nodatavalue = -9999.0, pars...)
         else
             @info "Raster file $(basename(filepath)) already exists in $(dirname(filepath))"
         end
