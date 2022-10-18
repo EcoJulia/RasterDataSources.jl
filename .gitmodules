@@ -1,3 +1,0 @@
-[submodule "dev/ASCIIrasters.jl"]
-	path = dev/ASCIIrasters.jl
-	url = https://github.com/JuliaGeo/ASCIIrasters.jl
