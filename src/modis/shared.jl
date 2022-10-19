@@ -79,7 +79,7 @@ Available layers for a given product can be looked up using [`RasterDataSources.
 
 - `lat` and `lon`: Coordinates in decimal degrees of the approximate center of the raster. The MODIS API will try to match its pixel grid system as close as possible to those coordinates.
 
-- `km_ab` and `km_lr``: Half-width and half-height of the raster in kilometers. Currently only `Integer` values are supported, up to 100.
+- `km_ab` and `km_lr`: Half-width and half-height of the raster in kilometers. Currently only `Integer` values are supported, up to 100.
 
 - `date`: `String`, `Date`, `DateTime`, `AbstractVector` of dates or `Tuple` of a start and end date for the request. `String`s should be in format YYYY-MM-DD but can be in similar formats as long as they are comprehensible by `Dates.Date`. The available date interval for MODIS is 16 days, reset every first of January.
 
