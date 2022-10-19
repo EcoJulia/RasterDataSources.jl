@@ -136,5 +136,5 @@ RasterDataSources.process_subset
 
 ```@docs
 RasterDataSources.product
-RasterDataSources.sin_to_ll
+RasterDataSources.sinusoidal_to_latlon
 ```
