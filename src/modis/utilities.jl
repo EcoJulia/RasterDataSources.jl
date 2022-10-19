@@ -81,13 +81,13 @@ function modis_request(T::Type{<:ModisProduct}, layer, lat, lon, km_ab, km_lr, f
 end
 
 """
-    sin_to_ll(x::Real, y::Real)    
+    sinusoidal_to_latlon(x::Real, y::Real)    
 
 Convert x and y in sinusoidal projection to lat and lon in dec. degrees
 
 The ![EPSG.io API](https://github.com/maptiler/epsg.io) takes care of coordinate conversions. This is not ideal in terms of network use but guarantees that the coordinates are correct.
 """
-function sin_to_ll(x::Real, y::Real)
+function sinusoidal_to_latlon(x::Real, y::Real)
 
     url = "https://epsg.io/trans"
 
@@ -144,7 +144,7 @@ function _maybe_prepare_params(xllcorner::Real, yllcorner::Real, nrows::Int, cel
     else
         # coordinates in sin projection ; we want upper-left in WGS84
         # convert coordinates
-        yll, xll = sin_to_ll(xllcorner, yllcorner)
+        yll, xll = sinusoidal_to_latlon(xllcorner, yllcorner)
 
         # convert cell size in meters to degrees in lat and lon directions
         dy, dx = meters_to_latlon(cellsize, yll) # watch out, this is a Tuple{Float64, Float64}

@@ -2,7 +2,7 @@ using RasterDataSources, Test
 
 @testset verbose = true "MODIS utility functions" begin
     @testset "Coordinate conversions" begin
-        @test RasterDataSources.sin_to_ll(0,0) == (0.0, 0.0)
+        @test RasterDataSources.sinusoidal_to_latlon(0,0) == (0.0, 0.0)
         @test RasterDataSources.meters_to_latlon(0, 45) == (0.0, 0.0)
         @test RasterDataSources.meters_to_latlon(111000, 0)[1] ≈ 1.0 rtol = 0.01
     end
