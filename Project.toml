@@ -4,13 +4,18 @@ authors = ["Rafael Schouten <rafaelschouten@gmail.com>", "Timothée Poisot <timo
 version = "0.5.4"
 
 [deps]
+ASCIIrasters = "81770e7c-c736-4fa5-8129-46dd21831640"
 Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
+DelimitedFiles = "8bb1440f-4735-579b-a4ab-409b98df4dab"
 HTTP = "cd3eb016-35fb-5094-929b-558a96fad6f3"
+JSON = "682c06a0-de6a-54ab-a142-c8b1cf79cde6"
 URIs = "5c2747f8-b7ea-4ff2-ba2e-563bfd36b1d4"
 ZipFile = "a5390f91-8eb1-5f08-bee0-b1d1ffed6cea"
 
 [compat]
+ASCIIrasters = "0.1"
 HTTP = "0.8, 0.9"
+JSON = "0.21"
 URIs = "1"
 ZipFile = "0.9"
 julia = "1.6"
