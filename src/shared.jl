@@ -7,8 +7,8 @@ for a `Tuple` of layers. `layer` values are usually values of
 `Symbol`, but can also be `Int` for `BioClim` datasets.
 
 Keyword arguments depend on the specific data source. 
-The may modify the return value, following a pattern:
-- `month` keywords of `AbstractArray will return a `Vector{String}`
+They may modify the return value, following a pattern:
+- `month` keywords of `AbstractArray` will return a `Vector{String}`
     or `Vector{<:NamedTuple}`.
 - `date` keywords of `AbstractArray` will return a `Vector{String}` or
     `Vector{<:NamedTuple}`.
