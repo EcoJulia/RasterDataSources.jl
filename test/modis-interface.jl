@@ -5,7 +5,7 @@ using RasterDataSources: rastername, rasterpath, zipurl, zipname, zippath, layer
     @testset "Core interface functionality" begin
         @test rastername(
             MOD13Q1; RasterDataSources.crozon...
-        ) == "48.24_-4.5_2002-02-02.asc"
+        ) == "48.24_-4.5_2012-02-02.asc"
 
         raster_file = joinpath(
             ENV["RASTERDATASOURCES_PATH"],
