@@ -15,8 +15,8 @@ using RasterDataSources, Test
             -4.5,
             1,
             1,
-            "A2002033",
-            "A2002033"
+            "A2012033",
+            "A2012033"
         )
         # look for a layer by its name
         @test RasterDataSources.modis_int(VNP21A2, :Emis_15) == 2
