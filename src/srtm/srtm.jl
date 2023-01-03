@@ -81,7 +81,6 @@ function bounds_to_tile_indices(::Type{SRTM}, (xs, ys)::NTuple{2,NTuple{2,Real}}
     _check_order(ys)
     t_xs = _wgs84_to_tile_x.(xs)
     t_ys = reverse(_wgs84_to_tile_y.(ys))
-    @show t_xs t_ys
     return CartesianIndices((t_ys[1]:(t_ys[2]), t_xs[1]:(t_xs[2])))
 end
 

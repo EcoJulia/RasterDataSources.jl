@@ -12,9 +12,9 @@ using RasterDataSources: rastername, rasterpath, zipurl, zipname, zippath, layer
             "MODIS",
             "MOD13Q1",
             "250m_16_days_NDVI",
-            "48.2313_-4.513_2002-02-02.asc"
+            "48.2313_-4.513_2012-02-02.asc"
         )
-        @test rasterpath(MOD13Q1, :NDVI; lat = 48.2313, lon = -4.513, date = "2002-02-02") == raster_file
+        @test rasterpath(MOD13Q1, :NDVI; lat = 48.2313, lon = -4.513, date = "2012-02-02") == raster_file
         @test getraster(MOD13Q1, :NDVI; RasterDataSources.crozon...) == raster_file
         @test getraster(MOD13Q1, (:NDVI,); RasterDataSources.crozon...) == (NDVI = raster_file,)
         @test getraster(MOD13Q1, [:NDVI]; RasterDataSources.crozon...) == (NDVI = raster_file,)
@@ -35,9 +35,9 @@ using RasterDataSources: rastername, rasterpath, zipurl, zipname, zippath, layer
     end
     
     @testset "date_sequence" begin
-        twodates = [Date(2001, 1, 1), Date(2001, 1, 17)]
-        @test RasterDataSources.date_sequence(MOD13Q1, (Date(2001,1,1), Date(2001,2,1)); RasterDataSources.broceliande...) == twodates
-        @test RasterDataSources.date_sequence(MODIS{MOD09A1}, (Date(2001,1,1), Date(2001,2,1)); RasterDataSources.broceliande...) == twodates
+        twodates = [Date(2011, 1, 1), Date(2011, 1, 17)]
+        @test RasterDataSources.date_sequence(MOD13Q1, (Date(2011,1,1), Date(2011,2,1)); RasterDataSources.broceliande...) == twodates
+        @test RasterDataSources.date_sequence(MODIS{MOD09A1}, (Date(2011,1,1), Date(2011,2,1)); RasterDataSources.broceliande...) == twodates
     end
     
     @testset "Ensure metadata copy opt out" begin
