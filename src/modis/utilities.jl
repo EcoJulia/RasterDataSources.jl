@@ -196,7 +196,7 @@ function process_subset(T::Type{<:ModisProduct}, subset::Vector{Any}, pars::Name
         
         mat = permutedims(reshape(subset[i]["data"], (ncols, nrows)))
 
-        mkpath(dirname(filepath)) # prepare directories
+        mkpath(dirname(filepath)) # prepare directories if they dont exist
 
         if !isfile(filepath)
             @info "Creating raster file $(basename(filepath)) in $(dirname(filepath))"
