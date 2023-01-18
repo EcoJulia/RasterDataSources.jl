@@ -193,19 +193,8 @@ function process_subset(T::Type{<:ModisProduct}, subset::Vector{Any}, pars::Name
         band = subset[i]["band"]
 
         filepath = rasterpath(T, band; lat = pars[:yll], lon = pars[:xll], date = date)
-
-        mat = Matrix{Float32}(undef, nrows, ncols)
-
-        # fill matrix row by row
-        count = 1
-        for c = 1:ncols
-            for r = 1:nrows
-                mat[r, c] = float(subset[i]["data"][count])
-                count += 1
-            end
-        end
-
-        mkpath(dirname(filepath))
+        
+        mat = permutedims(reshape(subset[i]["data"], (ncols, nrows)))
 
         if !isfile(filepath)
             @info "Creating raster file $(basename(filepath)) in $(dirname(filepath))"
