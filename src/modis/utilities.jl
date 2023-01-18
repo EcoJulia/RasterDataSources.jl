@@ -196,6 +196,8 @@ function process_subset(T::Type{<:ModisProduct}, subset::Vector{Any}, pars::Name
         
         mat = permutedims(reshape(subset[i]["data"], (ncols, nrows)))
 
+        mkpath(dirname(filepath)) # prepare directories
+
         if !isfile(filepath)
             @info "Creating raster file $(basename(filepath)) in $(dirname(filepath))"
             write_ascii(filepath, mat; ncols = ncols, nrows = nrows, nodatavalue = -3000.0, pars...)
