@@ -22,6 +22,7 @@ end
 @time @safetestset "worldclim bioclim" begin include("worldclim-bioclim.jl") end
 @time @safetestset "worldclim climate" begin include("worldclim-climate.jl") end
 @time @safetestset "worldclim weather" begin include("worldclim-weather.jl") end
+@time @safetestset "worldclim elevation" begin include("worldclim-elevation.jl") end
 # SRTM SSL certs have expired
 # @time @safetestset "srtm" begin include("srtm.jl") end
 @time @safetestset "modis utilities" begin include("modis-utilities.jl") end

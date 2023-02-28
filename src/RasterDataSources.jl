@@ -16,7 +16,7 @@ import JSON.Parser as JP
 
 export WorldClim, CHELSA, EarthEnv, AWAP, ALWB, SRTM, MODIS
 
-export BioClim, Climate, Weather, LandCover, HabitatHeterogeneity
+export BioClim, Climate, Weather, Elevation, LandCover, HabitatHeterogeneity
 
 export Future, CMIP5, CMIP6
 
@@ -60,6 +60,7 @@ include("worldclim/shared.jl")
 include("worldclim/bioclim.jl")
 include("worldclim/climate.jl")
 include("worldclim/weather.jl")
+include("worldclim/elevation.jl")
 
 include("chelsa/shared.jl")
 include("chelsa/bioclim.jl")
