@@ -58,6 +58,7 @@ WorldClim
 getraster(T::Type{WorldClim{BioClim}}, layers::Union{Tuple,Int,Symbol}; res)
 getraster(T::Type{WorldClim{Weather}}, layers::Union{Tuple,Symbol}; date)
 getraster(T::Type{WorldClim{Climate}}, layers::Union{Tuple,Symbol}; month, res)
+getraster(T::Type{WorldClim{Elevation}}, layers::Union{Tuple,Symbol}; month, res)
 ```
 
 ## MODIS
@@ -76,6 +77,7 @@ RasterDataSources.RasterDataSet
 BioClim
 Climate
 Weather
+Elevation
 LandCover
 HabitatHeterogeneity
 Future

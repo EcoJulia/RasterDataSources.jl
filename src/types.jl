@@ -94,6 +94,17 @@ See the [`getraster`](@ref) docs for implementation details.
 struct Weather <: RasterDataSet end
 
 """
+    Elevation <: RasterDataSet
+
+Elevation datasets. 
+
+Currently implemented for WorldClim as `WorldClim{Elevation}`.
+
+See the [`getraster`](@ref) docs for implementation details.
+"""
+struct Elevation <: RasterDataSet end
+
+"""
     LandCover <: RasterDataSet
 
 Land-cover datasets.

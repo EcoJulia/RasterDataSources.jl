@@ -9,17 +9,17 @@ RasterDataSources downloads raster data for local use or for integration into ot
 [Rasters.jl](https://github.com/rafaqz/Rasters.jl). The collection is largely focussed on datasets relevant
 to ecology, but will have a lot of crossover with other sciences.
 
-Currently sources include :
+Currently sources include:
 
-| Source    | URL                                      | Status                               |
-| --------- | ---------------------------------------- |--------------------------------------|
-| CHELSA    | https://chelsa-climate.org               | BioClim, Future BioClim and Climate  |
-| WorldClim | https://www.worldclim.org                | Climate, Weather and BioClim         |
-| EarthEnv  | http://www.earthenv.org                  | LandCover and HabitatHeterogeneity   |
-| AWAP      | http://www.bom.gov.au/jsp/awap/index.jsp | Complete                             |
-| ALWB      | http://www.bom.gov.au/water/landscape/   | Complete                             |
-| SRTM      | https://www2.jpl.nasa.gov/srtm/          | Complete                             |
-| MODIS     | https://modis.ornl.gov |     Complete (beta) |
+| Source    | URL                                      | Status                                   |
+| --------- | ---------------------------------------- | ---------------------------------------- |
+| CHELSA    | https://chelsa-climate.org               | BioClim, Future BioClim and Climate      |
+| WorldClim | https://www.worldclim.org                | Climate, Weather, BioClim, and Elevation |
+| EarthEnv  | http://www.earthenv.org                  | LandCover and HabitatHeterogeneity       |
+| AWAP      | http://www.bom.gov.au/jsp/awap/index.jsp | Complete                                 |
+| ALWB      | http://www.bom.gov.au/water/landscape/   | Complete                                 |
+| SRTM      | https://www2.jpl.nasa.gov/srtm/          | Complete                                 |
+| MODIS     | https://modis.ornl.gov                   | Complete (beta)                          |
 
 Please open an issue if you need more datasets added, or (even better) open a pull request 
 following the form of the other datasets where possible.
