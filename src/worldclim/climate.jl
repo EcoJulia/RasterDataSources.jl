@@ -21,6 +21,8 @@ function getraster(T::Type{WorldClim{Climate}}, layers::Union{Tuple,Symbol};
     _getraster(T, layers, month, res)
 end
 
+getraster_keywords(::Type{WorldClim{Climate}}) = (:month, :res,)
+
 function _getraster(T::Type{WorldClim{Climate}}, layers, month::AbstractArray, res::String)
     _getraster.(T, Ref(layers), month, Ref(res))
 end

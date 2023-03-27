@@ -20,4 +20,6 @@ using RasterDataSources: rastername, rasterpath, zipurl, zipname, zippath
         @test getraster(AWAP, [:vprpress09]; date=DateTime(2001, 01, 01)) == (vprpress09=raster_file,)
         @test isfile(raster_file)
     end
+
+    @test RasterDataSources.getraster_keywords(AWAP) == (:date,)
 end

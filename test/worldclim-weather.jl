@@ -22,4 +22,5 @@ using RasterDataSources: rastername, rasterpath, zipurl, zipname, zippath
         @test getraster(WorldClim{Weather}, (:prec,); date=Date(2001):Month(1):Date(2001, 12)) == map(f -> (prec=f,), raster_files)
         @test getraster(WorldClim{Weather}, [:prec]; date=Date(2001):Month(1):Date(2001, 12)) == map(f -> (prec=f,), raster_files)
     end
+    @test RasterDataSources.getraster_keywords(WorldClim{Weather}) == (:date,)
 end

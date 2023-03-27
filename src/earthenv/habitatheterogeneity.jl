@@ -47,6 +47,8 @@ function getraster(T::Type{EarthEnv{HabitatHeterogeneity}}, layers::Union{Tuple,
     _getraster(T, layers, res)
 end
 
+getraster_keywords(::Type{EarthEnv{HabitatHeterogeneity}}) = (:res,)
+
 function _getraster(T::Type{EarthEnv{HabitatHeterogeneity}}, layers::Tuple, res::String)
     return _map_layers(T, layers, res)
 end
@@ -65,7 +67,7 @@ end
 function rasterpath(::Type{EarthEnv{HabitatHeterogeneity}})
     joinpath(rasterpath(EarthEnv), "HabitatHeterogeneity")
 end
-function rasterpath(T::Type{<:EarthEnv{HabitatHeterogeneity}}, layer::Symbol; res::String=defres(T))
+function rasterpath(T::Type{EarthEnv{HabitatHeterogeneity}}, layer::Symbol; res::String=defres(T))
     joinpath(rasterpath(T), string(res), rastername(T, layer; res))
 end
 function rasterurl(::Type{EarthEnv{HabitatHeterogeneity}})

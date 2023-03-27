@@ -18,11 +18,12 @@ function getraster(T::Type{WorldClim{Weather}}, layers::Union{Tuple,Symbol}; dat
     _getraster(T, layers, date)
 end
 
+getraster_keywords(::Type{WorldClim{Weather}}) = (:date,)
+
 function _getraster(T::Type{WorldClim{Weather}}, layers, date::Tuple)
     _getraster(T, layers, date_sequence(T, date))
 end
 function _getraster(T::Type{WorldClim{Weather}}, layers, dates::AbstractArray)
-    @show layers
     _getraster.(T, Ref(layers), dates)
 end
 function _getraster(T::Type{WorldClim{Weather}}, layers::Tuple, date::Dates.TimeType)

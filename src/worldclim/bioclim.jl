@@ -24,6 +24,8 @@ function getraster(T::Type{WorldClim{BioClim}}, layers::Union{Tuple,Int,Symbol};
     _getraster(T, layers, res)
 end
 
+getraster_keywords(::Type{WorldClim{BioClim}}) = (:res,)
+
 _getraster(T::Type{WorldClim{BioClim}}, layers::Tuple, res) = _map_layers(T, layers, res)
 _getraster(T::Type{WorldClim{BioClim}}, layer::Symbol, res) = _getraster(T, bioclim_int(layer), res)
 function _getraster(T::Type{WorldClim{BioClim}}, layer::Integer, res)

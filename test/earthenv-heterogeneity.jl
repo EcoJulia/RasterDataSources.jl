@@ -18,4 +18,6 @@ using RasterDataSources: rastername, rasterpath, rasterurl
     @test isfile(raster_path)
     files = getraster(EarthEnv{HabitatHeterogeneity})
     @test all(map(isfile, files))
+
+    @test RasterDataSources.getraster_keywords(EarthEnv{HabitatHeterogeneity}) == (:res,)
 end

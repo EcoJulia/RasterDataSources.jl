@@ -64,6 +64,8 @@ Returns the filepath/s of the downloaded or pre-existing files.
 """
 getraster(T::Type{AWAP}, layer::Union{Tuple,Symbol}; date) = _getraster(T, layer, date)
 
+getraster_keywords(::Type{<:AWAP}) = (:date,)
+
 function _getraster(T::Type{AWAP}, layer::Union{Tuple,Symbol}, dates::Tuple{<:Any,<:Any})
     _getraster(T, layer, date_sequence(T, dates))
 end
