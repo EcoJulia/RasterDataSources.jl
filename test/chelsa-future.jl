@@ -13,6 +13,8 @@ using RasterDataSources: rasterurl, rastername, rasterpath
     @test getraster(CHELSA{Future{BioClim,CMIP5,CCSM4,RCP26}}, (5,); date=Date(2050)) == (bio5=raster_path,)
     @test getraster(CHELSA{Future{BioClim,CMIP5,CCSM4,RCP26}}, [5]; date=Date(2050)) == (bio5=raster_path,)
     @test isfile(raster_path)
+
+    @test RasterDataSources.getraster_keywords(CHELSA{Future{BioClim}}) == (:date,)
 end
 
 @testset "CHELSA Future BioClim CMIP6" begin
@@ -50,6 +52,7 @@ end
     @test getraster(CHELSA{Future{Climate,CMIP5,CCSM4,RCP60}}, (:tmax,); date=Date(2050), month=7:7) == [(tmax=raster_path,)]
     @test getraster(CHELSA{Future{Climate,CMIP5,CCSM4,RCP60}}, :tmax; date=[Date(2050)], month=7:7) == [[raster_path]]
     @test isfile(raster_path)
+    @test RasterDataSources.getraster_keywords(CHELSA{Future{Climate}}) == (:date, :month)
 end
 
 @testset "CHELSA Future Climate CMIP6" begin

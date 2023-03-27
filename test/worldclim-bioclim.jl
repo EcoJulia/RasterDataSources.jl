@@ -13,4 +13,6 @@ using RasterDataSources: rastername, rasterpath, zipurl, zipname, zippath
     @test getraster(WorldClim{BioClim}, 2:2; res="10m") == (bio2=raster_file,)
     @test getraster(WorldClim{BioClim}, [:bio2]; res="10m") == (bio2=raster_file,)
     @test isfile(raster_file)
+
+    @test RasterDataSources.getraster_keywords(WorldClim{BioClim}) == (:res,)
 end

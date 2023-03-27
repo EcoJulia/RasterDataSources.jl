@@ -32,6 +32,16 @@ end
 # Without a layers argument, all layers are downloaded
 getraster(T::Type; kw...) = getraster(T, layers(T); kw...)
 
+"""
+    getraster_keywords(::Type{<:RasterDataSource})
+
+Trait for defining data source keywords, which returns
+a `NTuple{N,Symbol}`.
+
+The default fallback method returns `()`.
+"""
+getraster_keywords(::Type{<:RasterDataSource}) = ()
+
 # Default assumption for `layerkeys` is that the layer
 # is the same as the layer key. This is not the case for
 # e.g. BioClim, where layers can be specified with Int.

@@ -113,6 +113,8 @@ function getraster(T::Type{<:ALWB}, layers::Union{Tuple,Symbol}; date)
      _getraster(T, layers, date)
 end
 
+getraster_keywords(::Type{<:ALWB}) = (:date,)
+
 function _getraster(T::Type{<:ALWB{M,P}}, layers, dates::Tuple) where {M,P}
     _getraster(T, layers, date_sequence(T, dates))
 end

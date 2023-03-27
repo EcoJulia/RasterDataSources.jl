@@ -19,4 +19,6 @@ using RasterDataSources: rastername, rasterpath, rasterurl
     @test getraster(CHELSA{BioClim}, 5:5) == (bio5=raster_path,)
     @test getraster(CHELSA{BioClim}, [:bio5]) == (bio5=raster_path,)
     @test isfile(raster_path)
+
+    @test RasterDataSources.getraster_keywords(CHELSA{BioClim}) == ()
 end

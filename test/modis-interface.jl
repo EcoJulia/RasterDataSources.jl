@@ -44,4 +44,7 @@ using RasterDataSources: rastername, rasterpath, zipurl, zipname, zippath, layer
         @test RasterDataSources.has_constant_metadata(MODIS{MOD13Q1}) == false
         @test RasterDataSources.has_constant_metadata(VNP09A1) == false
     end
+
+    @test RasterDataSources.getraster_keywords(MODIS) == (:lat, :lon, :km_ab, :km_lr, :date, :end)
+    @test RasterDataSources.getraster_keywords(MOD13Q1) == (:lat, :lon, :km_ab, :km_lr, :date, :end)
 end

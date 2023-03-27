@@ -64,6 +64,8 @@ function getraster(T::Type{<:MODIS{X}}, args...; kwargs...) where {X}
     throw("Unrecognized MODIS product.")
 end
 
+getraster_keywords(::Type{<:Union{MODIS,ModisProduct}}) = (:lat, :lon, :km_ab, :km_lr, :date, :end)
+
 """
     getraster(T::Union{Type{<:ModisProduct}, Type{MODIS{X}}}, [layer::Union{Tuple,AbstractVector,Integer, Symbol}]; kwargs...) => Union{String, AbstractVector, NamedTuple}
 
@@ -114,6 +116,8 @@ function getraster(
     # then pass them to internal functions
     _getraster(T, layer, date; lat = lat, lon = lon, km_ab = km_ab, km_lr = km_lr)
 end
+
+
 
 # if layer is a tuple, get them all using _map_layers
 function _getraster(T::Type{<:ModisProduct}, layers::Tuple, date; kwargs...)

@@ -32,6 +32,8 @@ function getraster(
     _getraster(T, layers, date)
 end
 
+getraster_keywords(::Type{<:CHELSA{<:Future{BioClim}}}) = (:date,)
+
 """
     getraster(T::Type{CHELSA{Future{Climate}}}, [layer]; date, month) => String
 
@@ -53,6 +55,8 @@ function getraster(
 )
     _getraster(T, layers, date, month)
 end
+
+getraster_keywords(::Type{<:CHELSA{<:Future{Climate}}}) = (:date, :month)
 
 function _getraster(T::Type{<:CHELSA{<:Future{Climate}}}, layers, date, months::AbstractArray)
     map(month -> _getraster(T, layers, date, month), months)

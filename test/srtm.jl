@@ -20,4 +20,6 @@ using RasterDataSources: rasterpath, zipurl, zipname
     @test getraster(SRTM; bounds=((lon1, lon1), (lat1, lat1))) == reshape([raster_path1], 1, 1)
     lon2, lat2 = -171, 55   # Coordinates of [3000, 3000] pixel of tile x=2, y=2
     @test getraster(SRTM; bounds=((lon1, lon2), (lat2, lat1))) == permutedims([raster_path1 raster_path2])
+
+    @test RasterDataSources.getraster_keywords(SRTM) == (:bounds, :tile_index)
 end

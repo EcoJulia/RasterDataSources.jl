@@ -24,4 +24,6 @@ using RasterDataSources: rastername, rasterpath, rasterurl
     for layer in RasterDataSources.layers(EarthEnv{LandCover})
         getraster(EarthEnv{LandCover{:DISCover}}, layer)
     end
+
+    @test RasterDataSources.getraster_keywords(EarthEnv{LandCover}) == ()
 end

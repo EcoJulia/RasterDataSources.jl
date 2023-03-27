@@ -31,6 +31,8 @@ const HAS_SRTM_TILE = BitArray([
     0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  1  1  0  0  0  0  0  0  1  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  1  0  0  0  0
 ])
 
+getraster_keywords(::Type{SRTM}) = (:bounds, :tile_index)
+
 function _raster_tile_stem(tile_index::CartesianIndex)
     y, x = tile_index.I
     "srtm_$(lpad(x, 2, '0'))_$(lpad(y, 2, '0'))"

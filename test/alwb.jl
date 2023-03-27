@@ -36,4 +36,6 @@ using RasterDataSources: rastername, rasterurl, rasterpath
     raster_path = joinpath(alwb_path, "values", "year", "dd.nc")
     @test getraster(ALWB{Values,Year}, [:dd]; date=DateTime(2018, 01, 01)) == (dd=raster_path,)
     @test isfile(raster_path)
+
+    @test RasterDataSources.getraster_keywords(ALWB) == (:date,)
 end
