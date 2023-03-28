@@ -47,6 +47,8 @@ export ACCESS1, BNUESM, CCSM4, CESM1BGC, CESM1CAM5, CMCCCMS, CMCCCM, CNRMCM5,
 # Climate models from CMIP6 (used in WorldClim)
 export BCCCSM2MR, CNRMCM61, CNRMESM21, CanESM5, GFDLESM4, IPSLCM6ALR, MIROCES2L, MIROC6, MRIESM2
 
+# Deltares datasets
+export Deltares, WorldFlood
 
 export Values, Deciles
 
@@ -80,5 +82,7 @@ include("modis/shared.jl")
 include("modis/products.jl")
 include("modis/utilities.jl")
 include("modis/examples.jl")
+
+include("deltares/worldflood.jl")
 
 end # module
