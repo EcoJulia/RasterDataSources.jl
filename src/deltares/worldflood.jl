@@ -18,13 +18,17 @@ function _validate_deltares_worldflood_params(; sea_level_year, resolution, dem_
   return true
 end
 
+function _deltares_res2resolution(res::Int)
+  res <= 1000 ? string(res)*"m" : string(div(res, 1000))*"km"
+end
+
 getraster_keywords(::Type{<: Deltares{<: WorldFlood}}) = (:resolution, :dem_source, :return_period)
 
 function rastername(::Type{<: Deltares{<: WorldFlood}}, sea_level_year = 2050; resolution::Int = 90, dem_source::Symbol = :NASADEM, return_period::Int = 100)
   
   # validate params
   _validate_deltares_worldflood_params(; sea_level_year, resolution, dem_source, return_period)
-  "GFM_global_$(dem_source)$(resolution)m_$(sea_level_year)_slr_rp$(return_period)_masked.nc"
+  "GFM_global_$(dem_source)$(_deltares_res2resolution(resolution))m_$(sea_level_year)slr_rp$(lpad(return_period, 4, '0'))_masked.nc"
   
 end
 
@@ -43,7 +47,7 @@ function rasterurl(T::Type{<: Deltares{<: WorldFlood}}, sea_level_year = 2050; r
   
   root_uri = URI(scheme = "https", host = "deltaresfloodssa.blob.core.windows.net", path = "/floods/v2021.06")
   
-  return URIs.URI(root_uri, path = "/global/$(dem_source)/$(resolution)m/" * rastername(T, sea_level_year; resolution, dem_source, return_period))
+  return URIs.URI(root_uri, path = "/floods/v2021.06/global/$(dem_source)/$(_deltares_res2resolution(resolution))m/" * rastername(T, sea_level_year; resolution, dem_source, return_period))
   
 end
 
