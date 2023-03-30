@@ -22,6 +22,8 @@ function getraster(T::Type{WorldClim{Elevation}}, layers::Union{Tuple,Symbol};
     _getraster(T, layers, res)
 end
 
+getraster_keywords(::Type{WorldClim{Elevation}}) = (:res,)
+
 _getraster(T::Type{WorldClim{Elevation}}, layers::Tuple, res) = _map_layers(T, layers, res)
 function _getraster(T::Type{WorldClim{Elevation}}, layer::Symbol, res)
     _check_layer(T, layer)
