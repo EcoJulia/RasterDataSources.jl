@@ -13,5 +13,5 @@ using RasterDataSources: rastername, rasterpath, zipurl, zipname, zippath
     @test getraster(WorldClim{Elevation}, :elev; res="10m") == raster_file
     @test getraster(WorldClim{Elevation}, [:elev]; res="10m") == (elev=raster_file,)
     @test isfile(raster_file)
-    @test RasterDataSources.getraster_keywords(WorldClim{Weather}) == (:res,)
+    @test RasterDataSources.getraster_keywords(WorldClim{Elevation}) == (:res,)
 end
