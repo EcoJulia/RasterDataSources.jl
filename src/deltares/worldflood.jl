@@ -2,58 +2,55 @@ struct Deltares{Description} <: RasterDataSource end
 
 struct WorldFlood end
 
-function _validate_deltares_worldflood_params(; sea_level_year, resolution, dem_source, return_period)
+function _validate_deltares_worldflood_params(; year, res, dem_source, return_period)
   # check the parameters
   # resolution depends on dem_source
   if dem_source == :NASADEM || dem_source == :MERITDEM
-    @assert resolution in (90, 1000)
+    @assert res in ("90m", "1km")
   elseif dem_source == :LIDAR
-    @assert resolution == 5000
+    @assert res == "5km"
   else
     @assert dem_source in (:NASADEM, :MERITDEM, :LIDAR)
   end
   
   @assert return_period in (0, 2, 5, 10, 25, 50, 100, 250)
-  @assert sea_level_year in (2018, 2050)
+  @assert year in (2018, 2050)
   return true
 end
 
-function _deltares_res2resolution(res::Int)
-  res <= 1000 ? string(res)*"m" : string(div(res, 1000))*"km"
-end
 
-getraster_keywords(::Type{<: Deltares{<: WorldFlood}}) = (:resolution, :dem_source, :return_period)
+getraster_keywords(::Type{<: Deltares{<: WorldFlood}}) = (:year, :res, :dem_source, :return_period)
 
-function rastername(::Type{<: Deltares{<: WorldFlood}}, sea_level_year = 2050; resolution::Int = 90, dem_source::Symbol = :NASADEM, return_period::Int = 100)
+function rastername(::Type{<: Deltares{<: WorldFlood}}, layer; res::String =" 90m", dem_source::Symbol = :NASADEM, return_period::Int = 100)
   
   # validate params
-  _validate_deltares_worldflood_params(; sea_level_year, resolution, dem_source, return_period)
-  "GFM_global_$(dem_source)$(_deltares_res2resolution(resolution))m_$(sea_level_year)slr_rp$(lpad(return_period, 4, '0'))_masked.nc"
+  _validate_deltares_worldflood_params(; year, res, dem_source, return_period)
+  "GFM_global_$(dem_source)$(res)_$(sea_level_year)slr_rp$(lpad(return_period, 4, '0'))_masked.nc"
   
 end
 
-function rasterpath(T::Type{<: Deltares{<: WorldFlood}}, sea_level_year = 2050; resolution::Int = 90, dem_source::Symbol = :NASADEM, return_period::Int = 100)
+function rasterpath(T::Type{<: Deltares{<: WorldFlood}}, layer; year = 2050, res::String =" 90m", dem_source::Symbol = :NASADEM, return_period::Int = 100)
  
   # validate params
-  _validate_deltares_worldflood_params(; sea_level_year, resolution, dem_source, return_period)
-  return joinpath(rasterpath(), "Deltares", "WorldFlood", rastername(T, sea_level_year; resolution, dem_source, return_period))
+  _validate_deltares_worldflood_params(; year, res, dem_source, return_period)
+  return joinpath(rasterpath(), "Deltares", "WorldFlood", rastername(T, layer; year, res, dem_source, return_period))
     
 end
 
-function rasterurl(T::Type{<: Deltares{<: WorldFlood}}, sea_level_year = 2050; resolution::Int = 90, dem_source::Symbol = :NASADEM, return_period::Int = 100)
+function rasterurl(T::Type{<: Deltares{<: WorldFlood}}, layer; year = 2050, res::String = 90, dem_source::Symbol = :NASADEM, return_period::Int = 100)
   
   # validate params
-  _validate_deltares_worldflood_params(; sea_level_year, resolution, dem_source, return_period)
+  _validate_deltares_worldflood_params(; year, res, dem_source, return_period)
   
   root_uri = URI(scheme = "https", host = "deltaresfloodssa.blob.core.windows.net", path = "/floods/v2021.06")
   
-  return URIs.URI(root_uri, path = "/floods/v2021.06/global/$(dem_source)/$(_deltares_res2resolution(resolution))m/" * rastername(T, sea_level_year; resolution, dem_source, return_period))
+  return URIs.URI(root_uri, path = "/floods/v2021.06/global/$(dem_source)/$(res)/" * rastername(T, layer; year, res, dem_source, return_period))
   
 end
 
-function getraster(T::Type{<: Deltares{<: WorldFlood}}, sea_level_year = 2050; resolution::Int = 90, dem_source::Symbol = :NASADEM, return_period::Int = 100)
-  raster_path = rasterpath(T, sea_level_year; resolution, dem_source, return_period)
+function getraster(T::Type{<: Deltares{<: WorldFlood}}, layer; year = 2050, res::String =" 90m", dem_source::Symbol = :NASADEM, return_period::Int = 100)
+  raster_path = rasterpath(T, layer; year, res, dem_source, return_period)
   mkpath(dirname(raster_path))
-  _maybe_download(rasterurl(T, sea_level_year; resolution, dem_source, return_period), raster_path)
+  _maybe_download(rasterurl(T, layer; year, res, dem_source, return_period), raster_path)
   raster_path
 end
