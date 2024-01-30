@@ -24,10 +24,10 @@ function _getraster(T::Type{CHELSA{BioClim}}, layer::Integer)
     return _maybe_download(url, path)
 end
 
-rastername(::Type{CHELSA{BioClim}}, layer::Integer) = "CHELSA_bio10_$(lpad(layer, 2, "0")).tif"
+rastername(::Type{CHELSA{BioClim}}, layer::Integer) = "CHELSA_bio$(layer)_1981-2010_V.2.1.tif"
 
 rasterpath(::Type{CHELSA{BioClim}}) = joinpath(rasterpath(CHELSA), "BioClim")
 rasterpath(T::Type{CHELSA{BioClim}}, layer::Integer) = joinpath(rasterpath(T), rastername(T, layer))
 
-rasterurl(::Type{CHELSA{BioClim}}) = joinpath(rasterurl(CHELSA), "chelsa_V1/climatologies/bio/")
+rasterurl(::Type{CHELSA{BioClim}}) = joinpath(rasterurl(CHELSA), "chelsa_V2/GLOBAL/climatologies/1981-2010/bio/")
 rasterurl(T::Type{CHELSA{BioClim}}, layer::Integer) = joinpath(rasterurl(T), rastername(T, layer))
