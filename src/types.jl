@@ -66,6 +66,38 @@ bioclim_int(k::Integer) = k
 bioclim_int(k::Symbol) = bioclim_lookup[bioclim_key(k)]
 
 """
+    BioClimPlus <: RasterDataSet
+
+Extended BioClim datasets, available from CHELSA. 
+More information on the CHELSA website: https://chelsa-climate.org/exchelsa-extended-bioclim/
+
+Some of these are available as average annual maximum, minimum, mean, and range. 
+Others have a single value, more like the regular BioClim variables.
+
+They do not usually use `month` or `date` keywords, but may use
+`date` in past/future scenarios. 
+
+Currently implemented for CHELSA as `CHELSA{BioClim}` and `CHELSA{Future{BioClim, args..}}`,
+specifying layer names as `Symbol`s.
+
+See the [`getraster`](@ref) docs for implementation details.
+"""
+struct BioClimPlus <: RasterDataSet end
+
+layerkeys(T::Type{BioClimPlus}) = vcat(collect(layerkeys(BioClim)), bioclimplus_layerkeys)
+
+const _bioclimplus_monthly = (:hurs, :clt, :sfcWind, :vpd, :rsds, :pet, :cmi, :swb)
+const _bioclimplus_gdd = (:gdd, :gddlgd, :gdgfgd, :ngd)
+const _bioclimplus_others = (:fcf, :scd, :npp, :gsl, :gst, :gsp)
+const bioclimplus_layerkeys = [
+    vec([Symbol("$(b)_$(m)") for b in _bioclimplus_monthly, m in [:max, :min, :mean, :range]]);
+    vec([Symbol("$(b)_$(d)") for b in _bioclimplus_gdd, d in [0, 5, 10]]);
+    collect(_bioclimplus_others)
+]
+
+layers(::Type{BioClimPlus}) = bioclimplus_layerkeys
+
+"""
     Climate <: RasterDataSet
 
 Climate datasets. These are usually months of the year, not specific dates,
