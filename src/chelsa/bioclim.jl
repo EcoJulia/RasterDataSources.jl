@@ -21,7 +21,7 @@ getraster(
     T::Type{CHELSA{BioClim}}, 
     layer::Union{Tuple,Int,Symbol}; 
     version::Int = 2, 
-    patch::Int = latest_patch(T, Val(version))) = _getraster(T, layer, Val(version), patch)
+    patch::Int = latest_patch(T, version)) = _getraster(T, layer, version, patch)
 
 _getraster(T::Type{CHELSA{BioClim}}, layers::Tuple, version, patch) = _map_layers(T, layers, version, patch)
 _getraster(T::Type{CHELSA{BioClim}}, layer::Symbol, version, patch) = _getraster(T, bioclim_int(layer), version, patch)
@@ -32,18 +32,30 @@ function _getraster(T::Type{CHELSA{BioClim}}, layer::Integer, version, patch)
     return _maybe_download(url, path)
 end
 
-rastername(::Type{CHELSA{BioClim}}, layer::Integer, version::Val{2}, patch) = "CHELSA_bio$(layer)_1981-2010_V.2.$patch.tif"
-rastername(::Type{CHELSA{BioClim}}, layer::Integer, version::Val{1}, patch) = "CHELSA_bio10_$(lpad(layer, 2, "0")).tif"
+function rastername(::Type{CHELSA{BioClim}}, layer::Integer, version::Int, patch)
+    if version == 1
+        "CHELSA_bio10_$(lpad(layer, 2, "0")).tif"
+    elseif version == 2
+        "CHELSA_bio$(layer)_1981-2010_V.2.$patch.tif"
+    else
+        CHELSA_invalid_version(version)
+    end
+end
 
 rasterpath(::Type{CHELSA{BioClim}}) = joinpath(rasterpath(CHELSA), "BioClim")
 rasterpath(T::Type{CHELSA{BioClim}}, layer::Integer, version, patch) = joinpath(rasterpath(T), rastername(T, layer, version, patch))
 
-rasterurl(::Type{CHELSA{BioClim}}, v::Val{2}) = joinpath(rasterurl(CHELSA, v), "climatologies/1981-2010/bio/")
-rasterurl(::Type{CHELSA{BioClim}}, v::Val{1}) = joinpath(rasterurl(CHELSA, v), "climatologies/bio/")
-rasterurl(T::Type{CHELSA{BioClim}}, layer::Integer, version, patch) = joinpath(rasterurl(T, version), rastername(T, layer, version, patch))
+function rasterurl(::Type{CHELSA{BioClim}}, v::Int)
+    if v == 1
+        joinpath(rasterurl(CHELSA, v), "climatologies/bio/")
+    elseif v == 2
+        joinpath(rasterurl(CHELSA, v), "climatologies/1981-2010/bio/")
+    else
+        CHELSA_invalid_version(v)
+    end
+end
 
-rasterpath(::Type{CHELSA{BioClim}}) = joinpath(rasterpath(CHELSA), "BioClim")
-rasterpath(T::Type{CHELSA{BioClim}}, layer::Integer) = joinpath(rasterpath(T), rastername(T, layer))
+rasterurl(T::Type{CHELSA{BioClim}}, layer::Integer, version, patch) = joinpath(rasterurl(T, version), rastername(T, layer, version, patch))
 
 ### Bioclim+
 layers(::Type{CHELSA{BioClimPlus}}) = layers(BioClimPlus)
@@ -52,17 +64,18 @@ getraster(
     T::Type{CHELSA{BioClimPlus}}, 
     layer::Union{Tuple,Int,Symbol}; 
     version::Int = 2, 
-    patch::Int = latest_patch(T, Val(version))) = _getraster(T, layer, Val(version), patch)
+    patch::Int = latest_patch(T, version)) = _getraster(T, layer, version, patch)
 
 _getraster(T::Type{CHELSA{BioClimPlus}}, layers::Tuple, version, patch) = _map_layers(T, layers, version, patch)
-function _getraster(T::Type{CHELSA{BioClimPlus}}, layer::Symbol, version::Val{2}, patch)
+function _getraster(T::Type{CHELSA{BioClimPlus}}, layer::Symbol, version, patch)
+    version == 2 || CHELSA_invalid_version(version, 2)
     _check_layer(T, layer)
     path = rasterpath(T, layer, version, patch)
     url = rasterurl(T, layer, version, patch)
     return _maybe_download(url, path)
 end
 
-rastername(::Type{CHELSA{BioClimPlus}}, layer::Symbol, version::Val{2}, patch) = "CHELSA_$(layer)_1981-2010_V.2.$patch.tif"
-rasterpath(::Type{CHELSA{BioClimPlus}}) = joinpath(rasterpath(CHELSA), "BioClim")
+rastername(::Type{CHELSA{BioClimPlus}}, layer::Symbol, version, patch) = "CHELSA_$(layer)_1981-2010_V.2.$patch.tif"
+rasterpath(::Type{CHELSA{BioClimPlus}}) = rasterpath(CHELSA{BioClim})
 rasterpath(T::Type{CHELSA{BioClimPlus}}, layer::Symbol, version, patch) = joinpath(rasterpath(T), rastername(T, layer, version, patch))
 rasterurl(T::Type{CHELSA{BioClimPlus}}, layer::Symbol, version, patch) = joinpath(rasterurl(CHELSA{BioClim}, version), rastername(T, layer, version, patch))
