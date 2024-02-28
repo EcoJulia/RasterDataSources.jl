@@ -29,6 +29,7 @@ function _getraster(T::Type{CHELSA{BioClim}}, layer::Integer, version, patch)
     _check_layer(T, layer)
     path = rasterpath(T, layer, version, patch)
     url = rasterurl(T, layer, version, patch)
+    CHELSA_warn_version(T, layer, version, patch, path)
     return _maybe_download(url, path)
 end
 
