@@ -84,18 +84,17 @@ See the [`getraster`](@ref) docs for implementation details.
 """
 struct BioClimPlus <: RasterDataSet end
 
-layerkeys(T::Type{BioClimPlus}) = vcat(collect(layerkeys(BioClim)), bioclimplus_layerkeys)
-
-const _bioclimplus_monthly = (:hurs, :clt, :sfcWind, :vpd, :rsds, :pet, :cmi, :swb)
-const _bioclimplus_gdd = (:gdd, :gddlgd, :gdgfgd, :ngd)
-const _bioclimplus_others = (:fcf, :scd, :npp, :gsl, :gst, :gsp)
-const bioclimplus_layerkeys = [
-    vec([Symbol("$(b)_$(m)") for b in _bioclimplus_monthly, m in [:max, :min, :mean, :range]]);
-    vec([Symbol("$(b)_$(d)") for b in _bioclimplus_gdd, d in [0, 5, 10]]);
-    collect(_bioclimplus_others)
+const _BIOCLIMPLUS_MONTHLY = (:hurs, :clt, :sfcWind, :vpd, :rsds, :pet, :cmi, :swb)
+const _BIOCLIMPLUS_GDD = (:gdd, :gddlgd, :gdgfgd, :ngd)
+const _BIOCLIMPLUS_OTHERS = (:fcf, :scd, :npp, :gsl, :gst, :gsp)
+const BIOCLIMPLUS_LAYERS = [
+    vec([Symbol("$(b)_$(m)") for b in _BIOCLIMPLUS_MONTHLY, m in [:max, :min, :mean, :range]]);
+    vec([Symbol("$(b)_$(d)") for b in _BIOCLIMPLUS_GDD, d in [0, 5, 10]]);
+    collect(_BIOCLIMPLUS_OTHERS);
+    collect(layerkeys(BioClim))    
 ]
 
-layers(::Type{BioClimPlus}) = bioclimplus_layerkeys
+layers(::Type{BioClimPlus}) = BIOCLIMPLUS_LAYERS
 
 """
     Climate <: RasterDataSet
