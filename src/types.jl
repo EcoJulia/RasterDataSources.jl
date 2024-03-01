@@ -295,7 +295,7 @@ Climate models can be chosen from:
 `MPIESMLR`, `MPIESMMR`, `MRICGCM3`, `MRIESM1`, `NorESM1M`, `BCCCSM1`, `Inmcm4`,
 `BCCCSM2MR`, `CNRMCM61`, `CNRMESM21`, `CanESM5`, `MIROCES2L`, `MIROC6` for CMIP5;
 
-`UKESM`, `MPIESMHR` `IPSLCM6ALR` `MRIESM2`, `GFDLESM4` for `CMIP6`.
+`UKESM`, `MPIESMHR` `IPSLCM6ALR`, `MRIESM2`, `GFDLESM4` for `CMIP6`.
 
 #### `ClimateScenario`
 
@@ -303,7 +303,9 @@ CMIP5 Climate scenarios are all [`RepresentativeConcentrationPathway`](@ref)
 and can be chosen from: `RCP26`, `RCP45`, `RCP60`, `RCP85`
 
 CMIP6 Climate scenarios are all [`SharedSocioeconomicPathway`](@ref) and
-can be chosen from: `SSP126`, `SSP245`, SSP370`, SSP585`
+can be chosen from: `SSP126`, `SSP245`, `SSP370`, `SSP585`
+
+However, note that not all climate scenarios are available for all models.
 
 ## Example
 
