@@ -32,6 +32,7 @@ function _getraster(T::Type{CHELSA{BioClim}}, layer::Integer, version, patch)
     CHELSA_warn_version(T, layer, version, patch, path)
     return _maybe_download(url, path)
 end
+getraster_keywords(::Type{<:CHELSA{BioClim}}) = (:version,:patch)
 
 function rastername(::Type{CHELSA{BioClim}}, layer::Integer, version::Int, patch)
     if version == 1
@@ -75,6 +76,8 @@ function _getraster(T::Type{CHELSA{BioClimPlus}}, layer::Symbol, version, patch)
     url = rasterurl(T, layer, version, patch)
     return _maybe_download(url, path)
 end
+getraster_keywords(::Type{<:CHELSA{BioClimPlus}}) = (:version,:patch)
+
 
 rastername(::Type{CHELSA{BioClimPlus}}, layer::Symbol, version, patch) = "CHELSA_$(layer)_1981-2010_V.2.$patch.tif"
 rasterpath(::Type{CHELSA{BioClimPlus}}) = rasterpath(CHELSA{BioClim})
