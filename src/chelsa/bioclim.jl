@@ -60,6 +60,20 @@ end
 rasterurl(T::Type{CHELSA{BioClim}}, layer::Integer, version, patch) = joinpath(rasterurl(T, version), rastername(T, layer, version, patch))
 
 ### Bioclim+
+"""
+    getraster(source::Type{CHELSA{BioClim}}, [layer]; version = 2, [patch]) => Union{Tuple,String}
+
+Download [`CHELSA`](@ref) [`BioClim`](@ref) data from [chelsa-climate.org](https://chelsa-climate.org/).
+
+# Arguments
+- `layer`: iterable of `Symbol`s from `$(layerkeys(BioClimPlus))`. Without a `layer` argument, all layers
+    will be downloaded, and a `NamedTuple` of paths returned.
+
+# Keyword arguments
+$CHELSA_KEYWORDS
+
+Returns the filepath/s of the downloaded or pre-existing files.
+"""
 layers(::Type{CHELSA{BioClimPlus}}) = layers(BioClimPlus)
 
 getraster(
