@@ -90,8 +90,9 @@ const _BIOCLIMPLUS_OTHERS = (:fcf, :scd, :npp, :gsl, :gst, :gsp)
 const BIOCLIMPLUS_LAYERS = [
     vec([Symbol("$(b)_$(m)") for b in _BIOCLIMPLUS_MONTHLY, m in [:max, :min, :mean, :range]]);
     vec([Symbol("$(b)_$(d)") for b in _BIOCLIMPLUS_GDD, d in [0, 5, 10]]);
+    [Symbol("kg$i") for i in 0:5];
     collect(_BIOCLIMPLUS_OTHERS);
-    collect(layerkeys(BioClim))    
+    collect(layerkeys(BioClim))
 ]
 
 layers(::Type{BioClimPlus}) = BIOCLIMPLUS_LAYERS
