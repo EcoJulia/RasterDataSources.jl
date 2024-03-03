@@ -19,6 +19,7 @@ function rasterurl(::Type{CHELSA}, v)
         CHELSA_invalid_version(v)
     end
 end
+rasterurl(::Type{CHELSA}) = URI(scheme="https", host="os.zhdk.cloud.switch.ch", path="/envicloud/chelsa/")
 
 function latest_patch(::Type{<:CHELSA}, v)
     if v == 1

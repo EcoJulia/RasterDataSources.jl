@@ -1,5 +1,5 @@
 
-layers(::Type{<:CHELSA{<:Future{BioClim}}}) = layers(BioClim)
+layers(::Type{<:CHELSA{<:Future{B}}}) where B = layers(B)
 layerkeys(T::Type{<:CHELSA{<:Future{BioClim}}}, args...) = layerkeys(BioClim, args...)
 
 layers(::Type{<:CHELSA{<:Future{Climate}}}) = (:prec, :temp, :tmin, :tmax)
@@ -24,7 +24,15 @@ returned.
 
 - `date`: a `Date` or `DateTime` object, a Vector, or Tuple of start/end dates.
     Note that CHELSA CMIP5 only has two datasets, for the periods 2041-2060 and
-    2061-2080. Dates must fall within these ranges.
+    2061-2080. CMIP6 has datasets for the periods 2011-2040, 2041-2070, and 2071-2100.
+    Dates must fall within these ranges.
+
+## Example
+```julia
+using RasterDataSources, Dates
+getraster(CHELSA{Future{BioClim, CMIP6, GFDLESM4, SSP370}}, 1, date = Date(2050))
+```
+
 """
 function getraster(
     T::Type{<:CHELSA{<:Future{BioClim}}}, layers::Union{Tuple,Int,Symbol}; date
@@ -33,6 +41,34 @@ function getraster(
 end
 
 getraster_keywords(::Type{<:CHELSA{<:Future{BioClim}}}) = (:date,)
+
+"""
+    getraster(T::Type{CHELSA{Future{BioClimPlus}}}, [layer]; date) => String
+
+Download CHELSA [`BioClimPlus`](@ref) data, choosing layers from: `$(layers(CHELSA{BioClimPlus}))`.
+
+See the docs for [`Future`](@ref) for model choices.
+
+Without a layer argument, all layers will be downloaded, and a `NamedTuple` of paths 
+returned.
+
+## Keywords
+
+- `date`: a `Date` or `DateTime` object, a Vector, or Tuple of start/end dates.
+    Note that CHELSA CMIP5 only has two datasets, for the periods 2041-2060 and
+    2061-2080. CMIP6 has datasets for the periods 2011-2040, 2041-2070, and 2071-2100.
+    Dates must fall within these ranges.
+
+## Example
+"""
+function getraster(
+    T::Type{<:CHELSA{<:Future{BioClimPlus}}}, layers::Union{Tuple,Int,Symbol}; date
+)
+    _getraster(T, layers, date)
+end
+
+getraster_keywords(::Type{<:CHELSA{<:Future{BioClimPlus}}}) = (:date,)
+
 
 """
     getraster(T::Type{CHELSA{Future{Climate}}}, [layer]; date, month) => String
@@ -47,8 +83,15 @@ Without a layer argument, all layers will be downloaded, and a `NamedTuple` of p
 
 - `date`: a `Date` or `DateTime` object, a Vector, or Tuple of start/end dates.
     Note that CHELSA CMIP5 only has two datasets, for the periods 2041-2060 and
-    2061-2080. Dates must fall within these ranges.
+    2061-2080. CMIP6 has datasets for the periods 2011-2040, 2041-2070, and 2071-2100.
+    Dates must fall within these ranges.
 - `month`: the month of the year, from 1 to 12, or a array or range of months like `1:12`.
+
+## Example
+```
+using Dates, RasterDataSources
+getraster(CHELSA{Future{Climate, CMIP6, GFDLESM4, SSP370}}, :prec; date = Date(2050), month = 1)
+```
 """
 function getraster(
     T::Type{<:CHELSA{<:Future{Climate}}}, layers::Union{Tuple,Symbol}; date, month
@@ -82,6 +125,12 @@ function _getraster(T::Type{<:CHELSA{<:Future{BioClim}}}, layers, dates::Abstrac
     map(date -> _getraster(T, layers, date), dates)
 end
 function _getraster(T::Type{<:CHELSA{<:Future{BioClim}}}, layers, date::TimeType)
+    _getraster(T, layers; date)
+end
+function _getraster(T::Type{<:CHELSA{<:Future{BioClimPlus}}}, layers, dates::AbstractArray)
+    map(date -> _getraster(T, layers, date), dates)
+end
+function _getraster(T::Type{<:CHELSA{<:Future{BioClimPlus}}}, layers, date::TimeType)
     _getraster(T, layers; date)
 end
 
@@ -124,6 +173,12 @@ function _rastername(::Type{CMIP6}, T::Type{<:CHELSA{<:Future{BioClim}}}, layer:
     scen = _format(CHELSA, _scenario(T))
     return "CHELSA_bio$(layer)_$(date_string)_$(mod)_$(scen)_V.2.1.tif"
 end
+function _rastername(::Type{CMIP6}, T::Type{<:CHELSA{<:Future{BioClimPlus}}}, layer::Symbol; date)
+    date_string = _date_string(_phase(T), date)
+    mod = _format(CHELSA, _model(T))
+    scen = _format(CHELSA, _scenario(T))
+    return "CHELSA_$(layer)_$(date_string)_$(mod)_$(scen)_V.2.1.tif"
+end
 function _rastername(
     ::Type{CMIP6}, T::Type{<:CHELSA{<:Future{Climate}}}, layer::Symbol; date, month
 )
@@ -151,6 +206,7 @@ function rasterurl(T::Type{<:CHELSA{<:Future}}, layer; date, kw...)
 end
 
 _chelsa_layer(::Type{<:BioClim}, layer) = :bio
+_chelsa_layer(::Type{<:BioClimPlus}, layer) = :bio
 _chelsa_layer(::Type{<:Climate}, layer) = layer
 
 function _urlpath(::Type{CMIP5}, T::Type{<:CHELSA{<:Future}}, name, date_str)
