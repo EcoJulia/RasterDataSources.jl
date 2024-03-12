@@ -16,7 +16,7 @@ import JSON.Parser as JP
 
 export WorldClim, CHELSA, EarthEnv, AWAP, ALWB, SRTM, MODIS
 
-export BioClim, Climate, Weather, Elevation, LandCover, HabitatHeterogeneity
+export BioClim, BioClimPlus, Climate, Weather, Elevation, LandCover, HabitatHeterogeneity
 
 export Future, CMIP5, CMIP6
 
