@@ -1,5 +1,6 @@
 
-layers(::Type{<:CHELSA{<:Future{B}}}) where B = layers(B)
+layers(::Type{<:CHELSA{<:Future{BioClim}}}) = layers(BioClim)
+layers(::Type{<:CHELSA{T}}) where T <:Future{BioClimPlus} = layers(T)
 layerkeys(T::Type{<:CHELSA{<:Future{BioClim}}}, args...) = layerkeys(BioClim, args...)
 
 layers(::Type{<:CHELSA{<:Future{Climate}}}) = (:prec, :temp, :tmin, :tmax)

@@ -84,15 +84,22 @@ See the [`getraster`](@ref) docs for implementation details.
 """
 struct BioClimPlus <: RasterDataSet end
 
-const _BIOCLIMPLUS_MONTHLY = (:hurs, :clt, :sfcWind, :vpd, :rsds, :pet, :cmi)
-const _BIOCLIMPLUS_GDD = (:gdd, :gddlgd, :gdgfgd, :ngd)
-const _BIOCLIMPLUS_OTHERS = (:fcf, :scd, :swb, :npp, :gsl, :gst, :gsp)
+const _BIOCLIMPLUS_MONTHLY = vec([Symbol("$(b)_$(m)") for b in (:hurs, :clt, :sfcWind, :vpd, :rsds, :pet, :cmi), m in [:max, :min, :mean, :range]])
+const _BIOCLIMPLUS_GDD = vec([Symbol("$(b)_$(d)") for b in (:gdd, :gddlgd, :gdgfgd, :ngd), d in [0, 5, 10]])
+const _BIOCLIMPLUS_OTHERS = (:fcf, :fgd, :lgd, :scd, :gsl, :gst, :gsp, :npp, :swb, :swe)
 const BIOCLIMPLUS_LAYERS = [
-    vec([Symbol("$(b)_$(m)") for b in _BIOCLIMPLUS_MONTHLY, m in [:max, :min, :mean, :range]]);
-    vec([Symbol("$(b)_$(d)") for b in _BIOCLIMPLUS_GDD, d in [0, 5, 10]]);
-    [Symbol("kg$i") for i in 0:5];
-    collect(_BIOCLIMPLUS_OTHERS);
     collect(layerkeys(BioClim))
+    _BIOCLIMPLUS_MONTHLY;
+    _BIOCLIMPLUS_GDD;
+    collect(_BIOCLIMPLUS_OTHERS);
+    [Symbol("kg$i") for i in 0:5];
+]
+
+const BIOCLIMPLUS_LAYERS_FUTURE = [
+    collect(layerkeys(BioClim));
+    _BIOCLIMPLUS_GDD;
+    collect(filter(!=(:swb), _BIOCLIMPLUS_OTHERS))
+    [Symbol("kg$i") for i in 0:5];
 ]
 
 layers(::Type{BioClimPlus}) = BIOCLIMPLUS_LAYERS
@@ -326,11 +333,11 @@ datasource = CHELSA{Future{BioClim, CMIP5, BNUESM, RCP45}}
 struct Future{D<:RasterDataSet,C<:CMIPphase,M<:ClimateModel,S<:ClimateScenario} end
 
 _dataset(::Type{<:Future{D}}) where D = D
+_dataset(::Type{<:Future{BioClimPlus}}) = BioClim
 _phase(::Type{<:Future{<:Any,P}}) where P = P
 _model(::Type{<:Future{<:Any,<:Any,M}}) where M = M
 _scenario(::Type{<:Future{<:Any,<:Any,<:Any,S}}) where S = S
-
-
+layers(::Type{<:Future{BioClimPlus}}) = BIOCLIMPLUS_LAYERS_FUTURE
 """
     ModisProduct <: RasterDataSet
 
