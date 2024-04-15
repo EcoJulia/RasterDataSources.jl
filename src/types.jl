@@ -85,7 +85,7 @@ See the [`getraster`](@ref) docs for implementation details.
 struct BioClimPlus <: RasterDataSet end
 
 const _BIOCLIMPLUS_MONTHLY = vec([Symbol("$(b)_$(m)") for b in (:hurs, :clt, :sfcWind, :vpd, :rsds, :pet_penman, :cmi), m in [:max, :min, :mean, :range]])
-const _BIOCLIMPLUS_GDD = vec([Symbol("$(b)_$(d)") for b in (:gdd, :gddlgd, :gdgfgd, :ngd), d in [0, 5, 10]])
+const _BIOCLIMPLUS_GDD = vec([Symbol("$b$d") for b in (:gdd, :gddlgd, :gdgfgd, :ngd), d in [0, 5, 10]])
 const _BIOCLIMPLUS_OTHERS = (:fcf, :fgd, :lgd, :scd, :gsl, :gst, :gsp, :npp, :swb, :swe)
 const BIOCLIMPLUS_LAYERS = [
     collect(layerkeys(BioClim))

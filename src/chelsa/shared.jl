@@ -10,13 +10,13 @@ and the [`getraster`](@ref) docs for implementation details.
 struct CHELSA{X} <: RasterDataSource end
 
 rasterpath(::Type{CHELSA}) = joinpath(rasterpath(), "CHELSA")
-function rasterurl(::Type{CHELSA}, v)
-    if v == 1
-        URI(scheme="https", host="os.zhdk.cloud.switch.ch", path="/envicloud/chelsa/chelsa_V1/")
-    elseif v == 2
-        URI(scheme="https", host="os.zhdk.cloud.switch.ch", path="/envicloud/chelsa/chelsa_V2/GLOBAL/")
+function rasterurl(T::Type{CHELSA}, version)
+    if version == 1
+        joinpath(rasterurl(T), "chelsa_V1")
+    elseif version == 2
+        joinpath(rasterurl(T), "chelsa_V2/GLOBAL")
     else 
-        CHELSA_invalid_version(v)
+        CHELSA_invalid_version(version)
     end
 end
 rasterurl(::Type{CHELSA}) = URI(scheme="https", host="os.zhdk.cloud.switch.ch", path="/envicloud/chelsa/")
