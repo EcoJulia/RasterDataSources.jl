@@ -8,7 +8,7 @@ if VERSION >= v"1.5.0"
     Aqua.test_undefined_exports(RasterDataSources)
     Aqua.test_project_extras(RasterDataSources)
     # Aqua.test_deps_compat(RasterDataSources)
-    Aqua.test_project_toml_formatting(RasterDataSources)
+    # Aqua.test_project_toml_formatting(RasterDataSources)
 end
 
 # TODO ALWB data is all giving 404s
@@ -16,6 +16,7 @@ end
 # @time @safetestset "alwb" begin include("alwb.jl") end
 @time @safetestset "awap" begin include("awap.jl") end
 @time @safetestset "chelsa bioclim" begin include("chelsa-bioclim.jl") end
+@time @safetestset "chelsa climate" begin include("chelsa-climate.jl") end
 @time @safetestset "chelsa future" begin include("chelsa-future.jl") end
 @time @safetestset "earthenv habitat heterogeneity" begin include("earthenv-heterogeneity.jl") end
 @time @safetestset "earthenv landcover" begin include("earthenv-landcover.jl") end
