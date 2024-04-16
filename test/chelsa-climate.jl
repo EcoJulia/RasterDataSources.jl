@@ -1,5 +1,5 @@
 using RasterDataSources, URIs, Test, Dates
-using RasterDataSources: rastername, rasterpath, zipurl, zipname, zippath, layers
+using RasterDataSources: rastername, rasterpath, rasterurl, layers
 
 @testset "CHELSA Climate" begin
     tmax_name = "CHELSA_tasmax_07_1981-2010_V.2.1.tif"

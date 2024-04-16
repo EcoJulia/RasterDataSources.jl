@@ -58,20 +58,3 @@ end
     @test length(RasterDataSources.BIOCLIMPLUS_LAYERS) == 75
     @test length(RasterDataSources.BIOCLIMPLUS_LAYERS_FUTURE) == 46
 end
-
-
-using DimensionalData
-darray = rand(X(-10:10))
-DimensionalData.Lookups.contains(
-    DimensionalData.Intervals(),
-    lookup(X(-10:10)),
-    Contains(-10 .. 10)
-)
-
-0 .. 10 isa DimensionalData.Lookup
-typeof(0 .. 10)
-
-DimensionalData.IntervalSets.ClosedInterval{Int64}[0 .. 10][1]
-DimensionalData.groupby(darray, X => Bins([-10..10]))
-Intervals
-DimensionalData.contains()
