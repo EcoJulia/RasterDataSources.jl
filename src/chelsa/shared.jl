@@ -40,7 +40,7 @@ CHELSA_invalid_version(v, valid_versions = [1,2]) =
         throw(ArgumentError("Version $v is not available for CHELSA. Available versions: $valid_versions."))
 
 function CHELSA_warn_version(T, layer, version, patch, path)
-    if version == 2 && !isfile(path) && isfile(rasterpath(T, layer, 1, 2))
+    if version == 2 && !isfile(path) && isfile(rasterpath(T, layer; version = 1))
         @info "File for CHELSA v1.2 detected, but requested version is CHELSA v$version.$patch. 
 To load data for CHELSA v1.2 instead, set version keyword to 1"
     end
