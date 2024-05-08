@@ -37,6 +37,8 @@ rasterpath(T::Type{<:CHELSA{Climate}}, layer; month) =
     joinpath(_rasterpath(T, layer), rastername(T, layer; month))
 _rasterpath(T::Type{<:CHELSA{Climate}}, layer) = joinpath(rasterpath(T), string(layer))
 rasterpath(T::Type{<:CHELSA{Climate}}) = joinpath(rasterpath(CHELSA), "Climate")
-rastername(T::Type{<:CHELSA{Climate}}, layer; month) =
-    "CHELSA_$(layer)_$(_pad2(month))_1981-2010_V.2.1.tif"
+function rastername(T::Type{<:CHELSA{Climate}}, layer; month)
+    _layer = layer == :pet ? :pet_penman : layer
+    "CHELSA_$(_layer)_$(_pad2(month))_1981-2010_V.2.1.tif"
+end
 rasterurl(T::Type{CHELSA{Climate}}, layer::Symbol; month) = joinpath(rasterurl(CHELSA, 2), "climatologies/1981-2010", string(layer), rastername(T, layer; month))
