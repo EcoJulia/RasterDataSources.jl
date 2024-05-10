@@ -1,4 +1,5 @@
 layers(::Type{CHELSA{BioClim}}) = layers(BioClim)
+layers(::Type{CHELSA{BioClimPlus}}) = layers(BioClimPlus)
 layerkeys(::Type{CHELSA{BioClim}}, args...) = layerkeys(BioClim, args...)
 layerkeys(::Type{CHELSA{BioClimPlus}}, args...) = layerkeys(BioClimPlus, args...)
 
@@ -75,8 +76,6 @@ $CHELSA_KEYWORDS
 
 Returns the filepath/s of the downloaded or pre-existing files.
 """
-layers(::Type{CHELSA{BioClimPlus}}) = layers(BioClimPlus)
-
 getraster(
     T::Type{CHELSA{BioClimPlus}}, 
     layer::Union{Tuple,Int,Symbol}; 
