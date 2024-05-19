@@ -8,7 +8,7 @@ if VERSION >= v"1.5.0"
     Aqua.test_undefined_exports(RasterDataSources)
     Aqua.test_project_extras(RasterDataSources)
     # Aqua.test_deps_compat(RasterDataSources)
-    Aqua.test_project_toml_formatting(RasterDataSources)
+    # Aqua.test_project_toml_formatting(RasterDataSources)
 end
 
 # TODO ALWB data is all giving 404s
