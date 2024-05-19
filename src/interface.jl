@@ -3,7 +3,7 @@
 """
     getraster(source::Type, [layer]; kw...)
 
-Download raster layers `layers` from the data source `T`,
+Download raster layers `layers` from the data `source`,
 returning a `String` for a single layer, or a `NamedTuple`
 for a `Tuple` of layers. 
 
