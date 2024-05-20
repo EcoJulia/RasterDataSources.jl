@@ -1,30 +1,3 @@
-"""
-    getraster(T::Type, layers::Union{Tuple,Int,Symbol}; kw...)
-
-Download raster layers `layers` from the data source `T`,
-returning a `String` for a single layer, or a `NamedTuple`
-for a `Tuple` of layers. `layer` values are usually values of
-`Symbol`, but can also be `Int` for `BioClim` datasets.
-
-Keyword arguments depend on the specific data source. 
-They may modify the return value, following a pattern:
-- `month` keywords of `AbstractArray` will return a `Vector{String}`
-    or `Vector{<:NamedTuple}`.
-- `date` keywords of `AbstractArray` will return a `Vector{String}` or
-    `Vector{<:NamedTuple}`.
-- `date` keywords of `Tuple{start,end}` will take all the dates between the 
-    start and end dates, and also return `Vector{String}` or `Vector{<:NamedTuple}`.
-
-
-Where `date` and `month` keywords coexist, `Vector{Vector{String}}` of
-`Vector{Vector{NamedTuple}}` is the result. `date` ranges are always
-the outer `Vector`, `month` the inner `Vector` with `layer` tuples as
-the inner `NamedTuple`. No other keywords can be `Vector`.
-
-This schema may be added to in future for datasets with additional axes,
-but should not change for the existing `RasterDataSource` types.
-"""
-function getraster end
 # Vector layers are allowed, but converted to `Tuple` immediatedly.
 function getraster(T::Type, layers::AbstractArray; kw...)
     getraster(T, (layers...,); kw...)
