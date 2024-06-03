@@ -9,7 +9,7 @@ using RasterDataSources: rastername, rasterpath, zipurl, zipname, zippath
     zip_file = joinpath(ENV["RASTERDATASOURCES_PATH"], "WorldClim", "Weather", "zips", "wc2.1_2.5m_prec_2010-2018.zip")
     @test zippath(WorldClim{Weather}, :prec; decade=Date(2010)) == zip_file
     @test zipurl(WorldClim{Weather}, :prec; decade=Date(2010)) == 
-        URI(scheme="https", host="geodata.ucdavis.edu", path="/data/worldclim/2_1/hist/wc2.1_2.5m_prec_2010-2018.zip")
+        URI(scheme="https", host="geodata.ucdavis.edu", path="/climate/worldclim/2_1/hist/wc2.1_2.5m_prec_2010-2018.zip")
     @test zipname(WorldClim{Weather}, :prec; decade=Date(2010)) == 
         "wc2.1_2.5m_prec_2010-2018.zip"
 
