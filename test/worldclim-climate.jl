@@ -3,7 +3,7 @@ using RasterDataSources: rastername, rasterpath, zipurl, zipname, zippath
 
 @testset "WorldClim Climate" begin
 
-    zip_url = URI(scheme="https", host="biogeo.ucdavis.edu", path="/data/worldclim/v2.1/base/wc2.1_10m_wind.zip")
+    zip_url = URI(scheme="https", host="geodata.ucdavis.edu", path="/data/worldclim/2_1/base/wc2.1_10m_wind.zip")
     @test zipurl(WorldClim{Climate}, :wind; res="10m") == zip_url
     @test zipname(WorldClim{Climate}, :wind; res="10m") == "wc2.1_10m_wind.zip"
 
