@@ -8,7 +8,7 @@ See: [www.worldclim.org](https://www.worldclim.org)
 """
 struct WorldClim{X} <: RasterDataSource end
 
-const WORLDCLIM_URI = URI(scheme="https", host="biogeo.ucdavis.edu", path="/data/worldclim/v2.1")
+const WORLDCLIM_URI = URI(scheme="https", host="geodata.ucdavis.edu", path="/climate/worldclim/2_1")
 
 resolutions(::Type{<:WorldClim}) = ("30s", "2.5m", "5m", "10m")
 defres(::Type{<:WorldClim}) = "10m"
