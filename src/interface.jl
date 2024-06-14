@@ -3,6 +3,10 @@
 """
     getraster(source::Type, [layer]; kw...)
 
+Download raster layers `layers` from the data `source`,
+returning a `String` for a single layer, or a `NamedTuple`
+for a `Tuple` of layers. 
+
 `getraster` provides a standardised interface to download data sources,
 and return the filename/s of the selected files.
 
@@ -16,9 +20,9 @@ same way so that they can be used interchangeably in the same code.
 
 - `source`: defines the [`RasterDataSource`](@ref) and (if it there is more than one)
     the specific [`RasterDataSet`](@ref) from which to download data.
-- `layer`: optionally choose the named or numbered layer/s of the data source.
-    If only the source argument is passed, all layers will be downloaded, returning a
-    `Tuple` of filenames.
+- `layer`: choose the named `Symbol`/s or numbered `Int`/s (for `BioClim`) layer/s of the 
+    data source. If `layer` is not passed, all layers will be downloaded, returning a 
+    `NamedTuple` of filenames.
 
 # Keywords
 
@@ -29,10 +33,35 @@ As much as possible these are standardised for all sources where they are releve
 - `month`: month or range of months to download for climatic datasets, as `Integer`s from 1 to 12.
 - `res`: spatial resolion of the file, as a `String` with units, e.g. "10m".
 
+# Return values
+
 The return value is either a single `String`, a `Tuple/Array` of `String`, or a
 `Tuple/Array` of `Tuple/Array` of `String` --- depending on the arguments. If multiple
 layers are specified, this may return multiple filenames. If multiple months or dates are
 specified, this may also return multiple filenames.
+
+Keyword arguments depend on the specific data source. 
+They may modify the return value, following a pattern:
+- `month` keywords of `AbstractArray` will return a `Vector{String}`
+    or `Vector{<:NamedTuple}`.
+- `date` keywords of `AbstractArray` will return a `Vector{String}` or
+    `Vector{<:NamedTuple}`.
+- `date` keywords of `Tuple{start,end}` will take all the dates between the 
+    start and end dates as a `Vector{String}` or `Vector{<:NamedTuple}`.
+
+Where `date` and `month` keywords coexist, `Vector{Vector{String}}` of
+`Vector{Vector{NamedTuple}}` is the result. `date` ranges are always
+the outer `Vector`, `month` the inner `Vector` with `layer` tuples as
+the inner `NamedTuple`. No other keywords can be `Vector`.
+
+This schema may be added to in future for datasets with additional axes,
+but should not change for the existing `RasterDataSource` types.
+"""
+function getraster end
+
+"""
+    getraster(T::Type, layers::Union{Tuple,Int,Symbol}; kw...)
+
 """
 function getraster end
 
