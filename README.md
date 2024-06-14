@@ -13,7 +13,7 @@ Currently sources include:
 
 | Source    | URL                                      | Status                                   |
 | --------- | ---------------------------------------- | ---------------------------------------- |
-| CHELSA    | https://chelsa-climate.org               | BioClim, Future BioClim and Climate      |
+| CHELSA    | https://chelsa-climate.org               | BioClim, BioClimPlus, and Climate     |
 | WorldClim | https://www.worldclim.org                | Climate, Weather, BioClim, and Elevation |
 | EarthEnv  | http://www.earthenv.org                  | LandCover and HabitatHeterogeneity       |
 | AWAP      | http://www.bom.gov.au/jsp/awap/index.jsp | Complete                                 |

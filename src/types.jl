@@ -66,6 +66,45 @@ bioclim_int(k::Integer) = k
 bioclim_int(k::Symbol) = bioclim_lookup[bioclim_key(k)]
 
 """
+    BioClimPlus <: RasterDataSet
+
+Extended BioClim datasets, available from CHELSA. 
+More information on the CHELSA website: https://chelsa-climate.org/exchelsa-extended-bioclim/
+
+Some of these are available as average annual maximum, minimum, mean, and range. 
+Others have a single value, more like the regular BioClim variables.
+
+They do not usually use `month` or `date` keywords, but may use
+`date` in past/future scenarios. 
+
+Currently implemented for CHELSA as `CHELSA{BioClim}` and `CHELSA{Future{BioClim, args..}}`,
+specifying layer names as `Symbol`s.
+
+See the [`getraster`](@ref) docs for implementation details.
+"""
+struct BioClimPlus <: RasterDataSet end
+
+const _BIOCLIMPLUS_MONTHLY = vec([Symbol("$(b)_$(m)") for b in (:hurs, :clt, :sfcWind, :vpd, :rsds, :pet_penman, :cmi), m in [:max, :min, :mean, :range]])
+const _BIOCLIMPLUS_GDD = vec([Symbol("$b$d") for b in (:gdd, :gddlgd, :gdgfgd, :ngd), d in [0, 5, 10]])
+const _BIOCLIMPLUS_OTHERS = (:fcf, :fgd, :lgd, :scd, :gsl, :gst, :gsp, :npp, :swb, :swe)
+const BIOCLIMPLUS_LAYERS = [
+    collect(layerkeys(BioClim))
+    _BIOCLIMPLUS_MONTHLY;
+    _BIOCLIMPLUS_GDD;
+    collect(_BIOCLIMPLUS_OTHERS);
+    [Symbol("kg$i") for i in 0:5];
+]
+
+const BIOCLIMPLUS_LAYERS_FUTURE = [
+    collect(layerkeys(BioClim));
+    _BIOCLIMPLUS_GDD;
+    collect(filter(!=(:swb), _BIOCLIMPLUS_OTHERS))
+    [Symbol("kg$i") for i in 0:5];
+]
+
+layers(::Type{BioClimPlus}) = BIOCLIMPLUS_LAYERS
+
+"""
     Climate <: RasterDataSet
 
 Climate datasets. These are usually months of the year, not specific dates,
@@ -264,7 +303,7 @@ Climate models can be chosen from:
 `MPIESMLR`, `MPIESMMR`, `MRICGCM3`, `MRIESM1`, `NorESM1M`, `BCCCSM1`, `Inmcm4`,
 `BCCCSM2MR`, `CNRMCM61`, `CNRMESM21`, `CanESM5`, `MIROCES2L`, `MIROC6` for CMIP5;
 
-`UKESM`, `MPIESMHR` `IPSLCM6ALR` `MRIESM2`, `GFDLESM4` for `CMIP6`.
+`UKESM`, `MPIESMHR` `IPSLCM6ALR`, `MRIESM2`, `GFDLESM4` for `CMIP6`.
 
 #### `ClimateScenario`
 
@@ -272,7 +311,9 @@ CMIP5 Climate scenarios are all [`RepresentativeConcentrationPathway`](@ref)
 and can be chosen from: `RCP26`, `RCP45`, `RCP60`, `RCP85`
 
 CMIP6 Climate scenarios are all [`SharedSocioeconomicPathway`](@ref) and
-can be chosen from: `SSP126`, `SSP245`, SSP370`, SSP585`
+can be chosen from: `SSP126`, `SSP245`, `SSP370`, `SSP585`
+
+However, note that not all climate scenarios are available for all models.
 
 ## Example
 
@@ -292,11 +333,11 @@ datasource = CHELSA{Future{BioClim, CMIP5, BNUESM, RCP45}}
 struct Future{D<:RasterDataSet,C<:CMIPphase,M<:ClimateModel,S<:ClimateScenario} end
 
 _dataset(::Type{<:Future{D}}) where D = D
+_dataset(::Type{<:Future{BioClimPlus}}) = BioClim
 _phase(::Type{<:Future{<:Any,P}}) where P = P
 _model(::Type{<:Future{<:Any,<:Any,M}}) where M = M
 _scenario(::Type{<:Future{<:Any,<:Any,<:Any,S}}) where S = S
-
-
+layers(::Type{<:Future{BioClimPlus}}) = BIOCLIMPLUS_LAYERS_FUTURE
 """
     ModisProduct <: RasterDataSet
 

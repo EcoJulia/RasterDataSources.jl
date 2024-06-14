@@ -16,7 +16,7 @@ import JSON.Parser as JP
 
 export WorldClim, CHELSA, EarthEnv, AWAP, ALWB, SRTM, MODIS
 
-export BioClim, Climate, Weather, Elevation, LandCover, HabitatHeterogeneity
+export BioClim, BioClimPlus, Climate, Weather, Elevation, LandCover, HabitatHeterogeneity
 
 export Future, CMIP5, CMIP6
 
@@ -47,6 +47,8 @@ export ACCESS1, BNUESM, CCSM4, CESM1BGC, CESM1CAM5, CMCCCMS, CMCCCM, CNRMCM5,
 # Climate models from CMIP6 (used in WorldClim)
 export BCCCSM2MR, CNRMCM61, CNRMESM21, CanESM5, GFDLESM4, IPSLCM6ALR, MIROCES2L, MIROC6, MRIESM2
 
+# Climate models from CMIP6 (CHELSA)
+export UKESM, MPIESMHR
 
 export Values, Deciles
 
@@ -63,6 +65,7 @@ include("worldclim/weather.jl")
 include("worldclim/elevation.jl")
 
 include("chelsa/shared.jl")
+include("chelsa/climate.jl")
 include("chelsa/bioclim.jl")
 include("chelsa/future.jl")
 
