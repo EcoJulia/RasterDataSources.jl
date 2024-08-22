@@ -181,7 +181,6 @@ abstract type CMIPphase end
 The Coupled Model Intercomparison Project, Phase 5.
 """
 struct CMIP5 <: CMIPphase end
-const CMIP5_MODELS = Type{<:ClimateModel{CMIP5}}[]
 
 """
     CMIP6 <: CMIPphase
@@ -189,7 +188,6 @@ const CMIP5_MODELS = Type{<:ClimateModel{CMIP5}}[]
 The Coupled Model Intercomparison Project, Phase 6.
 """
 struct CMIP6 <: CMIPphase end
-const CMIP6_MODELS = Type{<:ClimateModel{CMIP6}}[]
 
 """
     ClimateModel
@@ -197,6 +195,8 @@ const CMIP6_MODELS = Type{<:ClimateModel{CMIP6}}[]
 Abstract supertype for climate models use in [`Future`](@ref) datasets.
 """
 abstract type ClimateModel{CMIP<:CMIPphase} end
+const CMIP6_MODELS = Type{<:ClimateModel{CMIP6}}[]
+const CMIP5_MODELS = Type{<:ClimateModel{CMIP5}}[]
 
 """
     ClimateScenario 
