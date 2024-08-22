@@ -10,25 +10,46 @@ function getraster(T::Type{<:WorldClim{<:Future{Climate, CMIP6}}}, layers::Union
     _getraster(T, layers, res, date)
 end
 
-
 function _getraster(T::Type{<:WorldClim{<:Future{Climate}}}, layer::Symbol, res::String, date)
     #date_str = _date_string(T, date)
     _check_layer(T, layer)
     _check_res(T, res)
-    raster_path = rasterpath(T, layer; res, date)
+    raster_path = rasterpath(T, "bioclim"; res, date)
     if !isfile(raster_path)
         _maybe_download(rasterurl(T, layer; res, date), raster_path)
     end
     return raster_path
 end
 
-function rasterurl(T::Type{<:WorldClim{<:Future{Climate, CMIP6, M, S}}}, layer; res, date) where {M, S}
-    joinpath(WORLDCLIM_URI_CMIP6, res, _format(WorldClim, M), _format(CHELSA, S), rastername(T, layer; res, date))
+function rasterurl(T::Type{<:WorldClim{<:Future}}, layer; res, date)
+    joinpath(WORLDCLIM_URI_CMIP6, res, _format(T, _model(T)), _format(T, _scenario(T)), rastername(T, layer; res, date))
 end
 
-function rastername(T::Type{<:WorldClim{<:Future{Climate, CMIP6, M, S}}}, layer; res, date) where {M, S}
-    join(["wc2.1", res, string(layer), _format(WorldClim, M), _format(CHELSA, S), date], "_") * ".tif"
+function rastername(T::Type{<:WorldClim{<:Future}}, layer; res, date)
+    join(["wc2.1", res, string(layer), _format(T, _model(T)), _format(T, _scenario(T)), date], "_") * ".tif"
 end
+
+function getraster(T::Type{<:WorldClim{<:Future{BioClim, CMIP6}}}, layer::Symbol; res::String=defres(T), date)
+    _getraster(T, layers, res, date)
+end
+
+function _getraster(T::Type{<:WorldClim{<:Future{BioClim}}}, layer::Symbol, res::String, date)
+    #date_str = _date_string(T, date)
+    #_check_layer(T, layer)
+    #_check_res(T, res)
+    raster_path = rasterpath(T; res, date)
+    if !isfile(raster_path)
+        _maybe_download(rasterurl(T, layer; res, date), raster_path)
+    end
+    return raster_path
+end
+
+# copy-pasted in from CHELSA - must be some way to implement this abstractly?
+_dataset(::Type{<:WorldClim{F}}) where F<:Future = _dataset(F)
+_phase(::Type{<:WorldClim{F}}) where F<:Future = _phase(F)
+_model(::Type{<:WorldClim{F}}) where F<:Future = _model(F)
+_scenario(::Type{<:WorldClim{F}}) where F<:Future = _scenario(F)
+
 
 
 function _date_string(::Type{<:WorldClim{<:Future{Climate, CMIP6}}}, date)
