@@ -260,54 +260,68 @@ _scenario(::Type{<:CHELSA{F}}) where F<:Future = _scenario(F)
 # Climate model string formatters for CHELSA Future
 
 # CMIP5
-_format(::Type{CHELSA}, ::Type{ACCESS1}) = "ACCESS1-0"
-_format(::Type{CHELSA}, ::Type{BNUESM}) = "BNU-ESM"
-_format(::Type{CHELSA}, ::Type{CCSM4}) = "CCSM4"
-_format(::Type{CHELSA}, ::Type{CESM1BGC}) = "CESM1-BGC"
-_format(::Type{CHELSA}, ::Type{CESM1CAM5}) = "CESM1-CAM5"
-_format(::Type{CHELSA}, ::Type{CMCCCMS}) = "CMCC-CMS"
-_format(::Type{CHELSA}, ::Type{CMCCCM}) = "CMCC-CM"
-_format(::Type{CHELSA}, ::Type{CNRMCM5}) = "CNRM-CM5"
-_format(::Type{CHELSA}, ::Type{CSIROMk3}) = "CSIRO-Mk3"
-_format(::Type{CHELSA}, ::Type{CanESM2}) = "CanESM2"
-_format(::Type{CHELSA}, ::Type{FGOALS}) = "FGOALS-g2"
-_format(::Type{CHELSA}, ::Type{FIOESM}) = "FIO-ESM"
-_format(::Type{CHELSA}, ::Type{GFDLCM3}) = "GFDL-CM3"
-_format(::Type{CHELSA}, ::Type{GFDLESM2G}) = "GFDL-ESM2G"
-_format(::Type{CHELSA}, ::Type{GFDLESM2M}) = "GFDL-ESM2M"
-_format(::Type{CHELSA}, ::Type{GISSE2HCC}) = "GISS-E2-H-CC"
-_format(::Type{CHELSA}, ::Type{GISSE2H}) = "GISS-E2-H"
-_format(::Type{CHELSA}, ::Type{GISSE2RCC}) = "GISS-E2-R-CC"
-_format(::Type{CHELSA}, ::Type{GISSE2R}) = "GISS-E2-R"
-_format(::Type{CHELSA}, ::Type{HadGEM2AO}) = "HadGEM2-AO"
-_format(::Type{CHELSA}, ::Type{HadGEM2CC}) = "HadGEM2-CC"
-_format(::Type{CHELSA}, ::Type{IPSLCM5ALR}) = "IPSL-CM5A-LR"
-_format(::Type{CHELSA}, ::Type{IPSLCM5AMR}) = "IPSL-CM5A-MR"
-_format(::Type{CHELSA}, ::Type{MIROCESMCHEM}) = "MIROC-ESM-CHEM"
-_format(::Type{CHELSA}, ::Type{MIROCESM}) = "MIROC-ESM"
-_format(::Type{CHELSA}, ::Type{MIROC5}) = "MIROC5"
-_format(::Type{CHELSA}, ::Type{MPIESMLR}) = "MPI-ESM-LR"
-_format(::Type{CHELSA}, ::Type{MPIESMMR}) = "MPI-ESM-MR"
-_format(::Type{CHELSA}, ::Type{MRICGCM3}) = "MRI-CGCM3"
-_format(::Type{CHELSA}, ::Type{MRIESM1}) = "MRI-ESM1"
-_format(::Type{CHELSA}, ::Type{NorESM1M}) = "NorESM1-M"
-_format(::Type{CHELSA}, ::Type{BCCCSM1}) = "bcc-csm-1"
-_format(::Type{CHELSA}, ::Type{Inmcm4}) = "inmcm4"
+const CHELSA_CMIP5_MODELS = Type{<:ClimateModel{CMIP5}}[]
+const CHELSA_CMIP5_MODEL_STRINGS =
+[
+    "ACCESS1-0"
+    "BNU-ESM"
+    "CCSM4"
+    "CESM1-BGC"
+    "CESM1-CAM5"
+    "CMCC-CMS"
+    "CMCC-CM"
+    "CNRM-CM5"
+    "CSIRO-Mk3"
+    "CanESM2"
+    "FGOALS-g2"
+    "FIO-ESM"
+    "GFDL-CM3"
+    "GFDL-ESM2G"
+    "GFDL-ESM2M"
+    "GISS-E2-H-CC"
+    "GISS-E2-H"
+    "GISS-E2-R-CC"
+    "GISS-E2-R"
+    "HadGEM2-AO"
+    "HadGEM2-CC"
+    "IPSL-CM5A-LR"
+    "IPSL-CM5A-MR"
+    "MIROC-ESM-CHEM"
+    "MIROC-ESM"
+    "MIROC5"
+    "MPI-ESM-LR"
+    "MPI-ESM-MR"
+    "MRI-CGCM3"
+    "MRI-ESM1"
+    "NorESM1-M"
+    "bcc-csm-1"
+    "inmcm4"
+]
 
 # CMIP6
-_format(::Type{CHELSA}, ::Type{GFDLESM4}) = "gfdl-esm4"
-_format(::Type{CHELSA}, ::Type{IPSLCM6ALR}) = "ipsl-cm6a-lr"
-_format(::Type{CHELSA}, ::Type{MPIESMHR}) = "mpi-esm1-2-hr"
-_format(::Type{CHELSA}, ::Type{MRIESM2}) = "mri-esm2-0"
-_format(::Type{CHELSA}, ::Type{UKESM}) = "ukesm1-0-ll"
+const CHELSA_CMIP6_MODELS = Type{<:ClimateModel{CMIP6}}[]
+const CHELSA_CMIP6_MODEL_STRINGS = [
+    "GFDL-ESM4"
+    "IPSL-CM6A-LR"
+    "MPI-ESM1-2-HR"
+    "MRI-ESM2-0"
+    "UKESM1-0-LL"
+]
 
-# Format scenarios
-_format(::Type{CHELSA}, ::Type{RCP26}) = "rcp26"
-_format(::Type{CHELSA}, ::Type{RCP45}) = "rcp45"
-_format(::Type{CHELSA}, ::Type{RCP60}) = "rcp60"
-_format(::Type{CHELSA}, ::Type{RCP85}) = "rcp85"
-
-_format(::Type{CHELSA}, ::Type{SSP126}) = "ssp126"
-_format(::Type{CHELSA}, ::Type{SSP245}) = "ssp245"
-_format(::Type{CHELSA}, ::Type{SSP370}) = "ssp370"
-_format(::Type{CHELSA}, ::Type{SSP585}) = "ssp585"
+for CMIP in [:CMIP5, :CMIP6]
+    strings = eval(Symbol("CHELSA_$(CMIP)_MODEL_STRINGS"))
+    models = eval(Symbol("CHELSA_$(CMIP)_MODELS"))
+    for model_str in strings
+        type = Symbol(replace(model_str, "-" => "_"))
+        @eval begin
+            if !(@isdefined $type) 
+                struct $type <: ClimateModel{$CMIP} end
+                export $type
+            end
+            _format(::Type{CHELSA}, ::Type{$type}) = lowercase($model_str)
+            push!($models, $type)
+        end
+    end
+    append!(eval(Symbol("$(CMIP)_MODELS")), models)
+    unique!(eval(Symbol("$(CMIP)_MODELS")))
+end
