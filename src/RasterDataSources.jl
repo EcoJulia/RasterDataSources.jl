@@ -72,4 +72,9 @@ include("modis/products.jl")
 include("modis/utilities.jl")
 include("modis/examples.jl")
 
+for model in [CMIP5_MODELS; CMIP6_MODELS]
+    symb = nameof(model)
+    @eval export $symb
+end
+
 end # module

@@ -90,7 +90,6 @@ WORDCLIM_CMIP6_MODELS = Type{<:ClimateModel{CMIP6}}[]
 for model_str in WORDCLIM_CMIP6_MODEL_STRINGS
     type = Symbol(replace(model_str, "-" => "_"))
     @eval begin
-        export $type
         if !(@isdefined $type) 
             struct $type <: ClimateModel{CMIP6} end
             export $type
