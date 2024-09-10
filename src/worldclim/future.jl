@@ -3,7 +3,6 @@ const WORLDCLIM_URI_CMIP6 = URI(scheme="https", host="geodata.ucdavis.edu", path
 layers(::Type{<:WorldClim{<:Future{Climate}}}) = (:tmin, :tmax, :prec)
 getraster_keywords(::Type{<:WorldClim{<:Future{Climate}}}) = (:date, :res)
 
-
 function getraster(T::Type{<:WorldClim{<:Future{Climate, CMIP6}}}, layers::Union{Tuple,Symbol}; 
     res::String=defres(T), date
 )
@@ -11,38 +10,49 @@ function getraster(T::Type{<:WorldClim{<:Future{Climate, CMIP6}}}, layers::Union
 end
 
 function _getraster(T::Type{<:WorldClim{<:Future{Climate}}}, layer::Symbol, res::String, date)
-    #date_str = _date_string(T, date)
     _check_layer(T, layer)
     _check_res(T, res)
-    raster_path = rasterpath(T, "bioclim"; res, date)
+    raster_path = rasterpath(T, layer; res, date)
     if !isfile(raster_path)
         _maybe_download(rasterurl(T, layer; res, date), raster_path)
     end
     return raster_path
 end
 
-function rasterurl(T::Type{<:WorldClim{<:Future}}, layer; res, date)
-    joinpath(WORLDCLIM_URI_CMIP6, res, _format(T, _model(T)), _format(T, _scenario(T)), rastername(T, layer; res, date))
+## Bioclim
+getraster_keywords(::Type{<:WorldClim{<:Future{BioClim}}}) = (:date, :res)
+
+function getraster(T::Type{<:WorldClim{<:Future{BioClim, CMIP6}}}; res::String=defres(T), date)
+    _getraster(T, res, date)
+end
+
+function _getraster(T::Type{<:WorldClim{<:Future{BioClim}}}, res::String, date)
+    _check_res(T, res)
+    raster_path = rasterpath(T; res, date)
+    if !isfile(raster_path)
+        _maybe_download(rasterurl(T; res, date), raster_path)
+    end
+    return raster_path
+end
+
+function rasterpath(T::Type{<:WorldClim{<:Future{Climate}}}, layer; res, date)
+    joinpath(_rasterpath(T), rastername(T, layer; res, date))
+end
+function rasterpath(T::Type{<:WorldClim{<:Future{BioClim}}}; res, date)
+    joinpath(_rasterpath(T), rastername(T; res, date))
+end
+function _rasterpath(T::Type{<:WorldClim{<:Future}})
+    joinpath(rasterpath(WorldClim), "Future", string(_dataset(T)), string(_scenario(T)), string(_model(T)))
+end
+
+function rasterurl(T::Type{<:WorldClim{<:Future}}, args...; res, date)
+    joinpath(WORLDCLIM_URI_CMIP6, res, _format(T, _model(T)), _format(T, _scenario(T)), rastername(T, args...; res, date))
 end
 
 function rastername(T::Type{<:WorldClim{<:Future}}, layer; res, date)
-    join(["wc2.1", res, string(layer), _format(T, _model(T)), _format(T, _scenario(T)), date], "_") * ".tif"
+    join(["wc2.1", res, string(layer), _format(T, _model(T)), _format(T, _scenario(T)), _date_string(T, date)], "_") * ".tif"
 end
-
-function getraster(T::Type{<:WorldClim{<:Future{BioClim, CMIP6}}}, layer::Symbol; res::String=defres(T), date)
-    _getraster(T, layers, res, date)
-end
-
-function _getraster(T::Type{<:WorldClim{<:Future{BioClim}}}, layer::Symbol, res::String, date)
-    #date_str = _date_string(T, date)
-    #_check_layer(T, layer)
-    #_check_res(T, res)
-    raster_path = rasterpath(T; res, date)
-    if !isfile(raster_path)
-        _maybe_download(rasterurl(T, layer; res, date), raster_path)
-    end
-    return raster_path
-end
+rastername(T::Type{<:WorldClim{<:Future{BioClim}}}; kw...) = rastername(T, :bioc, ; kw...)
 
 # copy-pasted in from CHELSA - must be some way to implement this abstractly?
 _dataset(::Type{<:WorldClim{F}}) where F<:Future = _dataset(F)
@@ -51,16 +61,15 @@ _model(::Type{<:WorldClim{F}}) where F<:Future = _model(F)
 _scenario(::Type{<:WorldClim{F}}) where F<:Future = _scenario(F)
 
 
-
-function _date_string(::Type{<:WorldClim{<:Future{Climate, CMIP6}}}, date)
+function _date_string(::Type{<:WorldClim{<:Future{<:Any, CMIP6}}}, date)
     if date < DateTime(2021)
         _cmip6_date_error(date)
     elseif date < DateTime(2041)
-        "2011-2040"
+        "2021-2040"
     elseif date < DateTime(2061)
         "2041-2060"
     elseif date < DateTime(2081)
-        "2041-2080"
+        "2041-2060"
     elseif date < DateTime(2101)
         "2081-2100"
     else
@@ -68,6 +77,8 @@ function _date_string(::Type{<:WorldClim{<:Future{Climate, CMIP6}}}, date)
     end
 end
 
+
+## Handle all the models
 const WORDCLIM_CMIP6_MODEL_STRINGS = [
     "ACCESS-CM2"
     "BCC-CSM2-MR"
