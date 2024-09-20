@@ -139,6 +139,7 @@ end
 function _getraster(T::Type{<:CHELSA{<:Future}}, layers::Tuple; kw...)
     _map_layers(T, layers; kw...)
 end
+_getraster(T::Type{<:CHELSA{<:Future{BioClim}}}, layer::Symbol; kw...) = _getraster(T, bioclim_int(layer); kw...)
 function _getraster(T::Type{<:CHELSA{<:Future}}, layer::Union{Symbol,Integer}; kw...)
     _check_layer(T, layer)
     path = rasterpath(T, layer; kw...)
