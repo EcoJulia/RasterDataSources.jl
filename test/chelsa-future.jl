@@ -20,7 +20,6 @@ end
 @testset "CHELSA Future BioClim CMIP6" begin
     bioclim_name = "CHELSA_bio5_2041-2070_mri-esm2-0_ssp126_V.2.1.tif"
     @test rastername(CHELSA{Future{BioClim,CMIP6,MRIESM2,SSP126}}, 5; date=Date(2050)) == bioclim_name
-
     bioclim_path = joinpath(ENV["RASTERDATASOURCES_PATH"], "CHELSA", "Future", "BioClim", "SSP126", "MRIESM2")
     @test rasterpath(CHELSA{Future{BioClim,CMIP6,MRIESM2,SSP126}}) == bioclim_path
 
@@ -31,7 +30,14 @@ end
     @test getraster(CHELSA{Future{BioClim,CMIP6,MRIESM2,SSP126}}, [5]; date=Date(2050)) == (bio5=raster_path,)
     @test getraster(CHELSA{Future{BioClim,CMIP6,MRIESM2,SSP126}}, (5,); date=[Date(2050)]) == 
         [(bio5=raster_path,)]
+    @test getraster(CHELSA{Future{BioClim,CMIP6,MRIESM2,SSP126}}, :bio5; date=Date(2050)) == raster_path
+    @test getraster(CHELSA{Future{BioClim,CMIP6,MRIESM2,SSP126}}, (:bio5,); date=Date(2050)) == (bio5=raster_path,)
+    @test getraster(CHELSA{Future{BioClimPlus,CMIP6,MRIESM2,SSP126}}, :bio5; date=Date(2050)) == raster_path
+    @test getraster(CHELSA{Future{BioClimPlus,CMIP6,MRIESM2,SSP126}}, (:bio5,); date=Date(2050)) == (bio5=raster_path,)
     @test isfile(raster_path)
+
+    # bioclimplus requires symbol input
+    @test_throws ArgumentError getraster(CHELSA{Future{BioClimPlus,CMIP6,MRIESM2,SSP126}}, 5; date=Date(2050))
 end
 
 @testset "CHELSA Future Climate CMIP5" begin
