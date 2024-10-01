@@ -212,14 +212,14 @@ _chelsa_layer(::Type{<:BioClimPlus}, layer) = :bio
 _chelsa_layer(::Type{<:Climate}, layer) = layer
 
 function _urlpath(::Type{CMIP5}, T::Type{<:CHELSA{<:Future}}, name, date_str)
-    return "chelsa_V1/cmip5/$date_str/$name/"
+    return "chelsav1/cmip5/$date_str/$name/"
 end
 function _urlpath(::Type{CMIP6}, T::Type{<:CHELSA{<:Future}}, name, date_str)
     # The model is in uppercase in the URL for CMIP6
     mod = uppercase(_format(CHELSA, _model(T)))
     scen = _format(CHELSA, _scenario(T))
     key = CHELSAKEY[name]
-    return "chelsa_V2/GLOBAL/climatologies/$date_str/$mod/$scen/$key/"
+    return "chelsav2/GLOBAL/climatologies/$date_str/$mod/$scen/$key/"
 end
 
 function _date_string(::Type{CMIP5}, date)
