@@ -81,3 +81,9 @@ function _map_layers(T, layers, args...; kw...)
     keys = layerkeys(T, layers)
     return NamedTuple{keys}(filenames)
 end
+
+# fallback for _format
+_format(RCP::Type{<:RepresentativeConcentrationPathway}) = lowercase(string(nameof(RCP)))
+_format(S::Type{<:SharedSocioeconomicPathway}) = lowercase(string(nameof(S)))
+_format(M::Type{<:ClimateModel}) = replace(string(nameof(M)), "_" => "-")
+_format(::Type, T::Type) = _format(T)

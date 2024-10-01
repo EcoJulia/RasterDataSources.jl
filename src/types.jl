@@ -13,159 +13,6 @@ Abstract supertype for datasets that belong to a [`RasterDataSource`](@ref).
 abstract type RasterDataSet end
 
 """
-    BioClim <: RasterDataSet
-
-BioClim datasets. Usually containing layers from `1:19`. 
-These can also be accessed with `:bioX`, e.g. `:bio5`.
-
-They do not usually use `month` or `date` keywords, but may use
-`date` in past/future scenarios. 
-
-Currently implemented for WorldClim and CHELSA as `WorldClim{BioClim}`,
-`CHELSA{BioClim}` and `CHELSA{Future{BioClim, args..}}`.
-
-See the [`getraster`](@ref) docs for implementation details.
-"""
-struct BioClim <: RasterDataSet end
-
-# Bioclim has standardised layers for all data sources
-layers(::Type{BioClim}) = values(bioclim_lookup)
-layerkeys(T::Type{BioClim}) = keys(bioclim_lookup)
-layerkeys(T::Type{BioClim}, layer) = bioclim_key(layer)
-layerkeys(T::Type{BioClim}, layers::Tuple) = map(l -> bioclim_key(l), layers)
-
-const bioclim_lookup = (
-    bio1 = 1,
-    bio2 = 2,
-    bio3 = 3,
-    bio4 = 4,
-    bio5 = 5,
-    bio6 = 6,
-    bio7 = 7,
-    bio8 = 8,
-    bio9 = 9,
-    bio10 = 10,
-    bio11 = 11,
-    bio12 = 12,
-    bio13 = 13,
-    bio14 = 14,
-    bio15 = 15,
-    bio16 = 16,
-    bio17 = 17,
-    bio18 = 18,
-    bio19 = 19,
-)
-
-# We allow a range of bioclim keys, as they are listed with 
-# a lot of variants on CHELSA and WorldClim
-bioclim_key(k::Symbol) = bioclim_key(string(k))
-bioclim_key(k::AbstractString) = Symbol(replace(lowercase(k), "_" => ""))
-bioclim_key(k::Integer) = keys(bioclim_lookup)[k]
-
-bioclim_int(k::Integer) = k
-bioclim_int(k::Symbol) = bioclim_lookup[bioclim_key(k)]
-
-"""
-    BioClimPlus <: RasterDataSet
-
-Extended BioClim datasets, available from CHELSA. 
-More information on the CHELSA website: https://chelsa-climate.org/exchelsa-extended-bioclim/
-
-Some of these are available as average annual maximum, minimum, mean, and range. 
-Others have a single value, more like the regular BioClim variables.
-
-They do not usually use `month` or `date` keywords, but may use
-`date` in past/future scenarios. 
-
-Currently implemented for CHELSA as `CHELSA{BioClim}` and `CHELSA{Future{BioClim, args..}}`,
-specifying layer names as `Symbol`s.
-
-See the [`getraster`](@ref) docs for implementation details.
-"""
-struct BioClimPlus <: RasterDataSet end
-
-const _BIOCLIMPLUS_MONTHLY = vec([Symbol("$(b)_$(m)") for b in (:hurs, :clt, :sfcWind, :vpd, :rsds, :pet_penman, :cmi), m in [:max, :min, :mean, :range]])
-const _BIOCLIMPLUS_GDD = vec([Symbol("$b$d") for b in (:gdd, :gddlgd, :gdgfgd, :ngd), d in [0, 5, 10]])
-const _BIOCLIMPLUS_OTHERS = (:fcf, :fgd, :lgd, :scd, :gsl, :gst, :gsp, :npp, :swb, :swe)
-const BIOCLIMPLUS_LAYERS = [
-    collect(layerkeys(BioClim))
-    _BIOCLIMPLUS_MONTHLY;
-    _BIOCLIMPLUS_GDD;
-    collect(_BIOCLIMPLUS_OTHERS);
-    [Symbol("kg$i") for i in 0:5];
-]
-
-const BIOCLIMPLUS_LAYERS_FUTURE = [
-    collect(layerkeys(BioClim));
-    _BIOCLIMPLUS_GDD;
-    collect(filter(!=(:swb), _BIOCLIMPLUS_OTHERS))
-    [Symbol("kg$i") for i in 0:5];
-]
-
-layers(::Type{BioClimPlus}) = BIOCLIMPLUS_LAYERS
-
-"""
-    Climate <: RasterDataSet
-
-Climate datasets. These are usually months of the year, not specific dates,
-and use a `month` keyword in `getraster`. They also use `date` in past/future scenarios.
-
-Currently implemented for WorldClim and CHELSA as `WorldClim{Climate}`,
-`CHELSA{Climate}` and `CHELSA{Future{Climate, args..}}`.
-
-See the [`getraster`](@ref) docs for implementation details.
-"""
-struct Climate <: RasterDataSet end
-
-months(::Type{Climate}) = ntuple(identity, Val{12})
-
-"""
-    Weather <: RasterDataSet
-
-Weather datasets. These are usually large time-series of specific dates,
-and use a `date` keyword in `getraster`.
-
-Currently implemented for WorldClim and CHELSA as `WorldClim{Weather}`,
-and `CHELSA{Weather}`
-
-See the [`getraster`](@ref) docs for implementation details.
-"""
-struct Weather <: RasterDataSet end
-
-"""
-    Elevation <: RasterDataSet
-
-Elevation datasets. 
-
-Currently implemented for WorldClim as `WorldClim{Elevation}`.
-
-See the [`getraster`](@ref) docs for implementation details.
-"""
-struct Elevation <: RasterDataSet end
-
-"""
-    LandCover <: RasterDataSet
-
-Land-cover datasets.
-
-Currently implemented for EarthEnv as `EarchEnv{LandCover}`.
-
-See the [`getraster`](@ref) docs for implementation details.
-"""
-struct LandCover{X} <: RasterDataSet end
-
-"""
-    HabitatHeterogeneity <: RasterDataSet
-
-Habitat heterogeneity datasets.
-
-Currently implemented for EarchEnv as `EarchEnv{HabitatHeterogeneity}`.
-
-See the [`getraster`](@ref) docs for implementation details.
-"""
-struct HabitatHeterogeneity <: RasterDataSet end
-
-"""
     CMIPphase 
 
 Abstract supertype for phases of the CMIP,
@@ -285,18 +132,169 @@ datasource = CHELSA{Future{BioClim, CMIP5, BNUESM, RCP45}}
 struct Future{D<:RasterDataSet,C<:CMIPphase,M<:ClimateModel,S<:ClimateScenario} end
 
 _dataset(::Type{<:Future{D}}) where D = D
-_dataset(::Type{<:Future{BioClimPlus}}) = BioClim
 _phase(::Type{<:Future{<:Any,P}}) where P = P
 _phase(::Type{<:ClimateModel{P}}) where P = P
 
 _model(::Type{<:Future{<:Any,<:Any,M}}) where M = M
 _scenario(::Type{<:Future{<:Any,<:Any,<:Any,S}}) where S = S
-layers(::Type{<:Future{BioClimPlus}}) = BIOCLIMPLUS_LAYERS_FUTURE
 
-# fallback for _format
-_format(::Type, RCP::Type{<:RepresentativeConcentrationPathway}) = lowercase(string(nameof(RCP)))
-_format(::Type, S::Type{<:SharedSocioeconomicPathway}) = lowercase(string(nameof(S)))
-_format(::Type, S::Type{<:ClimateModel}) = replace(string(nameof(S)), "_" => "-")
+# fallback for layers
+layers(::Type{<:Future{T}}) where T = layers(T) # need to define this after Future is defined
+
+### Define types for all RasterDataSets
+"""
+    BioClim <: RasterDataSet
+
+BioClim datasets. Usually containing layers from `1:19`. 
+These can also be accessed with `:bioX`, e.g. `:bio5`.
+
+They do not usually use `month` or `date` keywords, but may use
+`date` in past/future scenarios. 
+
+Currently implemented for WorldClim and CHELSA as `WorldClim{BioClim}`,
+`CHELSA{BioClim}` and `CHELSA{Future{BioClim, args..}}`.
+
+See the [`getraster`](@ref) docs for implementation details.
+"""
+struct BioClim <: RasterDataSet end
+
+# Bioclim has standardised layers for all data sources
+layers(::Type{BioClim}) = values(bioclim_lookup)
+layerkeys(T::Type{BioClim}) = keys(bioclim_lookup)
+layerkeys(T::Type{BioClim}, layer) = bioclim_key(layer)
+layerkeys(T::Type{BioClim}, layers::Tuple) = map(l -> bioclim_key(l), layers)
+
+const bioclim_lookup = (
+    bio1 = 1,
+    bio2 = 2,
+    bio3 = 3,
+    bio4 = 4,
+    bio5 = 5,
+    bio6 = 6,
+    bio7 = 7,
+    bio8 = 8,
+    bio9 = 9,
+    bio10 = 10,
+    bio11 = 11,
+    bio12 = 12,
+    bio13 = 13,
+    bio14 = 14,
+    bio15 = 15,
+    bio16 = 16,
+    bio17 = 17,
+    bio18 = 18,
+    bio19 = 19,
+)
+
+# We allow a range of bioclim keys, as they are listed with 
+# a lot of variants on CHELSA and WorldClim
+bioclim_key(k::Symbol) = bioclim_key(string(k))
+bioclim_key(k::AbstractString) = Symbol(replace(lowercase(k), "_" => ""))
+bioclim_key(k::Integer) = keys(bioclim_lookup)[k]
+
+bioclim_int(k::Integer) = k
+bioclim_int(k::Symbol) = bioclim_lookup[bioclim_key(k)]
+
+"""
+    BioClimPlus <: RasterDataSet
+
+Extended BioClim datasets, available from CHELSA. 
+More information on the CHELSA website: https://chelsa-climate.org/exchelsa-extended-bioclim/
+
+Some of these are available as average annual maximum, minimum, mean, and range. 
+Others have a single value, more like the regular BioClim variables.
+
+They do not usually use `month` or `date` keywords, but may use
+`date` in past/future scenarios. 
+
+Currently implemented for CHELSA as `CHELSA{BioClim}` and `CHELSA{Future{BioClim, args..}}`,
+specifying layer names as `Symbol`s.
+
+See the [`getraster`](@ref) docs for implementation details.
+"""
+struct BioClimPlus <: RasterDataSet end
+
+const _BIOCLIMPLUS_MONTHLY = vec([Symbol("$(b)_$(m)") for b in (:hurs, :clt, :sfcWind, :vpd, :rsds, :pet_penman, :cmi), m in [:max, :min, :mean, :range]])
+const _BIOCLIMPLUS_GDD = vec([Symbol("$b$d") for b in (:gdd, :gddlgd, :gdgfgd, :ngd), d in [0, 5, 10]])
+const _BIOCLIMPLUS_OTHERS = (:fcf, :fgd, :lgd, :scd, :gsl, :gst, :gsp, :npp, :swb, :swe)
+const BIOCLIMPLUS_LAYERS = [
+    collect(layerkeys(BioClim))
+    _BIOCLIMPLUS_MONTHLY;
+    _BIOCLIMPLUS_GDD;
+    collect(_BIOCLIMPLUS_OTHERS);
+    [Symbol("kg$i") for i in 0:5];
+]
+
+const BIOCLIMPLUS_LAYERS_FUTURE = [
+    collect(layerkeys(BioClim));
+    _BIOCLIMPLUS_GDD;
+    collect(filter(!=(:swb), _BIOCLIMPLUS_OTHERS))
+    [Symbol("kg$i") for i in 0:5];
+]
+
+layers(::Type{BioClimPlus}) = BIOCLIMPLUS_LAYERS
+layers(::Type{Future{BioClimPlus}}) = BIOCLIMPLUS_LAYERS_FUTURE
+
+"""
+    Climate <: RasterDataSet
+
+Climate datasets. These are usually months of the year, not specific dates,
+and use a `month` keyword in `getraster`. They also use `date` in past/future scenarios.
+
+Currently implemented for WorldClim and CHELSA as `WorldClim{Climate}`,
+`CHELSA{Climate}` and `CHELSA{Future{Climate, args..}}`.
+
+See the [`getraster`](@ref) docs for implementation details.
+"""
+struct Climate <: RasterDataSet end
+
+months(::Type{Climate}) = ntuple(identity, Val{12})
+
+"""
+    Weather <: RasterDataSet
+
+Weather datasets. These are usually large time-series of specific dates,
+and use a `date` keyword in `getraster`.
+
+Currently implemented for WorldClim and CHELSA as `WorldClim{Weather}`,
+and `CHELSA{Weather}`
+
+See the [`getraster`](@ref) docs for implementation details.
+"""
+struct Weather <: RasterDataSet end
+
+"""
+    Elevation <: RasterDataSet
+
+Elevation datasets. 
+
+Currently implemented for WorldClim as `WorldClim{Elevation}`.
+
+See the [`getraster`](@ref) docs for implementation details.
+"""
+struct Elevation <: RasterDataSet end
+
+"""
+    LandCover <: RasterDataSet
+
+Land-cover datasets.
+
+Currently implemented for EarthEnv as `EarchEnv{LandCover}`.
+
+See the [`getraster`](@ref) docs for implementation details.
+"""
+struct LandCover{X} <: RasterDataSet end
+
+"""
+    HabitatHeterogeneity <: RasterDataSet
+
+Habitat heterogeneity datasets.
+
+Currently implemented for EarchEnv as `EarchEnv{HabitatHeterogeneity}`.
+
+See the [`getraster`](@ref) docs for implementation details.
+"""
+struct HabitatHeterogeneity <: RasterDataSet end
 
 """
     ModisProduct <: RasterDataSet

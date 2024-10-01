@@ -254,6 +254,7 @@ _cmip5_date_error(date) = error("CMIP5 covers the period from 2041-2080, not inc
 _cmip6_date_error(date) = error("CMIP6 covers the period from 1981-2100, not including $date")
 
 _dataset(::Type{<:CHELSA{F}}) where F<:Future = _dataset(F)
+_dataset(::Type{<:Future{BioClimPlus}}) = BioClim # to make sure bioclimplus and bioclim end up in the same folder
 _phase(::Type{<:CHELSA{F}}) where F<:Future = _phase(F)
 _model(::Type{<:CHELSA{F}}) where F<:Future = _model(F)
 _scenario(::Type{<:CHELSA{F}}) where F<:Future = _scenario(F)
