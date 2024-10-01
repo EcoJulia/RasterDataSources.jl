@@ -42,7 +42,7 @@ function rasterpath(T::Type{<:WorldClim{<:Future{BioClim}}}; res, date)
     joinpath(_rasterpath(T), rastername(T; res, date))
 end
 function _rasterpath(T::Type{<:WorldClim{<:Future}})
-    joinpath(rasterpath(WorldClim), "Future", string(_dataset(T)), string(_scenario(T)), string(_model(T)))
+    joinpath(rasterpath(WorldClim), "Future", _format(T, _dataset(T)), _format(T, _scenario(T)), _format(T, _model(T)))
 end
 
 function rasterurl(T::Type{<:WorldClim{<:Future}}, args...; res, date)
@@ -50,7 +50,7 @@ function rasterurl(T::Type{<:WorldClim{<:Future}}, args...; res, date)
 end
 
 function rastername(T::Type{<:WorldClim{<:Future}}, layer; res, date)
-    join(["wc2.1", res, string(layer), _format(T, _model(T)), _format(T, _scenario(T)), _date_string(T, date)], "_") * ".tif"
+    join(["wc2.1", res, _format(T, layer), _format(T, _model(T)), _format(T, _scenario(T)), _date_string(T, date)], "_") * ".tif"
 end
 rastername(T::Type{<:WorldClim{<:Future{BioClim}}}; kw...) = rastername(T, :bioc, ; kw...)
 
@@ -60,6 +60,8 @@ _phase(::Type{<:WorldClim{F}}) where F<:Future = _phase(F)
 _model(::Type{<:WorldClim{F}}) where F<:Future = _model(F)
 _scenario(::Type{<:WorldClim{F}}) where F<:Future = _scenario(F)
 
+# overload _format
+_format(::Type{WorldClim}, T::Type{<:SharedSocioeconomicPathway}) = lowercase(_format(T))
 
 function _date_string(::Type{<:WorldClim{<:Future{<:Any, CMIP6}}}, date)
     if date < DateTime(2021)
@@ -106,7 +108,6 @@ for model_str in WORDCLIM_CMIP6_MODEL_STRINGS
             export $type
         end
         push!(WORDCLIM_CMIP6_MODELS, $type)
-        _format(::Type{WorldClim}, ::Type{$type}) = $model_str
     end
 end
 

@@ -194,7 +194,7 @@ function _rastername(
 end
 
 function rasterpath(T::Type{<:CHELSA{<:Future}})
-    joinpath(rasterpath(CHELSA), "Future", string(_dataset(T)), string(_scenario(T)), string(_model(T)))
+    joinpath(rasterpath(CHELSA), "Future", _format(T, _dataset(T)), _format(T, _scenario(T)), _format(T, _model(T)))
 end
 function rasterpath(T::Type{<:CHELSA{<:Future}}, layer; kw...)
     joinpath(rasterpath(T), rastername(T, layer; kw...))
@@ -212,7 +212,7 @@ _chelsa_layer(::Type{<:BioClimPlus}, layer) = :bio
 _chelsa_layer(::Type{<:Climate}, layer) = layer
 
 function _urlpath(::Type{CMIP5}, T::Type{<:CHELSA{<:Future}}, name, date_str)
-    return "chelsa_V1/cmip5/$date_str/$name/"
+    return "chelsav1/cmip5/$date_str/$name/"
 end
 function _urlpath(::Type{CMIP6}, T::Type{<:CHELSA{<:Future}}, name, date_str)
     # The model is in uppercase in the URL for CMIP6
@@ -259,8 +259,11 @@ _phase(::Type{<:CHELSA{F}}) where F<:Future = _phase(F)
 _model(::Type{<:CHELSA{F}}) where F<:Future = _model(F)
 _scenario(::Type{<:CHELSA{F}}) where F<:Future = _scenario(F)
 
-# Climate model string formatters for CHELSA Future
+## overload _format to use lowercase
+_format(::Type{CHELSA}, T::Type{<:SharedSocioeconomicPathway}) = lowercase(_format(T))
+_format(::Type{CHELSA}, T::Type{<:RepresentativeConcentrationPathway}) = lowercase(_format(T))
 
+## Climate model string formatters for CHELSA Future
 # CMIP5
 const CHELSA_CMIP5_MODELS = Type{<:ClimateModel{CMIP5}}[]
 const CHELSA_CMIP5_MODEL_STRINGS =
@@ -320,7 +323,6 @@ for CMIP in [:CMIP5, :CMIP6]
                 struct $type <: ClimateModel{$CMIP} end
                 export $type
             end
-            _format(::Type{CHELSA}, ::Type{$type}) = lowercase($model_str)
             push!($models, $type)
         end
     end
