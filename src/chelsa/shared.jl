@@ -12,14 +12,14 @@ struct CHELSA{X} <: RasterDataSource end
 rasterpath(::Type{CHELSA}) = joinpath(rasterpath(), "CHELSA")
 function rasterurl(T::Type{CHELSA}, version)
     if version == 1
-        joinpath(rasterurl(T), "chelsa_V1")
+        joinpath(rasterurl(T), "chelsav1")
     elseif version == 2
-        joinpath(rasterurl(T), "chelsa_V2/GLOBAL")
+        joinpath(rasterurl(T), "chelsav2/GLOBAL")
     else 
         CHELSA_invalid_version(version)
     end
 end
-rasterurl(::Type{CHELSA}) = URI(scheme="https", host="os.zhdk.cloud.switch.ch", path="/envicloud/chelsa/")
+rasterurl(::Type{CHELSA}) = URI(scheme="https", host="os.zhdk.cloud.switch.ch", path="")
 
 function latest_patch(::Type{<:CHELSA}, v)
     if v == 1
