@@ -12,7 +12,7 @@ using RasterDataSources: rastername, rasterpath, rasterurl, layers
     @test rasterpath(CHELSA{Climate}, :tasmax; month=7) == raster_path
 
     @test rasterurl(CHELSA{Climate}, :pr; month=6) |> string ==
-    "https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/1981-2010/pr/CHELSA_pr_06_1981-2010_V.2.1.tif"
+    "https://os.zhdk.cloud.switch.ch/chelsav2/GLOBAL/climatologies/1981-2010/pr/CHELSA_pr_06_1981-2010_V.2.1.tif"
 
     @test getraster(CHELSA{Climate}, :tasmax; month=7) == raster_path
     @test getraster(CHELSA{Climate}, [:tasmax]; month=7) == (tasmax=raster_path,)

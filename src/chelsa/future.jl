@@ -219,7 +219,7 @@ function _urlpath(::Type{CMIP6}, T::Type{<:CHELSA{<:Future}}, name, date_str)
     mod = uppercase(_format(CHELSA, _model(T)))
     scen = _format(CHELSA, _scenario(T))
     key = CHELSAKEY[name]
-    return "chelsa_V2/GLOBAL/climatologies/$date_str/$mod/$scen/$key/"
+    return "chelsav2/GLOBAL/climatologies/$date_str/$mod/$scen/$key/"
 end
 
 function _date_string(::Type{CMIP5}, date)
