@@ -1,7 +1,7 @@
 const WORLDCLIM_URI_CMIP6 = URI(scheme="https", host="geodata.ucdavis.edu", path="/cmip6")
-layers(::Type{WorldClim{Future{BioClim}}}) = layers(WorldClim{BioClim})
-layers(::Type{WorldClim{Future{Climate}}}) = (:tmin, :tmax, :prec)
-getraster_keywords(::Type{WorldClim{Future}}) = (:date, :res)
+layers(::Type{<:WorldClim{<:Future{BioClim}}}) = layers(WorldClim{BioClim})
+layers(::Type{<:WorldClim{<:Future{Climate}}}) = (:tmin, :tmax, :prec)
+getraster_keywords(::Type{<:WorldClim{<:Future}}) = (:date, :res)
 
 function getraster(T::Type{<:WorldClim{<:Future{Climate, CMIP6}}}, layers::Union{Tuple,Symbol}; 
     res::String=defres(T), date
@@ -45,13 +45,10 @@ function _getraster(T::Type{<:WorldClim{<:Future{BioClim}}}, res::String, date)
     return raster_path
 end
 
-function rasterpath(T::Type{<:WorldClim{<:Future{Climate}}}, layer; res, date)
-    joinpath(_rasterpath(T), rastername(T, layer; res, date))
+function rasterpath(T::Type{<:WorldClim{<:Future}}, args...; res, date) # splat to make sure this works with and without layer argument
+    joinpath(rasterpath(T), rastername(T, args...; res, date))
 end
-function rasterpath(T::Type{<:WorldClim{<:Future{BioClim}}}; res, date)
-    joinpath(_rasterpath(T), rastername(T; res, date))
-end
-function _rasterpath(T::Type{<:WorldClim{<:Future}})
+function rasterpath(T::Type{<:WorldClim{<:Future}})
     joinpath(rasterpath(WorldClim), "Future", _format(T, _dataset(T)), _format(T, _scenario(T)), _format(T, _model(T)))
 end
 
@@ -60,9 +57,10 @@ function rasterurl(T::Type{<:WorldClim{<:Future}}, args...; res, date)
 end
 
 function rastername(T::Type{<:WorldClim{<:Future}}, layer; res, date)
-    join(["wc2.1", res, _format(T, layer), _format(T, _model(T)), _format(T, _scenario(T)), _date_string(T, date)], "_") * ".tif"
+    join(["wc2.1", res, string(layer), _format(T, _model(T)), _format(T, _scenario(T)), _date_string(T, date)], "_") * ".tif"
 end
-rastername(T::Type{<:WorldClim{<:Future{BioClim}}}; kw...) = rastername(T, :bioc, ; kw...)
+rastername(T::Type{<:WorldClim{<:Future{BioClim}}}; kw...) = rastername(T, "bioc"; kw...)
+rastername(T::Type{<:WorldClim{<:Future{BioClim}}}, layers::Union{Tuple,Symbol,Int}; kw...) = rastername(T, "bioc"; kw...)
 
 # copy-pasted in from CHELSA - must be some way to implement this abstractly?
 _dataset(::Type{<:WorldClim{F}}) where F<:Future = _dataset(F)
@@ -71,7 +69,8 @@ _model(::Type{<:WorldClim{F}}) where F<:Future = _model(F)
 _scenario(::Type{<:WorldClim{F}}) where F<:Future = _scenario(F)
 
 # overload _format
-_format(::Type{WorldClim}, T::Type{<:SharedSocioeconomicPathway}) = lowercase(_format(T))
+_format(::Type{<:WorldClim}, T::Type{<:SharedSocioeconomicPathway}) = lowercase(_format(T))
+
 
 function _date_string(::Type{<:WorldClim{<:Future{<:Any, CMIP6}}}, date)
     if date < DateTime(2021)
@@ -115,7 +114,6 @@ for model_str in WORDCLIM_CMIP6_MODEL_STRINGS
     @eval begin
         if !(@isdefined $type) 
             struct $type <: ClimateModel{CMIP6} end
-            export $type
         end
         push!(WORDCLIM_CMIP6_MODELS, $type)
     end

@@ -260,8 +260,8 @@ _model(::Type{<:CHELSA{F}}) where F<:Future = _model(F)
 _scenario(::Type{<:CHELSA{F}}) where F<:Future = _scenario(F)
 
 ## overload _format to use lowercase
-_format(::Type{CHELSA}, T::Type{<:SharedSocioeconomicPathway}) = lowercase(_format(T))
-_format(::Type{CHELSA}, T::Type{<:RepresentativeConcentrationPathway}) = lowercase(_format(T))
+_format(::Type{<:CHELSA}, T::Type{<:SharedSocioeconomicPathway}) = lowercase(_format(T))
+_format(::Type{<:CHELSA}, T::Type{<:RepresentativeConcentrationPathway}) = lowercase(_format(T))
 
 ## Climate model string formatters for CHELSA Future
 # CMIP5
