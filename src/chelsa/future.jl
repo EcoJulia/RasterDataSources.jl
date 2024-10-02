@@ -155,30 +155,30 @@ function _rastername(
     ::Type{CMIP5}, T::Type{<:CHELSA{<:Future{BioClim}}}, layer::Integer; date
 )
     date_string = _date_string(_phase(T), date)
-    mod = _format(CHELSA, _model(T))
-    scen = _format(CHELSA, _scenario(T))
+    mod = _format(T, _model(T))
+    scen = _format(T, _scenario(T))
     return "CHELSA_bio_mon_$(mod)_$(scen)_r1i1p1_g025.nc_$(layer)_$(date_string)_V1.2.tif"
 end
 function _rastername(
     ::Type{CMIP5}, T::Type{<:CHELSA{<:Future{Climate}}}, layer::Symbol; date, month
 )
     date_string = _date_string(_phase(T), date)
-    mod = _format(CHELSA, _model(T))
-    scen = _format(CHELSA, _scenario(T))
+    mod = _format(T, _model(T))
+    scen = _format(T, _scenario(T))
     key = CHELSAKEY[layer]
     suffix = layer === :prec ? "" : "_V1.2" # prec filenames dont end in _V1.2
     return "CHELSA_$(key)_mon_$(mod)_$(scen)_r1i1p1_g025.nc_$(month)_$(date_string)$(suffix).tif"
 end
 function _rastername(::Type{CMIP6}, T::Type{<:CHELSA{<:Future{BioClim}}}, layer::Integer; date)
     date_string = _date_string(_phase(T), date)
-    mod = _format(CHELSA, _model(T))
-    scen = _format(CHELSA, _scenario(T))
+    mod = _format(T, _model(T))
+    scen = _format(T, _scenario(T))
     return "CHELSA_bio$(layer)_$(date_string)_$(mod)_$(scen)_V.2.1.tif"
 end
 function _rastername(::Type{CMIP6}, T::Type{<:CHELSA{<:Future{BioClimPlus}}}, layer::Symbol; date)
     date_string = _date_string(_phase(T), date)
-    mod = _format(CHELSA, _model(T))
-    scen = _format(CHELSA, _scenario(T))
+    mod = _format(T, _model(T))
+    scen = _format(T, _scenario(T))
     return "CHELSA_$(layer)_$(date_string)_$(mod)_$(scen)_V.2.1.tif"
 end
 function _rastername(
@@ -186,15 +186,15 @@ function _rastername(
 )
     # CMIP6 Climate uses an underscore in the date string, of course
     date_string = replace(_date_string(_phase(T), date), "-" => "_")
-    mod = _format(CHELSA, _model(T))
-    scen = _format(CHELSA, _scenario(T))
+    mod = _format(T, _model(T))
+    scen = _format(T, _scenario(T))
     key = CHELSAKEY[layer]
     mon = lpad(month, 2, '0')
     return "CHELSA_$(mod)_r1i1p1f1_w5e5_$(scen)_$(key)_$(mon)_$(date_string)_norm.tif"
 end
 
 function rasterpath(T::Type{<:CHELSA{<:Future}})
-    joinpath(rasterpath(CHELSA), "Future", _format(T, _dataset(T)), _format(T, _scenario(T)), _format(T, _model(T)))
+    joinpath(rasterpath(CHELSA), "Future", _format(T, _dataset(T)), _format(_scenario(T)), replace(_format(_model(T)), "-" => ""))
 end
 function rasterpath(T::Type{<:CHELSA{<:Future}}, layer; kw...)
     joinpath(rasterpath(T), rastername(T, layer; kw...))
@@ -216,8 +216,8 @@ function _urlpath(::Type{CMIP5}, T::Type{<:CHELSA{<:Future}}, name, date_str)
 end
 function _urlpath(::Type{CMIP6}, T::Type{<:CHELSA{<:Future}}, name, date_str)
     # The model is in uppercase in the URL for CMIP6
-    mod = uppercase(_format(CHELSA, _model(T)))
-    scen = _format(CHELSA, _scenario(T))
+    mod = uppercase(_format(T, _model(T)))
+    scen = _format(T, _scenario(T))
     key = CHELSAKEY[name]
     return "chelsav2/GLOBAL/climatologies/$date_str/$mod/$scen/$key/"
 end
@@ -262,6 +262,7 @@ _scenario(::Type{<:CHELSA{F}}) where F<:Future = _scenario(F)
 ## overload _format to use lowercase
 _format(::Type{<:CHELSA}, T::Type{<:SharedSocioeconomicPathway}) = lowercase(_format(T))
 _format(::Type{<:CHELSA}, T::Type{<:RepresentativeConcentrationPathway}) = lowercase(_format(T))
+_format(::Type{<:CHELSA{<:Future{<:Any, CMIP6}}}, T::Type{<:ClimateModel}) = lowercase(_format(T))
 
 ## Climate model string formatters for CHELSA Future
 # CMIP5
