@@ -60,7 +60,7 @@ end
     @test isfile(raster_path)
     @test RasterDataSources.getraster_keywords(CHELSA{Future{Climate}}) == (:date, :month)
 end
-@edit rasterpath(CHELSA{Future{Climate,CMIP6,GFDL_ESM4,SSP585}})
+
 @testset "CHELSA Future Climate CMIP6" begin
     date_name =  "CHELSA_gfdl-esm4_r1i1p1f1_w5e5_ssp585_tas_01_2011_2040_norm.tif"
     date_name2 = "CHELSA_gfdl-esm4_r1i1p1f1_w5e5_ssp585_tas_01_2041_2070_norm.tif"
