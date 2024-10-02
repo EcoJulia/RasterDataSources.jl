@@ -194,7 +194,9 @@ function _rastername(
 end
 
 function rasterpath(T::Type{<:CHELSA{<:Future}})
-    joinpath(rasterpath(CHELSA), "Future", _format(T, _dataset(T)), _format(_scenario(T)), replace(_format(_model(T)), "-" => ""))
+    # drop dashes so paths are more (but not entirely!) compatibile with v0.6
+    modelname = replace(_format(_model(T)), "-" => "")
+    joinpath(rasterpath(CHELSA), "Future", _format(T, _dataset(T)), _format(_scenario(T)), modelname)
 end
 function rasterpath(T::Type{<:CHELSA{<:Future}}, layer; kw...)
     joinpath(rasterpath(T), rastername(T, layer; kw...))
