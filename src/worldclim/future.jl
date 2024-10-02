@@ -1,7 +1,7 @@
 const WORLDCLIM_URI_CMIP6 = URI(scheme="https", host="geodata.ucdavis.edu", path="/cmip6")
-
-layers(::Type{<:WorldClim{<:Future{Climate}}}) = (:tmin, :tmax, :prec)
-getraster_keywords(::Type{<:WorldClim{<:Future{Climate}}}) = (:date, :res)
+layers(::Type{WorldClim{Future{BioClim}}}) = layers(WorldClim{BioClim})
+layers(::Type{WorldClim{Future{Climate}}}) = (:tmin, :tmax, :prec)
+getraster_keywords(::Type{WorldClim{Future}}) = (:date, :res)
 
 function getraster(T::Type{<:WorldClim{<:Future{Climate, CMIP6}}}, layers::Union{Tuple,Symbol}; 
     res::String=defres(T), date
@@ -21,7 +21,17 @@ end
 
 ## Bioclim
 getraster_keywords(::Type{<:WorldClim{<:Future{BioClim}}}) = (:date, :res)
-
+# Future worldclim bioclim variables are in one big file. This is for syntax consistency
+function getraster(T::Type{<:WorldClim{<:Future{BioClim, CMIP6}}}, layers::Union{Tuple,Symbol,Int}; kw...)
+    if layers isa Tuple
+        for l in layers
+            _check_layer(WorldClim{BioClim}, bioclim_int(l))
+        end
+    else
+        _check_layer(WorldClim{BioClim}, bioclim_int(layers))
+    end
+    getraster(T; kw...)
+end
 function getraster(T::Type{<:WorldClim{<:Future{BioClim, CMIP6}}}; res::String=defres(T), date)
     _getraster(T, res, date)
 end
