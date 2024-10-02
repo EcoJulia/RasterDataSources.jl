@@ -20,7 +20,7 @@ end
 @testset "CHELSA Future BioClim CMIP6" begin
     bioclim_name = "CHELSA_bio5_2041-2070_mri-esm2-0_ssp126_V.2.1.tif"
     @test rastername(CHELSA{Future{BioClim,CMIP6,MRI_ESM2_0,SSP126}}, 5; date=Date(2050)) == bioclim_name
-    bioclim_path = joinpath(ENV["RASTERDATASOURCES_PATH"], "CHELSA", "Future", "BioClim", "SSP126", "mri-esm2-0")
+    bioclim_path = joinpath(ENV["RASTERDATASOURCES_PATH"], "CHELSA", "Future", "BioClim", "SSP126", "MRIESM20")
     @test rasterpath(CHELSA{Future{BioClim,CMIP6,MRI_ESM2_0,SSP126}}) == bioclim_path
 
     raster_path = joinpath(bioclim_path, bioclim_name)
