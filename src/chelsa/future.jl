@@ -7,10 +7,10 @@ layers(::Type{<:CHELSA{<:Future{Climate}}}) = (:prec, :temp, :tmin, :tmax)
 # A modified key is used in the file name, while the key is used as-is in the path
 const CHELSAKEY = (prec="pr", temp="tas", tmin="tasmin", tmax="tasmax", bio="bio")
 
-date_step(::Type{<:CHELSA{<:Future{Climate,CMIP5}}}) = Year(20) 
-date_range(::Type{<:CHELSA{<:Future{Climate,CMIP5}}}) = (Date(2041), Date(2080)) 
-date_step(::Type{<:CHELSA{<:Future{Climate,CMIP6}}}) = Year(30) 
-date_range(::Type{<:CHELSA{<:Future{Climate,CMIP6}}}) = (Date(1981), Date(2100)) 
+date_step(::Type{<:CHELSA{<:Future{<:Any,CMIP5}}}) = Year(20) 
+date_range(::Type{<:CHELSA{<:Future{<:Any,CMIP5}}}) = (Date(2041), Date(2080)) 
+date_step(::Type{<:CHELSA{<:Future{<:Any,CMIP6}}}) = Year(30) 
+date_range(::Type{<:CHELSA{<:Future{<:Any,CMIP6}}}) = (Date(1981), Date(2100)) 
 
 """
     getraster(T::Type{CHELSA{Future{BioClim}}}, [layer]; date) => String
