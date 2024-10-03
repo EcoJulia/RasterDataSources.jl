@@ -4,12 +4,13 @@ layers(::Type{<:CHELSA{T}}) where T <:Future{BioClimPlus} = layers(T)
 layerkeys(T::Type{<:CHELSA{<:Future{BioClim}}}, args...) = layerkeys(BioClim, args...)
 
 layers(::Type{<:CHELSA{<:Future{Climate}}}) = (:prec, :temp, :tmin, :tmax)
-
-date_step(::Type{<:CHELSA{<:Future{Climate,CMIP5}}}) = Year(20) 
-date_step(::Type{<:CHELSA{<:Future{Climate,CMIP6}}}) = Year(30) 
-
 # A modified key is used in the file name, while the key is used as-is in the path
 const CHELSAKEY = (prec="pr", temp="tas", tmin="tasmin", tmax="tasmax", bio="bio")
+
+date_step(::Type{<:CHELSA{<:Future{Climate,CMIP5}}}) = Year(20) 
+date_range(::Type{<:CHELSA{<:Future{Climate,CMIP5}}}) = (Date(2041), Date(2080)) 
+date_step(::Type{<:CHELSA{<:Future{Climate,CMIP6}}}) = Year(30) 
+date_range(::Type{<:CHELSA{<:Future{Climate,CMIP6}}}) = (Date(1981), Date(2100)) 
 
 """
     getraster(T::Type{CHELSA{Future{BioClim}}}, [layer]; date) => String
@@ -154,7 +155,7 @@ end
 function _rastername(
     ::Type{CMIP5}, T::Type{<:CHELSA{<:Future{BioClim}}}, layer::Integer; date
 )
-    date_string = _date_string(_phase(T), date)
+    date_string = _format(T, date)
     mod = _format(T, _model(T))
     scen = _format(T, _scenario(T))
     return "CHELSA_bio_mon_$(mod)_$(scen)_r1i1p1_g025.nc_$(layer)_$(date_string)_V1.2.tif"
@@ -162,7 +163,7 @@ end
 function _rastername(
     ::Type{CMIP5}, T::Type{<:CHELSA{<:Future{Climate}}}, layer::Symbol; date, month
 )
-    date_string = _date_string(_phase(T), date)
+    date_string = _format(T, date)
     mod = _format(T, _model(T))
     scen = _format(T, _scenario(T))
     key = CHELSAKEY[layer]
@@ -170,13 +171,13 @@ function _rastername(
     return "CHELSA_$(key)_mon_$(mod)_$(scen)_r1i1p1_g025.nc_$(month)_$(date_string)$(suffix).tif"
 end
 function _rastername(::Type{CMIP6}, T::Type{<:CHELSA{<:Future{BioClim}}}, layer::Integer; date)
-    date_string = _date_string(_phase(T), date)
+    date_string = _format(T, date)
     mod = _format(T, _model(T))
     scen = _format(T, _scenario(T))
     return "CHELSA_bio$(layer)_$(date_string)_$(mod)_$(scen)_V.2.1.tif"
 end
 function _rastername(::Type{CMIP6}, T::Type{<:CHELSA{<:Future{BioClimPlus}}}, layer::Symbol; date)
-    date_string = _date_string(_phase(T), date)
+    date_string = _format(T, date)
     mod = _format(T, _model(T))
     scen = _format(T, _scenario(T))
     return "CHELSA_$(layer)_$(date_string)_$(mod)_$(scen)_V.2.1.tif"
@@ -185,7 +186,7 @@ function _rastername(
     ::Type{CMIP6}, T::Type{<:CHELSA{<:Future{Climate}}}, layer::Symbol; date, month
 )
     # CMIP6 Climate uses an underscore in the date string, of course
-    date_string = replace(_date_string(_phase(T), date), "-" => "_")
+    date_string = replace(_format(T, date), "-" => "_")
     mod = _format(T, _model(T))
     scen = _format(T, _scenario(T))
     key = CHELSAKEY[layer]
@@ -203,7 +204,7 @@ function rasterpath(T::Type{<:CHELSA{<:Future}}, layer; kw...)
 end
 
 function rasterurl(T::Type{<:CHELSA{<:Future}}, layer; date, kw...)
-    date_str = _date_string(_phase(T), date)
+    date_str = _format(T, date)
     key = _chelsa_layer(_dataset(T), layer)
     path = _urlpath(_phase(T), T::Type{<:CHELSA{<:Future}}, key, date_str)
     joinpath(rasterurl(CHELSA), path, rastername(T, layer; date, kw...))
@@ -223,37 +224,6 @@ function _urlpath(::Type{CMIP6}, T::Type{<:CHELSA{<:Future}}, name, date_str)
     key = CHELSAKEY[name]
     return "chelsav2/GLOBAL/climatologies/$date_str/$mod/$scen/$key/"
 end
-
-function _date_string(::Type{CMIP5}, date)
-    if date < DateTime(2041)
-        _cmip5_date_error(date)
-    elseif date < DateTime(2061)
-        "2041-2060"
-    elseif date < DateTime(2081)
-        "2061-2080"
-    else
-        _cmip5_date_error(date)
-    end
-end
-
-function _date_string(::Type{CMIP6}, date)
-    if date < DateTime(1981)
-        _cmip6_date_error(date)
-    elseif date < DateTime(2011)
-        "1981-2010"
-    elseif date < DateTime(2041)
-        "2011-2040"
-    elseif date < DateTime(2071)
-        "2041-2070"
-    elseif date < DateTime(2101)
-        "2071-2100"
-    else
-        _cmip6_date_error(date)
-    end
-end
-
-_cmip5_date_error(date) = error("CMIP5 covers the period from 2041-2080, not including $date")
-_cmip6_date_error(date) = error("CMIP6 covers the period from 1981-2100, not including $date")
 
 _dataset(::Type{<:CHELSA{F}}) where F<:Future = _dataset(F)
 _dataset(::Type{<:Future{BioClimPlus}}) = BioClim # to make sure bioclimplus and bioclim end up in the same folder
