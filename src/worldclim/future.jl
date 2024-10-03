@@ -1,15 +1,27 @@
-const WORLDCLIM_URI_CMIP6 = URI(scheme="https", host="geodata.ucdavis.edu", path="/cmip6")
-layers(::Type{<:WorldClim{<:Future{BioClim}}}) = layers(WorldClim{BioClim})
-layers(::Type{<:WorldClim{<:Future{Climate}}}) = (:tmin, :tmax, :prec)
+## Shared
 getraster_keywords(::Type{<:WorldClim{<:Future}}) = (:date, :res)
 
-function getraster(T::Type{<:WorldClim{<:Future{Climate, CMIP6}}}, layers::Union{Tuple,Symbol}; 
+date_step(::Type{<:WorldClim{<:Future{<:Any,CMIP6}}}) = Year(20) 
+date_range(::Type{<:WorldClim{<:Future{<:Any,CMIP6}}}) = (Date(2021), Date(2100))
+
+function getraster(T::Type{<:WorldClim{<:Future}}, layers::Union{Tuple,Symbol,Int}; 
     res::String=defres(T), date
 )
     _getraster(T, layers, res, date)
 end
 
-function _getraster(T::Type{<:WorldClim{<:Future{Climate}}}, layer::Symbol, res::String, date)
+function _getraster(T::Type{<:WorldClim{<:Future}}, layers, res::String, dates)
+    map(date -> _getraster(T, layers, res, date), date_sequence(T, dates))
+end
+
+
+## Climate
+layers(::Type{<:WorldClim{<:Future{Climate}}}) = (:tmin, :tmax, :prec)
+
+function _getraster(T::Type{<:WorldClim{<:Future{Climate}}}, layers::Tuple, res::String, date::TimeType)
+    _map_layers(T, layers, res, date)
+end
+function _getraster(T::Type{<:WorldClim{<:Future{Climate}}}, layer::Symbol, res::String, date::TimeType)
     _check_layer(T, layer)
     _check_res(T, res)
     raster_path = rasterpath(T, layer; res, date)
@@ -19,24 +31,22 @@ function _getraster(T::Type{<:WorldClim{<:Future{Climate}}}, layer::Symbol, res:
     return raster_path
 end
 
+
 ## Bioclim
-getraster_keywords(::Type{<:WorldClim{<:Future{BioClim}}}) = (:date, :res)
-# Future worldclim bioclim variables are in one big file. This is for syntax consistency
-function getraster(T::Type{<:WorldClim{<:Future{BioClim, CMIP6}}}, layers::Union{Tuple,Symbol,Int}; kw...)
-    if layers isa Tuple
-        for l in layers
-            _check_layer(WorldClim{BioClim}, bioclim_int(l))
-        end
-    else
-        _check_layer(WorldClim{BioClim}, bioclim_int(layers))
-    end
-    getraster(T; kw...)
-end
+layers(::Type{<:WorldClim{<:Future{BioClim}}}) = layers(WorldClim{BioClim})
+
 function getraster(T::Type{<:WorldClim{<:Future{BioClim, CMIP6}}}; res::String=defres(T), date)
-    _getraster(T, res, date)
+    getraster(T, :bio1; res, date)
 end
 
-function _getraster(T::Type{<:WorldClim{<:Future{BioClim}}}, res::String, date)
+function _getraster(T::Type{<:WorldClim{<:Future{BioClim, CMIP6}}}, layers, res::String, date::TimeType)
+    if layers isa Tuple
+        for l in layers
+            _check_layer(T, bioclim_int(l))
+        end
+    else
+    _check_layer(T, bioclim_int(layers))
+    end
     _check_res(T, res)
     raster_path = rasterpath(T; res, date)
     if !isfile(raster_path)
@@ -53,11 +63,12 @@ function rasterpath(T::Type{<:WorldClim{<:Future}})
 end
 
 function rasterurl(T::Type{<:WorldClim{<:Future}}, args...; res, date)
-    joinpath(WORLDCLIM_URI_CMIP6, res, _format(T, _model(T)), _format(T, _scenario(T)), rastername(T, args...; res, date))
+    joinpath(rasterurl(T), res, _format(T, _model(T)), _format(T, _scenario(T)), rastername(T, args...; res, date))
 end
+rasterurl(T::Type{<:WorldClim{<:Future}}) = URI(scheme="https", host="geodata.ucdavis.edu", path="/cmip6")
 
 function rastername(T::Type{<:WorldClim{<:Future}}, layer; res, date)
-    join(["wc2.1", res, string(layer), _format(T, _model(T)), _format(T, _scenario(T)), _date_string(T, date)], "_") * ".tif"
+    join(["wc2.1", res, string(layer), _format(T, _model(T)), _format(T, _scenario(T)), _format(T, date)], "_") * ".tif"
 end
 rastername(T::Type{<:WorldClim{<:Future{BioClim}}}; kw...) = rastername(T, "bioc"; kw...)
 rastername(T::Type{<:WorldClim{<:Future{BioClim}}}, layers::Union{Tuple,Symbol,Int}; kw...) = rastername(T, "bioc"; kw...)
@@ -70,24 +81,6 @@ _scenario(::Type{<:WorldClim{F}}) where F<:Future = _scenario(F)
 
 # overload _format
 _format(::Type{<:WorldClim}, T::Type{<:SharedSocioeconomicPathway}) = lowercase(_format(T))
-
-
-function _date_string(::Type{<:WorldClim{<:Future{<:Any, CMIP6}}}, date)
-    if date < DateTime(2021)
-        _cmip6_date_error(date)
-    elseif date < DateTime(2041)
-        "2021-2040"
-    elseif date < DateTime(2061)
-        "2041-2060"
-    elseif date < DateTime(2081)
-        "2041-2060"
-    elseif date < DateTime(2101)
-        "2081-2100"
-    else
-        _cmip6_date_error(date)
-    end
-end
-
 
 ## Handle all the models
 const WORDCLIM_CMIP6_MODEL_STRINGS = [
