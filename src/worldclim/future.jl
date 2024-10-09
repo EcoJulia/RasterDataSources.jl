@@ -34,6 +34,7 @@ end
 
 ## Bioclim
 layers(::Type{<:WorldClim{<:Future{BioClim}}}) = layers(WorldClim{BioClim})
+layerkeys(::Type{<:WorldClim{<:Future{BioClim}}}) = layerkeys(WorldClim{BioClim})
 
 function getraster(T::Type{<:WorldClim{<:Future{BioClim, CMIP6}}}; res::String=defres(T), date)
     getraster(T, :bio1; res, date)
