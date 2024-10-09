@@ -32,6 +32,32 @@ _date_sequence(step, dates::AbstractArray) = dates
 _date_sequence(step, dates::NTuple{2}) = first(dates):step:last(dates)
 _date_sequence(step, date) = date:step:date
 
+function _format(T::Type{<:RasterDataSource}, date::TimeType)
+    daterange = date_range(T)
+    datestep = date_step(T)
+    # check if the date is within the range
+    if date < first(daterange) || date > last(daterange)
+        _date_error(date, daterange)
+    end
+
+    # find which bin it is in
+    r = range(daterange...; step = datestep)
+    idx = searchsortedfirst(r, date)
+
+    # from here on just use integer math
+    startyear = Dates.year(first(daterange))
+    yearstep = Dates.value(datestep)
+    startyear = startyear + yearstep * (idx - 2)
+    endyear = startyear + yearstep - 1
+    return "$startyear-$endyear"
+end
+
+function _date_error(date, daterange)
+    startyear = Dates.year(first(daterange))
+    endyear = Dates.year(last(daterange))
+    error("The requested dataset covers the period from $startyear-$endyear, which does not include $date")
+end         
+
 function _maybe_download(uri::URI, filepath, headers = [])
     if !isfile(filepath)
         mkpath(dirname(filepath))
@@ -81,3 +107,8 @@ function _map_layers(T, layers, args...; kw...)
     keys = layerkeys(T, layers)
     return NamedTuple{keys}(filenames)
 end
+
+# fallback for _format
+_format(::Type, T) = _format(T)
+_format(T::Type) = string(nameof(T))
+_format(M::Type{<:ClimateModel}) = replace(string(nameof(M)), "_" => "-")

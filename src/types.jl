@@ -13,6 +13,136 @@ Abstract supertype for datasets that belong to a [`RasterDataSource`](@ref).
 abstract type RasterDataSet end
 
 """
+    CMIPphase 
+
+Abstract supertype for phases of the CMIP,
+the Coupled Model Intercomparison Project.
+
+Subtypes are `CMIP5` and `CMIP6`.
+"""
+abstract type CMIPphase end
+
+"""
+    CMIP5 <: CMIPphase
+
+The Coupled Model Intercomparison Project, Phase 5.
+"""
+struct CMIP5 <: CMIPphase end
+
+"""
+    CMIP6 <: CMIPphase
+
+The Coupled Model Intercomparison Project, Phase 6.
+"""
+struct CMIP6 <: CMIPphase end
+
+"""
+    ClimateModel
+
+Abstract supertype for climate models use in [`Future`](@ref) datasets.
+"""
+abstract type ClimateModel{CMIP<:CMIPphase} end
+const CMIP6_MODELS = Type{<:ClimateModel{CMIP6}}[]
+const CMIP5_MODELS = Type{<:ClimateModel{CMIP5}}[]
+
+"""
+    ClimateScenario 
+
+Abstract supertype for scenarios used in [`CMIPphase`](@ref) models.
+"""
+abstract type ClimateScenario end
+
+"""
+    RepresentativeConcentrationPathway
+
+Abstract supertype for Representative Concentration Pathways (RCPs) for [`CMIP5`](@ref).
+
+Subtypes are: `RCP26`, `RCP45`, `RCP60`, `RCP85`
+"""
+abstract type RepresentativeConcentrationPathway <: ClimateScenario end
+
+struct RCP26 <: RepresentativeConcentrationPathway end
+struct RCP45 <: RepresentativeConcentrationPathway end
+struct RCP60 <: RepresentativeConcentrationPathway end
+struct RCP85 <: RepresentativeConcentrationPathway end
+
+"""
+    SharedSocioeconomicPathway
+
+Abstract supertype for Shared Socio-economic Pathways (SSPs) for [`CMIP6`](@ref).
+
+Subtypes are: `SSP126`, `SSP245`, SSP370`, SSP585`
+"""
+abstract type SharedSocioeconomicPathway <: ClimateScenario end
+
+struct SSP126 <: SharedSocioeconomicPathway end
+struct SSP245 <: SharedSocioeconomicPathway end
+struct SSP370 <: SharedSocioeconomicPathway end
+struct SSP585 <: SharedSocioeconomicPathway end
+
+"""
+    Future{<:RasterDataSet,<:CMIPphase,<:ClimateModel,<:ClimateScenario}
+
+Future climate datasets specified with a dataset, phase, model, and scenario.
+
+## Type Parameters
+
+#### `RasterDataSet`
+
+Currently [`BioClim`](@ref) and [`Climate`](@ref) are implemented
+for the [`CHELSA`](@ref) data source.
+
+#### `CMIPphase`
+
+Can be either [`CMIP5`](@ref) or [`CMIP6`](@ref).
+
+#### `ClimateModel`
+
+Climate models can be chosen from: 
+
+`$(join(CMIP5_MODELS, "`,  `"))` for `CMIP5`;
+
+`$(join(CMIP6_MODELS, "`,  `"))` for `CMIP6`;"
+
+#### `ClimateScenario`
+
+CMIP5 Climate scenarios are all [`RepresentativeConcentrationPathway`](@ref)
+and can be chosen from: `RCP26`, `RCP45`, `RCP60`, `RCP85`
+
+CMIP6 Climate scenarios are all [`SharedSocioeconomicPathway`](@ref) and
+can be chosen from: `SSP126`, `SSP245`, `SSP370`, `SSP585`
+
+However, note that not all climate scenarios are available for all models.
+
+## Example
+
+```jldoctest future
+using RasterDataSources
+dataset = Future{BioClim, CMIP5, BNUESM, RCP45}
+# output
+Future{BioClim, CMIP5, BNUESM, RCP45}
+```
+Currently `Future` is only implented for `CHELSA`
+
+```jldoctest future
+datasource = CHELSA{Future{BioClim, CMIP5, BNUESM, RCP45}}
+```
+
+"""
+struct Future{D<:RasterDataSet,C<:CMIPphase,M<:ClimateModel,S<:ClimateScenario} end
+
+_dataset(::Type{<:Future{D}}) where D = D
+_phase(::Type{<:Future{<:Any,P}}) where P = P
+_phase(::Type{<:ClimateModel{P}}) where P = P
+
+_model(::Type{<:Future{<:Any,<:Any,M}}) where M = M
+_scenario(::Type{<:Future{<:Any,<:Any,<:Any,S}}) where S = S
+
+# fallback for layers
+layers(::Type{<:Future{T}}) where T = layers(T) # need to define this after Future is defined
+
+### Define types for all RasterDataSets
+"""
     BioClim <: RasterDataSet
 
 BioClim datasets. Usually containing layers from `1:19`. 
@@ -103,6 +233,7 @@ const BIOCLIMPLUS_LAYERS_FUTURE = [
 ]
 
 layers(::Type{BioClimPlus}) = BIOCLIMPLUS_LAYERS
+layers(::Type{Future{BioClimPlus}}) = BIOCLIMPLUS_LAYERS_FUTURE
 
 """
     Climate <: RasterDataSet
@@ -165,179 +296,6 @@ See the [`getraster`](@ref) docs for implementation details.
 """
 struct HabitatHeterogeneity <: RasterDataSet end
 
-"""
-    ClimateModel
-
-Abstract supertype for climate models use in [`Future`](@ref) datasets.
-"""
-abstract type ClimateModel end
-
-struct ACCESS1 <: ClimateModel end
-struct BNUESM <: ClimateModel end
-struct CCSM4 <: ClimateModel end
-struct CESM1BGC <: ClimateModel end
-struct CESM1CAM5 <: ClimateModel end
-struct CMCCCMS <: ClimateModel end
-struct CMCCCM <: ClimateModel end
-struct CNRMCM5 <: ClimateModel end
-struct CSIROMk3 <: ClimateModel end
-struct CanESM2 <: ClimateModel end
-struct FGOALS <: ClimateModel end
-struct FIOESM <: ClimateModel end
-struct GFDLCM3 <: ClimateModel end
-struct GFDLESM2G <: ClimateModel end
-struct GFDLESM2M <: ClimateModel end
-struct GISSE2HCC <: ClimateModel end
-struct GISSE2H <: ClimateModel end
-struct GISSE2RCC <: ClimateModel end
-struct GISSE2R <: ClimateModel end
-struct HadGEM2AO <: ClimateModel end
-struct HadGEM2CC <: ClimateModel end
-struct IPSLCM5ALR <: ClimateModel end
-struct IPSLCM5AMR <: ClimateModel end
-struct MIROCESMCHEM <: ClimateModel end
-struct MIROCESM <: ClimateModel end
-struct MIROC5 <: ClimateModel end
-struct MPIESMLR <: ClimateModel end
-struct MPIESMMR <: ClimateModel end
-struct MRICGCM3 <: ClimateModel end
-struct MRIESM1 <: ClimateModel end
-struct NorESM1M <: ClimateModel end
-struct BCCCSM1 <: ClimateModel end
-struct Inmcm4 <: ClimateModel end
-struct BCCCSM2MR <: ClimateModel end
-struct CNRMCM61 <: ClimateModel end
-struct CNRMESM21 <: ClimateModel end
-struct CanESM5 <: ClimateModel end
-struct GFDLESM4 <: ClimateModel end
-struct IPSLCM6ALR <: ClimateModel end
-struct MIROCES2L <: ClimateModel end
-struct MIROC6 <: ClimateModel end
-struct MRIESM2 <: ClimateModel end
-struct UKESM <: ClimateModel end
-struct MPIESMHR <: ClimateModel end
-
-"""
-    CMIPphase 
-
-Abstract supertype for phases of the CMIP,
-the Coupled Model Intercomparison Project.
-
-Subtypes are `CMIP5` and `CMIP6`.
-"""
-abstract type CMIPphase end
-
-"""
-    CMIP5 <: CMIPphase
-
-The Coupled Model Intercomparison Project, Phase 5.
-"""
-struct CMIP5 <: CMIPphase end
-
-"""
-    CMIP6 <: CMIPphase
-
-The Coupled Model Intercomparison Project, Phase 6.
-"""
-struct CMIP6 <: CMIPphase end
-
-"""
-    ClimateScenario 
-
-Abstract supertype for scenarios used in [`CMIPphase`](@ref) models.
-"""
-abstract type ClimateScenario end
-
-"""
-    RepresentativeConcentrationPathway
-
-Abstract supertype for Representative Concentration Pathways (RCPs) for [`CMIP5`](@ref).
-
-Subtypes are: `RCP26`, `RCP45`, `RCP60`, `RCP85`
-"""
-abstract type RepresentativeConcentrationPathway <: ClimateScenario end
-
-struct RCP26 <: RepresentativeConcentrationPathway end
-struct RCP45 <: RepresentativeConcentrationPathway end
-struct RCP60 <: RepresentativeConcentrationPathway end
-struct RCP85 <: RepresentativeConcentrationPathway end
-
-"""
-    SharedSocioeconomicPathway
-
-Abstract supertype for Shared Socio-economic Pathways (SSPs) for [`CMIP6`](@ref).
-
-Subtypes are: `SSP126`, `SSP245`, SSP370`, SSP585`
-"""
-abstract type SharedSocioeconomicPathway <: ClimateScenario end
-
-struct SSP126 <: SharedSocioeconomicPathway end
-struct SSP245 <: SharedSocioeconomicPathway end
-struct SSP370 <: SharedSocioeconomicPathway end
-struct SSP585 <: SharedSocioeconomicPathway end
-
-"""
-    Future{<:RasterDataSet,<:CMIPphase,<:ClimateModel,<:ClimateScenario}
-
-Future climate datasets specified with a dataset, phase, model, and scenario.
-
-## Type Parameters
-
-#### `RasterDataSet`
-
-Currently [`BioClim`](@ref) and [`Climate`](@ref) are implemented
-for the [`CHELSA`](@ref) data source.
-
-#### `CMIPphase`
-
-Can be either [`CMIP5`](@ref) or [`CMIP6`](@ref).
-
-#### `ClimateModel`
-
-Climate models can be chosen from: 
-
-`ACCESS1`, `BNUESM`, `CCSM4`, `CESM1BGC`, `CESM1CAM5`, `CMCCCMS`, `CMCCCM`,
-`CNRMCM5`, `CSIROMk3`, `CanESM2`, `FGOALS`, `FIOESM`, `GFDLCM3`, `GFDLESM2G`,
-`GFDLESM2M`, `GISSE2HCC`, `GISSE2H`, `GISSE2RCC`, `GISSE2R`, `HadGEM2AO`,
-`HadGEM2CC`, `IPSLCM5ALR`, `IPSLCM5AMR`, `MIROCESMCHEM`, `MIROCESM`, `MIROC5`,
-`MPIESMLR`, `MPIESMMR`, `MRICGCM3`, `MRIESM1`, `NorESM1M`, `BCCCSM1`, `Inmcm4`,
-`BCCCSM2MR`, `CNRMCM61`, `CNRMESM21`, `CanESM5`, `MIROCES2L`, `MIROC6` for CMIP5;
-
-`UKESM`, `MPIESMHR` `IPSLCM6ALR`, `MRIESM2`, `GFDLESM4` for `CMIP6`.
-
-#### `ClimateScenario`
-
-CMIP5 Climate scenarios are all [`RepresentativeConcentrationPathway`](@ref)
-and can be chosen from: `RCP26`, `RCP45`, `RCP60`, `RCP85`
-
-CMIP6 Climate scenarios are all [`SharedSocioeconomicPathway`](@ref) and
-can be chosen from: `SSP126`, `SSP245`, `SSP370`, `SSP585`
-
-However, note that not all climate scenarios are available for all models.
-
-## Example
-
-```jldoctest future
-using RasterDataSources
-dataset = Future{BioClim, CMIP5, BNUESM, RCP45}
-# output
-Future{BioClim, CMIP5, BNUESM, RCP45}
-```
-Currently `Future` is only implented for `CHELSA`
-
-```jldoctest future
-datasource = CHELSA{Future{BioClim, CMIP5, BNUESM, RCP45}}
-```
-
-"""
-struct Future{D<:RasterDataSet,C<:CMIPphase,M<:ClimateModel,S<:ClimateScenario} end
-
-_dataset(::Type{<:Future{D}}) where D = D
-_dataset(::Type{<:Future{BioClimPlus}}) = BioClim
-_phase(::Type{<:Future{<:Any,P}}) where P = P
-_model(::Type{<:Future{<:Any,<:Any,M}}) where M = M
-_scenario(::Type{<:Future{<:Any,<:Any,<:Any,S}}) where S = S
-layers(::Type{<:Future{BioClimPlus}}) = BIOCLIMPLUS_LAYERS_FUTURE
 """
     ModisProduct <: RasterDataSet
 

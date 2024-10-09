@@ -13,7 +13,8 @@ const WORLDCLIM_URI = URI(scheme="https", host="geodata.ucdavis.edu", path="/cli
 resolutions(::Type{<:WorldClim}) = ("30s", "2.5m", "5m", "10m")
 defres(::Type{<:WorldClim}) = "10m"
 
-rasterpath(::Type{WorldClim{T}}) where T = joinpath(rasterpath(), "WorldClim", string(nameof(T)))
+rasterpath(::Type{WorldClim}) = joinpath(rasterpath(), "WorldClim")
+rasterpath(::Type{WorldClim{T}}) where T = joinpath(rasterpath(WorldClim), string(nameof(T)))
 rasterpath(T::Type{<:WorldClim}, layer; kw...) =
     joinpath(rasterpath(T), string(layer), rastername(T, layer; kw...))
 

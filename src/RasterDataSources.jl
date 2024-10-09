@@ -37,19 +37,6 @@ export ECO4ESIPTJPL,ECO4WUE,GEDI03,GEDI04_B,MCD12Q1,MCD12Q2,MCD15A2H,
     MYD17A2H, MYD17A3HGF, MYD21A2, SIF005, SIF_ANN, VNP09A1, VNP09H1, 
     VNP13A1, VNP15A2H, VNP21A2, VNP22Q2
 
-# Climate models from CMIP5 (used in CHELSA)
-export ACCESS1, BNUESM, CCSM4, CESM1BGC, CESM1CAM5, CMCCCMS, CMCCCM, CNRMCM5,
-    CSIROMk3, CanESM2, FGOALS, FIOESM, GFDLCM3, GFDLESM2G, GFDLESM2M, GISSE2HCC,
-    GISSE2H, GISSE2RCC, GISSE2R, HadGEM2AO, HadGEM2CC, IPSLCM5ALR, IPSLCM5AMR,
-    MIROCESMCHEM, MIROCESM, MIROC5, MPIESMLR, MPIESMMR, MRICGCM3, MRIESM1, NorESM1M,
-    BCCCSM1, Inmcm4
-
-# Climate models from CMIP6 (used in WorldClim)
-export BCCCSM2MR, CNRMCM61, CNRMESM21, CanESM5, GFDLESM4, IPSLCM6ALR, MIROCES2L, MIROC6, MRIESM2
-
-# Climate models from CMIP6 (CHELSA)
-export UKESM, MPIESMHR
-
 export Values, Deciles
 
 export getraster
@@ -63,6 +50,7 @@ include("worldclim/bioclim.jl")
 include("worldclim/climate.jl")
 include("worldclim/weather.jl")
 include("worldclim/elevation.jl")
+include("worldclim/future.jl")
 
 include("chelsa/shared.jl")
 include("chelsa/climate.jl")
@@ -83,5 +71,10 @@ include("modis/shared.jl")
 include("modis/products.jl")
 include("modis/utilities.jl")
 include("modis/examples.jl")
+
+for model in [CMIP5_MODELS; CMIP6_MODELS]
+    symb = nameof(model)
+    @eval export $symb
+end
 
 end # module
