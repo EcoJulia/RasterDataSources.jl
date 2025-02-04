@@ -47,3 +47,11 @@ end
 
     @test isfile(date_path)
 end
+
+
+@testset "WorldClim dates" begin
+    bioclim_name = "wc2.1_10m_bioc_MRI-ESM2-0_ssp126_2041-2060.tif"
+    @test rastername(WorldClim{Future{BioClim,CMIP6,MRI_ESM2_0,SSP126}}, 5; date=Date(2041), res = "10m") ==
+        rastername(WorldClim{Future{BioClim,CMIP6,MRI_ESM2_0,SSP126}}, 5; date=Date(2060), res = "10m") ==
+        bioclim_name
+end

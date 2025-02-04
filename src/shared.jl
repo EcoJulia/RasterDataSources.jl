@@ -42,7 +42,7 @@ function _format(T::Type{<:RasterDataSource}, date::TimeType)
 
     # find which bin it is in
     r = range(daterange...; step = datestep)
-    idx = searchsortedfirst(r, date)
+    idx = searchsortedfirst(r, date, lt = <=)
 
     # from here on just use integer math
     startyear = Dates.year(first(daterange))
