@@ -150,6 +150,7 @@ See: [www.worldclim.org](https://www.worldclim.org)
     - `BioClim`: Integers $(first(layers(BioClim))) to $(last(layers(BioClim))) 
         or Symbols :$(first(layerkeys(BioClim))) to :$(last(layerkeys(BioClim)))
     - `Climate`: $(layers(WorldClim{Climate}))
+    - `Elevation`: Only has a single layer, :elev
     - `Weather`: $(layers(WorldClim{Weather}))
     - `Future{Climate}`: $(layers(WorldClim{Future{Climate}}))
 
