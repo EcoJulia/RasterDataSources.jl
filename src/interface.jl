@@ -10,11 +10,10 @@ for a `Tuple` of layers.
 `getraster` provides a standardised interface to download data sources,
 and return the filename/s of the selected files.
 
-RasterDataSources.jl aims to standardise an API for downloading many kinds of raster files
-from many sources, that can be wrapped by other packages (such as Rasters.jl and
-SimpleSDMLayers.jl) in a simple, regular way. As much as possible it will move towards
-having less source-specific keywords wherever possible. Similar datasets will behave in the
-same way so that they can be used interchangeably in the same code.
+`getraster` can be called with any `RasterDataSource`. See the docstrings of these types
+for the specific keywords and arguments. `RasterDataSource` with documented `getraster` usage are
+[`WorldClim`](@ref), [`EarthEnv`](@ref), [`CHELSA`](@ref), [`AWAP`](@ref), [`ALWB`](@ref), 
+and [`MODIS`](@ref). All these implementations follow the template specified below.
 
 # Arguments
 
@@ -53,18 +52,8 @@ Where `date` and `month` keywords coexist, `Vector{Vector{String}}` of
 `Vector{Vector{NamedTuple}}` is the result. `date` ranges are always
 the outer `Vector`, `month` the inner `Vector` with `layer` tuples as
 the inner `NamedTuple`. No other keywords can be `Vector`.
-
-This schema may be added to in future for datasets with additional axes,
-but should not change for the existing `RasterDataSource` types.
 """
 function getraster end
-
-"""
-    getraster(T::Type, layers::Union{Tuple,Int,Symbol}; kw...)
-
-"""
-function getraster end
-
 
 # Not exported, but relatively consistent and stable
 # These should be used for consistency accross all sources
@@ -135,3 +124,107 @@ Arguments are the same as for `getraster` where possible.
 Returns a URIs.jl `URI` or mulitiple `URI`s.
 """
 function zipurl end
+
+"""
+    WorldClim{Union{BioClim,Climate,Elevation,Weather,<:Future}} <: RasterDataSource
+
+Data from WorldClim datasets, either [`BioClim`](@ref), [`Climate`](@ref), 
+[`Weather`](@ref), [`Climate`](@ref), or [`Future`](@ref) variables for current and future conditions.
+
+Future variables are available for `BioClim` and `Climate` data. See the docstring of `Future` for available model choices
+    and implementation details.
+
+See: [www.worldclim.org](https://www.worldclim.org)
+
+# Usage with `getraster`
+    getraster(T::Type{WorldClim{BioClim}}, [layer::Union{Tuple,Int,Symbol}]; res)
+    getraster(T::Type{WorldClim{Climate}}, [layer::Union{Tuple,Symbol}]; month, res)
+    getraster(T::Type{WorldClim{Elevation}}; res)
+    getraster(T::Type{WorldClim{Weather}}, [layer::Union{Tuple,Symbol}]; date)
+    getraster(T::Type{WorldClim{Future}}, [layer]; date, res) => String
+
+## Arguments
+
+- `layer`: `Integer`, `Symbol` or tuple/range of these. Without a `layer` argument, all layers
+    will be downloaded, and a `NamedTuple` of paths returned. Available layers are:
+    - `BioClim`: Integers $(first(layers(BioClim))) to $(last(layers(BioClim))) 
+        or Symbols :$(first(layerkeys(BioClim))) to :$(last(layerkeys(BioClim)))
+    - `Climate`: $(layers(WorldClim{Climate}))
+    - `Weather`: $(layers(WorldClim{Weather}))
+    - `Future{Climate}`: $(layers(WorldClim{Future{Climate}}))
+
+## Keywords
+
+- `res`: `String` chosen from $(resolutions(WorldClim{BioClim})), "10m" by default.
+- `month`: `Integer` or `AbstractArray` of `Integer`. Chosen from `1:12`.
+- `date`: a `Date` or `DateTime` object, a `Vector` of dates, or `Tuple` of start/end dates.
+    `WorldClim{Weather}` is available with a daily timestep. Future data is available in 20-year intervals from 2021 to 2100.
+
+"""
+WorldClim
+
+"""
+    EarthEnv{Union{HabitatHeterogeneity,LandCover}} <: RasterDataSource
+
+Data from the `EarthEnv` including `HabitatHeterogeneity` and `LandCover`
+
+See: [www.earthenv.org](http://www.earthenv.org/)
+
+# Usage with `getraster`
+    getraster(T::Type{EarthEnv{HabitatHeterogeneity}}, [layer]; res="25km")
+    getraster(T::Type{EarthEnv{LandCover}}, [layer]; discover=false)
+
+Download [`EarthEnv`](@ref) habitat heterogeneity data.
+
+# Arguments
+- `layer`: `Integer`, `Symbol` or tuple/range of these. Without a `layer` argument, all layers
+    will be downloaded, and a `NamedTuple` of paths returned. Available layers are:
+    - `HabitatHeterogeneity`: $(layers(EarthEnv{HabitatHeterogeneity}))
+    - `LandCover`: Integers $(first(layers(EarthEnv{LandCover}))) to $(last(layers(EarthEnv{LandCover}))) or 
+        Symbols $(layerkeys(EarthEnv{LandCover}))
+
+# Keywords
+- `res`: `String` chosen from `$(resolutions(EarthEnv{HabitatHeterogeneity}))`, defaulting to "25km".
+- `discover::Bool`: whether to download the dataset that integrates the DISCover model.
+
+Returns the filepath/s of the downloaded or pre-existing files.
+"""
+EarthEnv
+
+"""
+    CHELSA{Union{BioClim,BioClimPlus,Climate,<:Future}} <: RasterDataSource
+
+Data from CHELSA, currently implements the `BioClim`, `BioClimPlus`, and `Climate`
+variables for current and future conditions. 
+
+See: [chelsa-climate.org](https://chelsa-climate.org/) for the dataset,
+and the [`getraster`](@ref) docs for implementation details.
+
+# Usage with `getraster`
+    getraster(source::Type{CHELSA{BioClim}}, [layer]; [version], [patch])
+    getraster(source::Type{CHELSA{BioClimPlus}}, [layer]; [version], [patch])
+    getraster(T::Type{CHELSA{Climate}}, [layer]; month)
+    getraster(T::Type{CHELSA{Future{BioClim}}}, [layer]; date
+    getraster(T::Type{CHELSA{Future{Climate}}}, [layer]; date, month)
+
+Download [`CHELSA`](@ref) [`BioClim`](@ref) data from [chelsa-climate.org](https://chelsa-climate.org/).
+
+## Arguments
+- `layer`: `Integer`, `Symbol` or tuple/range of these. Without a `layer` argument, all layers
+    will be downloaded, and a `NamedTuple` of paths returned. Available layers are:
+    - `BioClim`: Integers $(first(layers(BioClim))) to $(last(layers(BioClim))) or 
+        Symbols :$(first(layerkeys(BioClim))) to :$(last(layerkeys(BioClim)))
+    - `BioClimPlus`: Includes `BioClim` layers and many additional layers. See `RasterDataSources.layers(BioClimPlus)`.
+    - `Climate`: $(layers(CHELSA{Climate}))
+
+## Keyword arguments
+- `version`: `Integer` indicating the CHELSA version, currently either `1` or `2`. Defaults to 2.
+- `patch`: `Integer` indicating the CHELSA patch number. Defaults to the latest patch (V1.2 and V2.1)
+- `month`: `Integer` or `AbstractArray` of `Integer`. Chosen from `1:12`.
+- `date`: a `Date` or `DateTime` object, a Vector, or Tuple of start/end dates.
+    Note that CHELSA CMIP5 only has two datasets, for the periods 2041-2060 and
+    2061-2080. CMIP6 has datasets for the periods 2011-2040, 2041-2070, and 2071-2100.
+    Dates must fall within these ranges.
+    
+"""
+CHELSA

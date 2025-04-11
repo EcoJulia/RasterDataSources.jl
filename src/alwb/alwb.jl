@@ -48,7 +48,29 @@ annual resolutions, and as `Values` or relative `Deciles`.
 
 `getraster` for `ALWB` must use a `date` keyword to specify the date to download.
 
-See the [`getraster`](@ref) docs for implementation details.
+# Usage with `getraster`
+    getraster(source::Type{<:ALWB{Union{Deciles,Values},Union{Day,Month,Year}}}, [layer]; date)
+
+Download `ALWB` weather data as values or deciles with timesteps of `Day`, `Month` or `Year`.
+
+# Arguments
+- `layer`: `Symbol` or `Tuple` of `Symbol` from `$(layers(ALWB))`. Without a 
+    `layer` argument, all layers will be downloaded, and a `NamedTuple` of paths returned.
+
+# Keywords
+- `date`: a `DateTime`, `AbstractVector` of `DateTime` or a `Tuple` of start and end dates.
+    For multiple dates, a `Vector` of multiple filenames will be returned.
+    ALWB is available with a daily, monthly, and yearly, timestep.
+
+# Example
+This will return the file containing annual averages, including your date:
+
+```julia
+julia> getraster(ALWB{Values,Year}, :ss_pct; date=Date(2001, 2))
+"/your/RASTERDATASOURCES_PATH/ALWB/values/month/ss_pct.nc"
+```
+
+Returns the filepath/s of the downloaded or pre-existing files.
 """ ALWB
 
 # http://www.bom.gov.au/jsp/awra/thredds/fileServer/AWRACMS/values/day/rain_day_2017.nc
@@ -83,32 +105,6 @@ See the [`getraster`](@ref) docs for implementation details.
 # DeepDrainage = "dd"
 
 
-"""
-    getraster(source::Type{<:ALWB{Union{Deciles,Values},Union{Day,Month,Year}}}, [layer]; date)
-
-Download [`ALWB`](@ref) weather data from 
-[www.bom.gov.au/water/landscape](http://www.bom.gov.au/water/landscape) as values or 
-deciles with timesteps of `Day`, `Month` or `Year`.
-
-# Arguments
-- `layer`: `Symbol` or `Tuple` of `Symbol` from `$(layers(ALWB))`. Without a 
-    `layer` argument, all layers will be downloaded, and a `NamedTuple` of paths returned.
-
-# Keywords
-- `date`: a `DateTime`, `AbstractVector` of `DateTime` or a `Tuple` of start and end dates.
-    For multiple dates, a `Vector` of multiple filenames will be returned.
-    ALWB is available with a daily, monthly, and yearly, timestep.
-
-# Example
-This will return the file containing annual averages, including your date:
-
-```julia
-julia> getraster(ALWB{Values,Year}, :ss_pct; date=Date(2001, 2))
-"/your/RASTERDATASOURCES_PATH/ALWB/values/month/ss_pct.nc"
-```
-
-Returns the filepath/s of the downloaded or pre-existing files.
-"""
 function getraster(T::Type{<:ALWB}, layers::Union{Tuple,Symbol}; date)
      _getraster(T, layers, date)
 end

@@ -14,34 +14,17 @@ Daily weather data from the Australian Water Availability Project, developed by 
 
 See: [www.csiro.au/awap](http://www.csiro.au/awap/)
 
-The available layers are: `$(layers(AWAP))`.
-""" AWAP
-
-const AWAP_PATHSEGMENTS = (
-    solar = ("solar", "solarave", "daily"),
-    rainfall = ("rainfall", "totals", "daily"),
-    vprpress09 = ("vprp", "vprph09", "daily"),
-    vprpress15 = ("vprp", "vprph15", "daily"),
-    tmin = ("temperature", "minave", "daily"),
-    tmax = ("temperature", "maxave", "daily"),
-)
-# Add ndvi monthly?  ndvi, ndviave, month
-
-"""
-    getraster(source::Type{AWAP}, [layer]; date)
-
-Download data from the [`AWAP`](@ref) weather dataset, from
-[www.csiro.au/awap](http://www.csiro.au/awap/). 
-
 The AWAP dataset contains ASCII `.grid` files.
 
-# Arguments
+# Usage with `getraster`
+    getraster(source::Type{AWAP}, [layer]; date)
 
-- `layer` `Symbol` or `Tuple` of `Symbol` for `layer`s in `$(layers(AWAP))`. Without a 
+
+# Arguments
+- `layer`: `Symbol` or `Tuple` of `Symbol` for `layer`s in `$(layers(AWAP))`. Without a 
     `layer` argument, all layers will be downloaded, and a `NamedTuple` of paths returned.
 
 # Keywords
-
 - `date`: a `DateTime`, `AbstractVector` of `DateTime` or a `Tuple` of start and end dates.
     For multiple dates, A `Vector` of multiple filenames will be returned.
     AWAP is available with a daily timestep.
@@ -61,7 +44,18 @@ julia> getraster(AWAP, :rainfall; date=Date(2001, 1, 1):Day(1):Date(2001, 1, 31)
 ```
 
 Returns the filepath/s of the downloaded or pre-existing files.
-"""
+""" AWAP
+
+const AWAP_PATHSEGMENTS = (
+    solar = ("solar", "solarave", "daily"),
+    rainfall = ("rainfall", "totals", "daily"),
+    vprpress09 = ("vprp", "vprph09", "daily"),
+    vprpress15 = ("vprp", "vprph15", "daily"),
+    tmin = ("temperature", "minave", "daily"),
+    tmax = ("temperature", "maxave", "daily"),
+)
+# Add ndvi monthly?  ndvi, ndviave, month
+
 getraster(T::Type{AWAP}, layer::Union{Tuple,Symbol}; date) = _getraster(T, layer, date)
 
 getraster_keywords(::Type{<:AWAP}) = (:date,)

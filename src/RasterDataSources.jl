@@ -41,7 +41,6 @@ export Values, Deciles
 
 export getraster
 
-include("interface.jl")
 include("types.jl")
 include("shared.jl")
 
@@ -71,6 +70,8 @@ include("modis/shared.jl")
 include("modis/products.jl")
 include("modis/utilities.jl")
 include("modis/examples.jl")
+
+include("interface.jl")
 
 for model in [CMIP5_MODELS; CMIP6_MODELS]
     symb = nameof(model)

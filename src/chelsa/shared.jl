@@ -1,12 +1,3 @@
-"""
-    CHELSA{Union{BioClim,BioClimPlus,Climate,<:Future}} <: RasterDataSource
-
-Data from CHELSA, currently implements the `BioClim` `BioClimPlus`, and `Climate`
-variables for current and future conditions. 
-
-See: [chelsa-climate.org](https://chelsa-climate.org/) for the dataset,
-and the [`getraster`](@ref) docs for implementation details.
-"""
 struct CHELSA{X} <: RasterDataSource end
 
 rasterpath(::Type{CHELSA}) = joinpath(rasterpath(), "CHELSA")
@@ -30,11 +21,6 @@ function latest_patch(::Type{<:CHELSA}, v)
         CHELSA_invalid_version(v)
     end
 end
-
-const CHELSA_KEYWORDS = """
-- `version`: `Integer` indicating the CHELSA version, currently either `1` or `2`.
-- `patch`: `Integer` indicating the CHELSA patch number. Defaults to the latest patch (V1.2 and V2.1)
-"""
 
 CHELSA_invalid_version(v, valid_versions = [1,2]) = 
         throw(ArgumentError("Version $v is not available for CHELSA. Available versions: $valid_versions."))

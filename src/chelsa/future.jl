@@ -12,30 +12,6 @@ date_range(::Type{<:CHELSA{<:Future{<:Any,CMIP5}}}) = (Date(2041), Date(2080))
 date_step(::Type{<:CHELSA{<:Future{<:Any,CMIP6}}}) = Year(30) 
 date_range(::Type{<:CHELSA{<:Future{<:Any,CMIP6}}}) = (Date(1981), Date(2100)) 
 
-"""
-    getraster(T::Type{CHELSA{Future{BioClim}}}, [layer]; date) => String
-
-Download CHELSA [`BioClim`](@ref) data, choosing layers from: `$(layers(CHELSA{BioClim}))`.
-
-See the docs for [`Future`](@ref) for model choices.
-
-Without a layer argument, all layers will be downloaded, and a `NamedTuple` of paths 
-returned.
-
-## Keywords
-
-- `date`: a `Date` or `DateTime` object, a Vector, or Tuple of start/end dates.
-    Note that CHELSA CMIP5 only has two datasets, for the periods 2041-2060 and
-    2061-2080. CMIP6 has datasets for the periods 2011-2040, 2041-2070, and 2071-2100.
-    Dates must fall within these ranges.
-
-## Example
-```julia
-using RasterDataSources, Dates
-getraster(CHELSA{Future{BioClim, CMIP6, GFDLESM4, SSP370}}, 1, date = Date(2050))
-```
-
-"""
 function getraster(
     T::Type{<:CHELSA{<:Future{BioClim}}}, layers::Union{Tuple,Int,Symbol}; date
 )
@@ -44,25 +20,6 @@ end
 
 getraster_keywords(::Type{<:CHELSA{<:Future{BioClim}}}) = (:date,)
 
-"""
-    getraster(T::Type{CHELSA{Future{BioClimPlus}}}, [layer]; date) => String
-
-Download CHELSA [`BioClimPlus`](@ref) data, choosing layers from: `$(layers(CHELSA{BioClimPlus}))`.
-
-See the docs for [`Future`](@ref) for model choices.
-
-Without a layer argument, all layers will be downloaded, and a `NamedTuple` of paths 
-returned.
-
-## Keywords
-
-- `date`: a `Date` or `DateTime` object, a Vector, or Tuple of start/end dates.
-    Note that CHELSA CMIP5 only has two datasets, for the periods 2041-2060 and
-    2061-2080. CMIP6 has datasets for the periods 2011-2040, 2041-2070, and 2071-2100.
-    Dates must fall within these ranges.
-
-## Example
-"""
 function getraster(
     T::Type{<:CHELSA{<:Future{BioClimPlus}}}, layers::Union{Tuple,Int,Symbol}; date
 )
@@ -72,29 +29,6 @@ end
 getraster_keywords(::Type{<:CHELSA{<:Future{BioClimPlus}}}) = (:date,)
 
 
-"""
-    getraster(T::Type{CHELSA{Future{Climate}}}, [layer]; date, month) => String
-
-Download CHELSA [`Climate`](@ref) data, choosing layers from: `$(layers(CHELSA{BioClim}))`.
-
-See the docs for [`Future`](@ref) for model choices.
-
-Without a layer argument, all layers will be downloaded, and a `NamedTuple` of paths returned.
-
-## Keywords
-
-- `date`: a `Date` or `DateTime` object, a Vector, or Tuple of start/end dates.
-    Note that CHELSA CMIP5 only has two datasets, for the periods 2041-2060 and
-    2061-2080. CMIP6 has datasets for the periods 2011-2040, 2041-2070, and 2071-2100.
-    Dates must fall within these ranges.
-- `month`: the month of the year, from 1 to 12, or a array or range of months like `1:12`.
-
-## Example
-```
-using Dates, RasterDataSources
-getraster(CHELSA{Future{Climate, CMIP6, GFDLESM4, SSP370}}, :prec; date = Date(2050), month = 1)
-```
-"""
 function getraster(
     T::Type{<:CHELSA{<:Future{Climate}}}, layers::Union{Tuple,Symbol}; date, month
 )

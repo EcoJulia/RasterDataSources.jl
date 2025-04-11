@@ -151,10 +151,10 @@ These can also be accessed with `:bioX`, e.g. `:bio5`.
 They do not usually use `month` or `date` keywords, but may use
 `date` in past/future scenarios. 
 
-Currently implemented for WorldClim and CHELSA as `WorldClim{BioClim}`,
-`CHELSA{BioClim}` and `CHELSA{Future{BioClim, args..}}`.
+Currently implemented for WorldClim and CHELSA as `WorldClim{BioClim}`, `WorldClim{Future{BioClim}}`,
+`CHELSA{BioClim}`, `CHELSA{Future{BioClim, args..}}`.
 
-See the [`getraster`](@ref) docs for implementation details.
+See the [`CHELSA`](@ref) and [`WorldClim`](@ref) docs for implementation details.
 """
 struct BioClim <: RasterDataSet end
 
@@ -210,7 +210,7 @@ They do not usually use `month` or `date` keywords, but may use
 Currently implemented for CHELSA as `CHELSA{BioClim}` and `CHELSA{Future{BioClim, args..}}`,
 specifying layer names as `Symbol`s.
 
-See the [`getraster`](@ref) docs for implementation details.
+See the [`CHELSA`](@ref) docs for implementation details.
 """
 struct BioClimPlus <: RasterDataSet end
 
@@ -241,10 +241,10 @@ layers(::Type{Future{BioClimPlus}}) = BIOCLIMPLUS_LAYERS_FUTURE
 Climate datasets. These are usually months of the year, not specific dates,
 and use a `month` keyword in `getraster`. They also use `date` in past/future scenarios.
 
-Currently implemented for WorldClim and CHELSA as `WorldClim{Climate}`,
+Currently implemented for WorldClim and CHELSA as `WorldClim{Climate}`, `WorldClim{Future{Climate, args..}}`
 `CHELSA{Climate}` and `CHELSA{Future{Climate, args..}}`.
 
-See the [`getraster`](@ref) docs for implementation details.
+See the [`CHELSA`](@ref) and [`WorldClim`](@ref) docs for implementation details.
 """
 struct Climate <: RasterDataSet end
 
@@ -256,10 +256,9 @@ months(::Type{Climate}) = ntuple(identity, Val{12})
 Weather datasets. These are usually large time-series of specific dates,
 and use a `date` keyword in `getraster`.
 
-Currently implemented for WorldClim and CHELSA as `WorldClim{Weather}`,
-and `CHELSA{Weather}`
+Currently implemented for WorldClim as `WorldClim{Weather}`.
 
-See the [`getraster`](@ref) docs for implementation details.
+See the [`WorldClim`](@ref) docs for implementation details.
 """
 struct Weather <: RasterDataSet end
 
@@ -270,7 +269,7 @@ Elevation datasets.
 
 Currently implemented for WorldClim as `WorldClim{Elevation}`.
 
-See the [`getraster`](@ref) docs for implementation details.
+See the [`WorldClim`](@ref) docs for implementation details.
 """
 struct Elevation <: RasterDataSet end
 
@@ -279,9 +278,9 @@ struct Elevation <: RasterDataSet end
 
 Land-cover datasets.
 
-Currently implemented for EarthEnv as `EarchEnv{LandCover}`.
+Currently implemented for EarthEnv as `EarthEnv{LandCover}`.
 
-See the [`getraster`](@ref) docs for implementation details.
+See the [`EarthEnv`](@ref) docs for implementation details.
 """
 struct LandCover{X} <: RasterDataSet end
 
@@ -290,9 +289,9 @@ struct LandCover{X} <: RasterDataSet end
 
 Habitat heterogeneity datasets.
 
-Currently implemented for EarchEnv as `EarchEnv{HabitatHeterogeneity}`.
+Currently implemented for EarthEnv as `EarthEnv{HabitatHeterogeneity}`.
 
-See the [`getraster`](@ref) docs for implementation details.
+See the [`EarthEnv`](@ref) docs for implementation details.
 """
 struct HabitatHeterogeneity <: RasterDataSet end
 
