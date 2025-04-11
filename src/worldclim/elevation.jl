@@ -1,6 +1,5 @@
 layers(::Type{WorldClim{Elevation}}) = (:elev,)
 
-getraster(T::Type{WorldClim{Elevation}}; kw...) = getraster(T, :elev; kw...)
 function getraster(T::Type{WorldClim{Elevation}}, layers::Union{Tuple,Symbol}; 
     res::String=defres(T)
 )
