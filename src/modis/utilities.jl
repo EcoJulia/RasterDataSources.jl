@@ -85,30 +85,10 @@ end
 
 Convert x and y in sinusoidal projection to lat and lon in dec. degrees
 
-The ![EPSG.io API](https://github.com/maptiler/epsg.io) takes care of coordinate conversions. This is not ideal in terms of network use but guarantees that the coordinates are correct.
+This function uses Proj for coordinate conversions. Use `import Proj` to make it available.
 """
-function sinusoidal_to_latlon(x::Real, y::Real)
-
-    url = "https://epsg.io/trans"
-
-    @info "Asking EPSG.io for coordinates calculation"
-
-    query = Dict(
-        "x" => string(x),
-        "y" => string(y),
-        "s_srs" => "53008", # sinusoidal
-        "t_srs" => "4326", # WGS84
-    )
-
-    r = HTTP.request("GET", url; query = query)
-
-    body = JP.parse(String(r.body))
-
-    lat = parse(Float64, body["y"])
-    lon = parse(Float64, body["x"])
-
-    return (lat, lon)
-end
+sinusoidal_to_latlon(args...) = 
+    error("This function call requires Proj to be loaded. Run `import Proj` to resolve this error")
 
 # data from https://nssdc.gsfc.nasa.gov/planetary/factsheet/earthfact.html
 const EARTH_EQ_RADIUS = 6378137
@@ -144,7 +124,7 @@ function _maybe_prepare_params(xllcorner::Real, yllcorner::Real, nrows::Int, cel
     else
         # coordinates in sin projection ; we want upper-left in WGS84
         # convert coordinates
-        yll, xll = sinusoidal_to_latlon(xllcorner, yllcorner)
+        xll, yll = sinusoidal_to_latlon(xllcorner, yllcorner)
 
         # convert cell size in meters to degrees in lat and lon directions
         dy, dx = meters_to_latlon(cellsize, yll) # watch out, this is a Tuple{Float64, Float64}
