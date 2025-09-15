@@ -161,6 +161,12 @@ See: [www.worldclim.org](https://www.worldclim.org)
 - `date`: a `Date` or `DateTime` object, a `Vector` of dates, or `Tuple` of start/end dates.
     `WorldClim{Weather}` is available with a daily timestep. Future data is available in 20-year intervals from 2021 to 2100.
 
+## Examples
+```julia
+using RasterDataSources, Dates
+bio_current = getraster(WorldClim{BioClim}, res = "5m")
+bio_future = getraster(WorldClim{Future{BioClim, CMIP6, GFDL_ESM4, SSP370}}, date = Date(2050), res = "5m")
+```
 """
 WorldClim
 
@@ -227,6 +233,11 @@ Download [`CHELSA`](@ref) [`BioClim`](@ref) data from [chelsa-climate.org](https
     2061-2080. CMIP6 has datasets for the periods 2011-2040, 2041-2070, and 2071-2100.
     Dates must fall within these ranges.
     
+## Example
+```julia
+using RasterDataSources, Dates
+getraster(CHELSA{Future{BioClim, CMIP6, GFDL_ESM4, SSP370}}, 1, date = Date(2050))
+```
 """
 CHELSA
 
