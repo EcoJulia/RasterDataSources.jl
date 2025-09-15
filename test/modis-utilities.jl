@@ -1,4 +1,4 @@
-using RasterDataSources, Test
+using RasterDataSources, Proj, Test
 
 @testset verbose = true "MODIS utility functions" begin
     @testset "Coordinate conversions" begin
