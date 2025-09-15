@@ -25,47 +25,36 @@ RasterDataSources.RasterDataSource
 
 ```@docs
 ALWB
-getraster(T::Type{<:ALWB}, layers::Union{Tuple,Symbol}; date)
 ```
 
 ## AWAP
 
 ```@docs
 AWAP
-getraster(T::Type{AWAP}, layer::Union{Tuple,Symbol}; date)
 ```
 
 ## CHELSA
 
 ```@docs
 CHELSA
-getraster(T::Type{CHELSA{BioClim}}, layer::Union{Tuple,Int,Symbol})
-getraster(T::Type{<:CHELSA{<:Future{Climate}}}, layers::Union{Tuple,Symbol}; date, month)
 ```
 
 ## EarthEnv
 
 ```@docs
 EarthEnv
-getraster(T::Type{EarthEnv{HabitatHeterogeneity}}, layers::Union{Tuple,Symbol}; res)
-getraster(T::Type{EarthEnv{LandCover}}, layers::Union{Tuple,Int,Symbol}; res)
 ```
 
 ## WorldClim
 
 ```@docs
 WorldClim
-getraster(T::Type{WorldClim{BioClim}}, layers::Union{Tuple,Int,Symbol}; res)
-getraster(T::Type{WorldClim{Weather}}, layers::Union{Tuple,Symbol}; date)
-getraster(T::Type{WorldClim{Climate}}, layers::Union{Tuple,Symbol}; month, res)
-getraster(T::Type{WorldClim{Elevation}}, layers::Union{Tuple,Symbol}; month, res)
 ```
 
 ## MODIS
 
 ```@docs
 MODIS
-getraster(T::Type{<:ModisProduct})
 ModisProduct
 RasterDataSources.layerkeys(T::Type{<:ModisProduct})
 ```
@@ -75,6 +64,7 @@ RasterDataSources.layerkeys(T::Type{<:ModisProduct})
 ```@docs
 RasterDataSources.RasterDataSet
 BioClim
+BioClimPlus
 Climate
 Weather
 Elevation

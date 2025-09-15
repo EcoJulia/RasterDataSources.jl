@@ -3,21 +3,6 @@ layers(::Type{CHELSA{BioClimPlus}}) = layers(BioClimPlus)
 layerkeys(::Type{CHELSA{BioClim}}, args...) = layerkeys(BioClim, args...)
 layerkeys(::Type{CHELSA{BioClimPlus}}, args...) = layerkeys(BioClimPlus, args...)
 
-"""
-    getraster(source::Type{CHELSA{BioClim}}, [layer]; version = 2, [patch]) => Union{Tuple,String}
-
-Download [`CHELSA`](@ref) [`BioClim`](@ref) data from [chelsa-climate.org](https://chelsa-climate.org/).
-
-# Arguments
-- `layer`: `Integer` or tuple/range of `Integer` from `$(layers(BioClim))`, 
-    or `Symbol`s form `$(layerkeys(BioClim))`. Without a `layer` argument, all layers
-    will be downloaded, and a `NamedTuple` of paths returned.
-
-# Keyword arguments
-$CHELSA_KEYWORDS
-
-Returns the filepath/s of the downloaded or pre-existing files.
-"""
 getraster(
     T::Type{CHELSA{BioClim}}, 
     layer::Union{Tuple,Int,Symbol}; 
@@ -62,20 +47,6 @@ rasterurl(T::Type{CHELSA{BioClim}}, layer::Integer; version = 2, patch = latest_
     joinpath(rasterurl(T; version), "bio", rastername(T, layer; version, patch))
 
 ### Bioclim+
-"""
-    getraster(source::Type{CHELSA{BioClim}}, [layer]; version = 2, [patch]) => Union{Tuple,String}
-
-Download [`CHELSA`](@ref) [`BioClim`](@ref) data from [chelsa-climate.org](https://chelsa-climate.org/).
-
-# Arguments
-- `layer`: iterable of `Symbol`s from `$(layerkeys(BioClimPlus))`. Without a `layer` argument, all layers
-    will be downloaded, and a `NamedTuple` of paths returned.
-
-# Keyword arguments
-$CHELSA_KEYWORDS
-
-Returns the filepath/s of the downloaded or pre-existing files.
-"""
 getraster(
     T::Type{CHELSA{BioClimPlus}}, 
     layer::Union{Tuple,Int,Symbol}; 

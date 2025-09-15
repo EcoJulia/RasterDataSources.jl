@@ -20,23 +20,6 @@ const landcover_lookup = (
     open_water = 12,
 )
 
-"""
-    getraster(T::Type{EarthEnv{LandCover}}, [layer]; discover=false) => Union{Tuple,String}
-
-Download [`EarthEnv`](@ref) landcover data.
-
-# Arguments
-
-- `layer`: `Integer` or tuple/range of `Integer` from `$(layers(EarthEnv{LandCover}))`,
-    or `Symbol`s from `$(layerkeys(EarthEnv{LandCover}))`. Without a `layer` argument,
-    all layers will be downloaded, and a `NamedTuple` of paths returned.
-
-# Keywords
-
-- `discover::Bool`: whether to download the dataset that integrates the DISCover model.
-
-Returns the filepath/s of the downloaded or pre-existing files.
-"""
 function getraster(T::Type{<:EarthEnv{<:LandCover}}, layers::Union{Tuple,Int,Symbol})
     _getraster(T, layers)
 end

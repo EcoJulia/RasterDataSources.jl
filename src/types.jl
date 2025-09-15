@@ -80,55 +80,6 @@ struct SSP245 <: SharedSocioeconomicPathway end
 struct SSP370 <: SharedSocioeconomicPathway end
 struct SSP585 <: SharedSocioeconomicPathway end
 
-"""
-    Future{<:RasterDataSet,<:CMIPphase,<:ClimateModel,<:ClimateScenario}
-
-Future climate datasets specified with a dataset, phase, model, and scenario.
-
-## Type Parameters
-
-#### `RasterDataSet`
-
-Currently [`BioClim`](@ref) and [`Climate`](@ref) are implemented
-for the [`CHELSA`](@ref) data source.
-
-#### `CMIPphase`
-
-Can be either [`CMIP5`](@ref) or [`CMIP6`](@ref).
-
-#### `ClimateModel`
-
-Climate models can be chosen from: 
-
-`$(join(CMIP5_MODELS, "`,  `"))` for `CMIP5`;
-
-`$(join(CMIP6_MODELS, "`,  `"))` for `CMIP6`;"
-
-#### `ClimateScenario`
-
-CMIP5 Climate scenarios are all [`RepresentativeConcentrationPathway`](@ref)
-and can be chosen from: `RCP26`, `RCP45`, `RCP60`, `RCP85`
-
-CMIP6 Climate scenarios are all [`SharedSocioeconomicPathway`](@ref) and
-can be chosen from: `SSP126`, `SSP245`, `SSP370`, `SSP585`
-
-However, note that not all climate scenarios are available for all models.
-
-## Example
-
-```jldoctest future
-using RasterDataSources
-dataset = Future{BioClim, CMIP5, BNUESM, RCP45}
-# output
-Future{BioClim, CMIP5, BNUESM, RCP45}
-```
-Currently `Future` is only implented for `CHELSA`
-
-```jldoctest future
-datasource = CHELSA{Future{BioClim, CMIP5, BNUESM, RCP45}}
-```
-
-"""
 struct Future{D<:RasterDataSet,C<:CMIPphase,M<:ClimateModel,S<:ClimateScenario} end
 
 _dataset(::Type{<:Future{D}}) where D = D
@@ -151,10 +102,10 @@ These can also be accessed with `:bioX`, e.g. `:bio5`.
 They do not usually use `month` or `date` keywords, but may use
 `date` in past/future scenarios. 
 
-Currently implemented for WorldClim and CHELSA as `WorldClim{BioClim}`,
-`CHELSA{BioClim}` and `CHELSA{Future{BioClim, args..}}`.
+Currently implemented for WorldClim and CHELSA as `WorldClim{BioClim}`, `WorldClim{Future{BioClim}}`,
+`CHELSA{BioClim}`, `CHELSA{Future{BioClim, args..}}`.
 
-See the [`getraster`](@ref) docs for implementation details.
+See the [`CHELSA`](@ref) and [`WorldClim`](@ref) docs for implementation details.
 """
 struct BioClim <: RasterDataSet end
 
@@ -210,7 +161,7 @@ They do not usually use `month` or `date` keywords, but may use
 Currently implemented for CHELSA as `CHELSA{BioClim}` and `CHELSA{Future{BioClim, args..}}`,
 specifying layer names as `Symbol`s.
 
-See the [`getraster`](@ref) docs for implementation details.
+See the [`CHELSA`](@ref) docs for implementation details.
 """
 struct BioClimPlus <: RasterDataSet end
 
@@ -241,10 +192,10 @@ layers(::Type{Future{BioClimPlus}}) = BIOCLIMPLUS_LAYERS_FUTURE
 Climate datasets. These are usually months of the year, not specific dates,
 and use a `month` keyword in `getraster`. They also use `date` in past/future scenarios.
 
-Currently implemented for WorldClim and CHELSA as `WorldClim{Climate}`,
+Currently implemented for WorldClim and CHELSA as `WorldClim{Climate}`, `WorldClim{Future{Climate, args..}}`
 `CHELSA{Climate}` and `CHELSA{Future{Climate, args..}}`.
 
-See the [`getraster`](@ref) docs for implementation details.
+See the [`CHELSA`](@ref) and [`WorldClim`](@ref) docs for implementation details.
 """
 struct Climate <: RasterDataSet end
 
@@ -256,10 +207,9 @@ months(::Type{Climate}) = ntuple(identity, Val{12})
 Weather datasets. These are usually large time-series of specific dates,
 and use a `date` keyword in `getraster`.
 
-Currently implemented for WorldClim and CHELSA as `WorldClim{Weather}`,
-and `CHELSA{Weather}`
+Currently implemented for WorldClim as `WorldClim{Weather}`.
 
-See the [`getraster`](@ref) docs for implementation details.
+See the [`WorldClim`](@ref) docs for implementation details.
 """
 struct Weather <: RasterDataSet end
 
@@ -270,7 +220,7 @@ Elevation datasets.
 
 Currently implemented for WorldClim as `WorldClim{Elevation}`.
 
-See the [`getraster`](@ref) docs for implementation details.
+See the [`WorldClim`](@ref) docs for implementation details.
 """
 struct Elevation <: RasterDataSet end
 
@@ -279,9 +229,9 @@ struct Elevation <: RasterDataSet end
 
 Land-cover datasets.
 
-Currently implemented for EarthEnv as `EarchEnv{LandCover}`.
+Currently implemented for EarthEnv as `EarthEnv{LandCover}`.
 
-See the [`getraster`](@ref) docs for implementation details.
+See the [`EarthEnv`](@ref) docs for implementation details.
 """
 struct LandCover{X} <: RasterDataSet end
 
@@ -290,9 +240,9 @@ struct LandCover{X} <: RasterDataSet end
 
 Habitat heterogeneity datasets.
 
-Currently implemented for EarchEnv as `EarchEnv{HabitatHeterogeneity}`.
+Currently implemented for EarthEnv as `EarthEnv{HabitatHeterogeneity}`.
 
-See the [`getraster`](@ref) docs for implementation details.
+See the [`EarthEnv`](@ref) docs for implementation details.
 """
 struct HabitatHeterogeneity <: RasterDataSet end
 

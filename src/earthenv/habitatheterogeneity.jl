@@ -27,20 +27,6 @@ const heterogeneity_lookup = (
 
 heterogeneity_layer(x::Symbol) = heterogeneity_lookup[Symbol(lowercase(string(x)))]
 
-"""
-    getraster(source::Type{EarthEnv{HabitatHeterogeneity}}, [layer]; res="25km")
-
-Download [`EarthEnv`](@ref) habitat heterogeneity data.
-
-# Arguments
-- `layer`: `Symbol` or `Tuple` of `Symbol` from `$(layers(EarthEnv{HabitatHeterogeneity}))`.
-    Without a `layer` argument, all layers will be downloaded, and a `NamedTuple` of paths returned.
-
-# Keywords
-- `res`: `String` chosen from `$(resolutions(EarthEnv{HabitatHeterogeneity}))`, defaulting to "25km".
-
-Returns the filepath/s of the downloaded or pre-existing files.
-"""
 function getraster(T::Type{EarthEnv{HabitatHeterogeneity}}, layers::Union{Tuple,Symbol};
     res::String=defres(T)
 )
