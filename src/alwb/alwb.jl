@@ -67,7 +67,7 @@ This will return the file containing annual averages, including your date:
 
 ```julia
 julia> getraster(ALWB{Values,Year}, :ss_pct; date=Date(2001, 2))
-"/your/RASTERDATASOURCES_PATH/ALWB/values/month/ss_pct.nc"
+"/path/to/storage/ALWB/values/month/ss_pct.nc"
 ```
 
 Returns the filepath/s of the downloaded or pre-existing files.

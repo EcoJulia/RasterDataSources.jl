@@ -73,11 +73,42 @@ function _maybe_download(uri::URI, filepath, headers = [])
     filepath
 end
 
+"""
+    rasterpath()
+
+Returns the absolute path to the directory where raster data is stored.
+
+The storage location is determined using the following priority order:
+1. If the `RASTERDATASOURCES_PATH` environment variable is set and points to a valid directory, that path is used
+2. If no environment variable is set, a persistent scratch directory is automatically created using Scratch.jl
+
+The scratch directory persists across Julia sessions and package updates, ensuring downloaded data is not lost.
+If scratch directory creation fails, an error is thrown with instructions to manually set the environment variable.
+
+# Examples
+```julia
+# With environment variable set
+ENV["RASTERDATASOURCES_PATH"] = "/path/to/data"
+rasterpath()  # Returns "/path/to/data"
+
+# Without environment variable (automatic scratch directory)
+rasterpath()  # Returns something like "/Users/username/.julia/scratchspaces/12345.../raster_data"
+```
+"""
 function rasterpath()
+    # Priority 1: Use environment variable if set and valid
     if haskey(ENV, "RASTERDATASOURCES_PATH") && isdir(ENV["RASTERDATASOURCES_PATH"])
-        ENV["RASTERDATASOURCES_PATH"]
-    else
-        error("You must set `ENV[\"RASTERDATASOURCES_PATH\"]` to a path in your system")
+        return ENV["RASTERDATASOURCES_PATH"]
+    end
+    
+    # Priority 2: Use scratch directory
+    try
+        scratch_dir = @get_scratch!("raster_data")
+        @debug "Using scratch directory for raster data storage: $scratch_dir"
+        return scratch_dir
+    catch e
+        error("Failed to create scratch directory for raster data storage. " *
+              "Please set ENV[\"RASTERDATASOURCES_PATH\"] manually. Error: $e")
     end
 end
 
