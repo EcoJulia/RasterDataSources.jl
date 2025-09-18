@@ -10,7 +10,8 @@ using Dates,
       URIs,
       ZipFile,
       ASCIIrasters,
-      DelimitedFiles
+      DelimitedFiles,
+      Scratch
 
 import JSON.Parser as JP
 

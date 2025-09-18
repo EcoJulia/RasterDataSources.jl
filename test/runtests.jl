@@ -30,3 +30,4 @@ end
 # @time @safetestset "modis utilities" begin include("modis-utilities.jl") end
 @time @safetestset "modis product info" begin include("modis-products.jl") end
 # @time @safetestset "modis interface" begin include("modis-interface.jl") end
+@time @safetestset "storage path resolution" begin include("storage-path.jl") end
