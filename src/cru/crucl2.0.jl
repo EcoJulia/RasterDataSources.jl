@@ -29,4 +29,3 @@ rastername(T::Type{<:CRU{Climate}}, layer) = "grid_10min_$(layer).dat"
 zipname(T::Type{<:CRU{Climate}}, layer) = "grid_10min_$(layer).dat.gz"
 zipurl(T::Type{<:CRU{Climate}}, layer) = joinpath(CRU_URI, zipname(T, layer))
 zippath(T::Type{<:CRU{Climate}}, layer) = joinpath(rasterpath(T), "zips", zipname(T, layer))
-datpath(T::Type{<:CRU{Climate}}, layer) = rasterpath(T, layer)
