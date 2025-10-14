@@ -1,4 +1,4 @@
-layers(::Type{CRU{Climate}}) = (:elv, :pre, :rd0, :wnd, :tmp, :dtr, :reh)
+layers(::Type{CRU{Climate}}) = (:pre, :rd0, :tmp, :dtr, :reh, :sunp, :frs, :wnd, :elv)
 
 function getraster(T::Type{CRU{Climate}}, layers::Union{Tuple,Symbol})
         _getraster(T, layers)
