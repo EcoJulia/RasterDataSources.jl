@@ -171,6 +171,11 @@ bio_future = getraster(WorldClim{Future{BioClim, CMIP6, GFDL_ESM4, SSP370}}, dat
 WorldClim
 
 """
+TODO
+"""
+CRU
+
+"""
     EarthEnv{Union{HabitatHeterogeneity,LandCover}} <: RasterDataSource
 
 Data from the `EarthEnv` including `HabitatHeterogeneity` and `LandCover`
