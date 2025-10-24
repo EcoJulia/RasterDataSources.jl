@@ -13,80 +13,51 @@ struct SurfaceGauss <: NCEPCategory end
 """
     NCEP{<:NCEPCategory} <: RasterDataSource
 
-Data from the NCEP/NCAR Reanalysis 1 and NCEP/DOE Reanalysis 2 datasets.
+Data from the NCEP/NCAR Reanalysis 1 (1948-Present) and NCEP/DOE Reanalysis 2 (1979-Present) datasets.
 
-`Reanalysis 1` is a global dataset of atmospheric model output, assimilating past data from 1948 to the present.
-`Reanalysis 2` is an improved version that corrected errors and updated physical parameterizations, covering 1979 to the present.
-
-See: https://psl.noaa.gov/data/gridded/data.ncep.reanalysis.html and
-     https://psl.noaa.gov/data/gridded/data.ncep.reanalysis2.html
-
-# Characteristics
-- **Spatial Resolution:** Varies by variable, typically 2.5° x 2.5° global grids or T62 Gaussian grids (~2.0° x 2.0°).
-- **Temporal Resolution:** 6-hourly, daily, and monthly.
-- **Time Span:** 1948-Present for Reanalysis 1, 1979-Present for Reanalysis 2.
+See: https://psl.noaa.gov/data/gridded/data.ncep.reanalysis.html
 
 # Type Parameters
 - `C`: The category of data to download. One of `DailyPressure`, `DailySurface`, 
   `DailySurfaceReanalysis2`, `MonthlyPressure`, `MonthlySurface`, or `SurfaceGauss`.
 
-# Usage with `getraster`
+# Usage
     getraster(NCEP{<category>}, layer; date, dataset)
 
-# Arguments
-- `layer`: `Symbol` or `Tuple` of `Symbol` for `layer`s in the given category.
-
 # Keywords
-- `date`: A `Date` or `DateTime` object. The year of the date is used to select the file for daily data.
-  For monthly data, the date is ignored as all data is in a single file.
+- `date`: A `Date` or `DateTime` object. The year is used to select the file for daily data.
 - `dataset`: "reanalysis" or "reanalysis2". Defaults to "reanalysis".
 
 # Layers
-
-## `SurfaceGauss`
-| Layer Symbol | Description                      | Units     |
-| :----------- | :------------------------------- | :-------- |
-| `:tmax`      | Maximum Temperature              | K         |
-| `:tmin`      | Minimum Temperature              | K         |
-| `:air_2m`    | Air Temperature (at 2m)          | K         |
-| `:shum_2m`   | Specific Humidity (at 2m)        | kg/kg     |
-| `:prate`     | Precipitation Rate               | Kg/m²/s   |
-| `:pres`      | Pressure                         | Pa        |
-| `:dswrf`     | Downward Shortwave Radiation Flux| W/m²      |
-| `:dlwrf`     | Downward Longwave Radiation Flux | W/m²      |
-| `:ulwrf`     | Upward Longwave Radiation Flux   | W/m²      |
-| `:uwnd_10m`  | U-Wind (at 10m)                  | m/s       |
-| `:vwnd_10m`  | V-Wind (at 10m)                  | m/s       |
-| `:tcdc`      | Total Cloud Cover                | %         |
-
-## `DailyPressure` & `MonthlyPressure`
-| Layer Symbol | Description                      | Units     |
-| :----------- | :------------------------------- | :-------- |
-| `:hgt`       | Geopotential Height              | m         |
-| `:rhum`      | Relative Humidity                | %         |
-| `:shum`      | Specific Humidity                | kg/kg     |
-| `:air`       | Air Temperature                  | K         |
-| `:uwnd`      | U-Wind                           | m/s       |
-| `:vwnd`      | V-Wind                           | m/s       |
-| `:omega`     | Vertical Velocity                | Pa/s      |
-
-## `DailySurface` & `MonthlySurface` (reanalysis)
-| Layer Symbol | Description                      | Units     |
-| :----------- | :------------------------------- | :-------- |
-| `:slp`       | Sea Level Pressure               | Pa        |
-| `:pr_wtr`    | Precipitable Water               | kg/m²     |
-
-## `DailySurfaceReanalysis2`
-| Layer Symbol | Description                      | Units     |
-| :----------- | :------------------------------- | :-------- |
-| `:mslp`      | Mean Sea Level Pressure          | Pa        |
-| `:pres_sfc`  | Surface Pressure                 | Pa        |
-| `:pr_wtr_eatm`| Precipitable Water               | kg/m²     |
-
+| Layer Symbol | Description | Units | Categories |
+| :--- | :--- | :--- | :--- |
+| `:tmax` | Max Temperature | K | `SurfaceGauss` |
+| `:tmin` | Min Temperature | K | `SurfaceGauss` |
+| `:air_2m` | Air Temperature (2m) | K | `SurfaceGauss` |
+| `:shum_2m` | Specific Humidity (2m) | kg/kg | `SurfaceGauss` |
+| `:prate` | Precipitation Rate | Kg/m²/s | `SurfaceGauss` |
+| `:pres` | Pressure | Pa | `SurfaceGauss` |
+| `:dswrf` | Downward Shortwave Flux | W/m² | `SurfaceGauss` |
+| `:dlwrf` | Downward Longwave Flux | W/m² | `SurfaceGauss` |
+| `:ulwrf` | Upward Longwave Flux | W/m² | `SurfaceGauss` |
+| `:uwnd_10m` | U-Wind (10m) | m/s | `SurfaceGauss` |
+| `:vwnd_10m` | V-Wind (10m) | m/s | `SurfaceGauss` |
+| `:tcdc` | Total Cloud Cover | % | `SurfaceGauss` |
+| `:hgt` | Geopotential Height | m | `DailyPressure`, `MonthlyPressure` |
+| `:rhum` | Relative Humidity | % | `DailyPressure`, `MonthlyPressure` |
+| `:shum` | Specific Humidity | kg/kg | `DailyPressure`, `MonthlyPressure` |
+| `:air` | Air Temperature | K | `DailyPressure`, `MonthlyPressure` |
+| `:uwnd` | U-Wind | m/s | `DailyPressure`, `MonthlyPressure` |
+| `:vwnd` | V-Wind | m/s | `DailyPressure`, `MonthlyPressure` |
+| `:omega` | Vertical Velocity | Pa/s | `DailyPressure`, `MonthlyPressure` |
+| `:slp` | Sea Level Pressure | Pa | `DailySurface`, `MonthlySurface` |
+| `:pr_wtr` | Precipitable Water | kg/m² | `DailySurface`, `MonthlySurface` |
+| `:mslp` | Mean Sea Level Pressure | Pa | `DailySurfaceReanalysis2` |
+| `:pres_sfc` | Surface Pressure | Pa | `DailySurfaceReanalysis2` |
+| `:pr_wtr_eatm`| Precipitable Water | kg/m² | `DailySurfaceReanalysis2` |
 
 # Example
 ```julia
-# Get the path to the 2001 daily pressure data for the 'hgt' layer
 getraster(NCEP{DailyPressure}, :hgt; date=Date(2001), dataset="reanalysis")
 ```
 """
