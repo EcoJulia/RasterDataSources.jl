@@ -10,6 +10,78 @@ struct MonthlyPressure <: NCEPCategory end
 struct MonthlySurface <: NCEPCategory end
 struct SurfaceGauss <: NCEPCategory end
 
+"""
+    NCEP{<:NCEPCategory} <: RasterDataSource
+
+Data from the NCEP/NCAR Reanalysis 1 and NCEP/DOE Reanalysis 2 datasets.
+
+See: https://psl.noaa.gov/data/gridded/data.ncep.reanalysis.html and
+     https://psl.noaa.gov/data/gridded/data.ncep.reanalysis2.html
+
+# Type Parameters
+- `C`: The category of data to download. One of `DailyPressure`, `DailySurface`, 
+  `DailySurfaceReanalysis2`, `MonthlyPressure`, `MonthlySurface`, or `SurfaceGauss`.
+
+# Usage with `getraster`
+    getraster(NCEP{<category>}, layer; date, dataset)
+
+# Arguments
+- `layer`: `Symbol` or `Tuple` of `Symbol` for `layer`s in the given category.
+
+# Keywords
+- `date`: A `Date` or `DateTime` object. The year of the date is used to select the file for daily data.
+  For monthly data, the date is ignored as all data is in a single file.
+- `dataset`: "reanalysis" or "reanalysis2". Defaults to "reanalysis".
+
+# Layers
+
+## `SurfaceGauss`
+| Layer Symbol | Description                      | Units     |
+| :----------- | :------------------------------- | :-------- |
+| `:tmax`      | Maximum Temperature              | K         |
+| `:tmin`      | Minimum Temperature              | K         |
+| `:air_2m`    | Air Temperature (at 2m)          | K         |
+| `:shum_2m`   | Specific Humidity (at 2m)        | kg/kg     |
+| `:prate`     | Precipitation Rate               | Kg/m²/s   |
+| `:pres`      | Pressure                         | Pa        |
+| `:dswrf`     | Downward Shortwave Radiation Flux| W/m²      |
+| `:dlwrf`     | Downward Longwave Radiation Flux | W/m²      |
+| `:ulwrf`     | Upward Longwave Radiation Flux   | W/m²      |
+| `:uwnd_10m`  | U-Wind (at 10m)                  | m/s       |
+| `:vwnd_10m`  | V-Wind (at 10m)                  | m/s       |
+| `:tcdc`      | Total Cloud Cover                | %         |
+
+## `DailyPressure` & `MonthlyPressure`
+| Layer Symbol | Description                      | Units     |
+| :----------- | :------------------------------- | :-------- |
+| `:hgt`       | Geopotential Height              | m         |
+| `:rhum`      | Relative Humidity                | %         |
+| `:shum`      | Specific Humidity                | kg/kg     |
+| `:air`       | Air Temperature                  | K         |
+| `:uwnd`      | U-Wind                           | m/s       |
+| `:vwnd`      | V-Wind                           | m/s       |
+| `:omega`     | Vertical Velocity                | Pa/s      |
+
+## `DailySurface` & `MonthlySurface` (reanalysis)
+| Layer Symbol | Description                      | Units     |
+| :----------- | :------------------------------- | :-------- |
+| `:slp`       | Sea Level Pressure               | Pa        |
+| `:pr_wtr`    | Precipitable Water               | kg/m²     |
+
+## `DailySurfaceReanalysis2`
+| Layer Symbol | Description                      | Units     |
+| :----------- | :------------------------------- | :-------- |
+| `:mslp`      | Mean Sea Level Pressure          | Pa        |
+| `:pres_sfc`  | Surface Pressure                 | Pa        |
+| `:pr_wtr_eatm`| Precipitable Water               | kg/m²     |
+
+
+# Example
+```julia
+# Get the path to the 2001 daily pressure data for the 'hgt' layer
+getraster(NCEP{DailyPressure}, :hgt; date=Date(2001), dataset="reanalysis")
+```
+"""
 struct NCEP{C<:NCEPCategory} <: RasterDataSource end
 
 # Mappings from user-friendly layer names to filename parts
