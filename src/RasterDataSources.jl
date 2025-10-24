@@ -72,8 +72,6 @@ include("modis/products.jl")
 include("modis/utilities.jl")
 include("modis/examples.jl")
 
-include("ncep/ncep.jl")
-
 include("terraclimate/terraclimate.jl")
 
 include("interface.jl")
