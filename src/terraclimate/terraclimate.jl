@@ -62,85 +62,38 @@ const AGGREGATED_MAP = (
     TerraClimate{<:TerraClimateCategory} <: RasterDataSource
 
 `TerraClimate` is a dataset of monthly climate and climatic water balance for global 
-terrestrial surfaces. It combines high-spatial resolution climatological normals from 
-the WorldClim dataset with coarser spatial resolution, time-varying data from other 
-sources to create a high-spatial resolution dataset covering a broad temporal record.
+terrestrial surfaces at ~4-km spatial resolution, covering 1958-Present.
 
 See: https://www.climatologylab.org/terraclimate.html
-
-# Characteristics
-- **Spatial Resolution:** ~4-km (1/24th degree)
-- **Temporal Resolution:** Monthly
-- **Time Span:** 1958-Present (updated annually)
 
 # Type Parameters
 - `C`: The category of data to download. One of `Historical`, `Plus2C`, `Plus4C`, `Climatology`, or `Aggregated`.
 
-# Usage with `getraster`
+# Usage
     getraster(TerraClimate{<category>}, layer; date=nothing, period=nothing)
 
-# Arguments
-- `layer`: `Symbol` or `Tuple` of `Symbol` for `layer`s.
-
 # Keywords
-- `date`: A `Date` or `DateTime` object. The year of the date is used to select the file to download for `Historical`, `Plus2C`, and `Plus4C` data.
+- `date`: A `Date` or `DateTime` object. The year is used to select the file for `Historical`, `Plus2C`, and `Plus4C` data.
 - `period`: A `String` representing the time period for `Climatology` and `Aggregated` data (e.g., "19611990", "1958_2021").
 
 # Layers
-
-## `Historical`, `Plus2C`, `Plus4C`
-| Layer Symbol | Description                      | Units     |
-| :----------- | :------------------------------- | :-------- |
-| `:aet`       | Actual Evapotranspiration        | mm        |
-| `:def`       | Climate Water Deficit            | mm        |
-| `:pet`       | Potential Evapotranspiration     | mm        |
-| `:ppt`       | Precipitation                    | mm        |
-| `:q`         | Runoff                           | mm        |
-| `:soil`      | Soil Moisture                    | mm        |
-| `:srad`      | Downward surface shortwave radiation | W/m²      |
-| `:swe`       | Snow water equivalent            | mm        |
-| `:tmax`      | Maximum Temperature              | °C        |
-| `:tmin`      | Minimum Temperature              | °C        |
-| `:vap`       | Vapor pressure                   | kPa       |
-| `:vpd`       | Vapor Pressure Deficit           | kPa       |
-| `:ws`        | Wind speed                       | m/s       |
-| `:PDSI`      | Palmer Drought Severity Index    | unitless  |
-
-## `Climatology`
-| Layer Symbol | Description                      | Units     |
-| :----------- | :------------------------------- | :-------- |
-| `:aet`       | Actual Evapotranspiration        | mm        |
-| `:def`       | Climate Water Deficit            | mm        |
-| `:pet`       | Potential Evapotranspiration     | mm        |
-| `:ppt`       | Precipitation                    | mm        |
-| `:q`         | Runoff                           | mm        |
-| `:soil`      | Soil Moisture                    | mm        |
-| `:srad`      | Downward surface shortwave radiation | W/m²      |
-| `:swe`       | Snow water equivalent            | mm        |
-| `:tmax`      | Maximum Temperature              | °C        |
-| `:tmin`      | Minimum Temperature              | °C        |
-| `:vap`       | Vapor pressure                   | kPa       |
-| `:vpd`       | Vapor Pressure Deficit           | kPa       |
-| `:ws`        | Wind speed                       | m/s       |
-| `:absmin`    | Absolute Minimum Temperature     | °C        |
-
-## `Aggregated`
-| Layer Symbol | Description                      | Units     |
-| :----------- | :------------------------------- | :-------- |
-| `:aet`       | Actual Evapotranspiration        | mm        |
-| `:def`       | Climate Water Deficit            | mm        |
-| `:PDSI`      | Palmer Drought Severity Index    | unitless  |
-| `:pet`       | Potential Evapotranspiration     | mm        |
-| `:ppt`       | Precipitation                    | mm        |
-| `:q`         | Runoff                           | mm        |
-| `:soil`      | Soil Moisture                    | mm        |
-| `:srad`      | Downward surface shortwave radiation | W/m²      |
-| `:swe`       | Snow water equivalent            | mm        |
-| `:tmax`      | Maximum Temperature              | °C        |
-| `:tmin`      | Minimum Temperature              | °C        |
-| `:vap`       | Vapor pressure                   | kPa       |
-| `:vpd`       | Vapor Pressure Deficit           | kPa       |
-| `:ws`        | Wind speed                       | m/s       |
+| Layer Symbol | Description | Units | Categories |
+| :--- | :--- | :--- | :--- |
+| `:aet` | Actual Evapotranspiration | mm | All |
+| `:def` | Climate Water Deficit | mm | All |
+| `:pet` | Potential Evapotranspiration | mm | All |
+| `:ppt` | Precipitation | mm | All |
+| `:q` | Runoff | mm | All |
+| `:soil` | Soil Moisture | mm | All |
+| `:srad` | Downward shortwave radiation | W/m² | All |
+| `:swe` | Snow water equivalent | mm | All |
+| `:tmax` | Max Temperature | °C | All |
+| `:tmin` | Min Temperature | °C | All |
+| `:vap` | Vapor pressure | kPa | All |
+| `:vpd` | Vapor Pressure Deficit | kPa | All |
+| `:ws` | Wind speed | m/s | All |
+| `:PDSI` | Palmer Drought Severity Index | unitless | `Historical`, `Plus2C`, `Plus4C`, `Aggregated` |
+| `:absmin` | Absolute Min Temperature | °C | `Climatology` |
 
 # Example
 ```julia
