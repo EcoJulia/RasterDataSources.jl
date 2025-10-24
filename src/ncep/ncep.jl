@@ -15,8 +15,16 @@ struct SurfaceGauss <: NCEPCategory end
 
 Data from the NCEP/NCAR Reanalysis 1 and NCEP/DOE Reanalysis 2 datasets.
 
+`Reanalysis 1` is a global dataset of atmospheric model output, assimilating past data from 1948 to the present.
+`Reanalysis 2` is an improved version that corrected errors and updated physical parameterizations, covering 1979 to the present.
+
 See: https://psl.noaa.gov/data/gridded/data.ncep.reanalysis.html and
      https://psl.noaa.gov/data/gridded/data.ncep.reanalysis2.html
+
+# Characteristics
+- **Spatial Resolution:** Varies by variable, typically 2.5° x 2.5° global grids or T62 Gaussian grids (~2.0° x 2.0°).
+- **Temporal Resolution:** 6-hourly, daily, and monthly.
+- **Time Span:** 1948-Present for Reanalysis 1, 1979-Present for Reanalysis 2.
 
 # Type Parameters
 - `C`: The category of data to download. One of `DailyPressure`, `DailySurface`, 
