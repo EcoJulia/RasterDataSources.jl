@@ -14,7 +14,8 @@ using Dates,
 
 import JSON.Parser as JP
 
-export WorldClim, CHELSA, EarthEnv, AWAP, ALWB, SRTM, MODIS
+export WorldClim, CHELSA, EarthEnv, AWAP, ALWB, SRTM, MODIS, TerraClimate
+export Historical, Plus2C, Plus4C, Climatology, Aggregated
 
 export BioClim, BioClimPlus, Climate, Weather, Elevation, LandCover, HabitatHeterogeneity
 
@@ -70,6 +71,10 @@ include("modis/shared.jl")
 include("modis/products.jl")
 include("modis/utilities.jl")
 include("modis/examples.jl")
+
+include("ncep/ncep.jl")
+
+include("terraclimate/terraclimate.jl")
 
 include("interface.jl")
 
