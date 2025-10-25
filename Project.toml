@@ -21,10 +21,24 @@ RasterDataSourcesProjExt = "Proj"
 
 [compat]
 ASCIIrasters = "0.1"
+Dates = "1"
 HTTP = "0.8, 0.9, 1"
 JSON = "0.21"
 Proj = "1"
+Pkg = "1"
+SafeTestsets = "0.0.1"
 Scratch = "1"
 URIs = "1"
 ZipFile = "0.9, 0.10"
 julia = "1.9"
+
+[extras]
+Aqua = "4c88cf16-eb10-579e-8560-4a9242c79595"
+Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
+Pkg = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
+Proj = "c94c279d-25a6-4763-9509-64d165bea63e"
+SafeTestsets = "1bc83da4-3b8d-516f-aca4-4fe02f6d838f"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Aqua", "Dates", "Pkg", "Proj", "SafeTestsets", "Test"]
