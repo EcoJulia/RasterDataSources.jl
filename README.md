@@ -59,30 +59,22 @@ Install as usual with:
 
 ### Storage Configuration
 
-RasterDataSources.jl automatically handles data storage for you. By default, it will create a persistent scratch directory to store downloaded raster data. No manual configuration is required to get started.
+RasterDataSources.jl handles data storage for you. By default, it will create a 
+persistent scratch directory to store downloaded raster data.
+However, raster data may be 100s of GB, or more. So make sure there is room in your home directory. 
 
-#### Automatic Storage (Recommended)
+#### Custom Storage Location
 
-When you first use RasterDataSources.jl, it will automatically create a scratch directory using Julia's Scratch.jl package. This directory persists across Julia sessions and package updates, so your downloaded data won't be lost.
-
-```julia
-julia> using RasterDataSources
-julia> getraster(WorldClim{Climate}, :wind; month=1)  # Automatically uses scratch storage
-```
-
-#### Custom Storage Location (Optional)
-
-If you prefer to specify your own storage location, you can set the `RASTERDATASOURCES_PATH` environment variable:
+To put data in a custom location, set `RASTERDATASOURCES_PATH` in your
+environment, usually in your `[juliadir]/config/startup.jl` file:
 
 ```julia
-ENV["RASTERDATASOURCES_PATH"] = "/home/user/Data/"
+ENV["RASTERDATASOURCES_PATH"] = "/path/to/your/data"
 ```
-
-This can be put in your `startup.jl` file or the system environment. When this variable is set, RasterDataSources.jl will use your specified directory instead of the automatic scratch directory.
 
 #### Finding Your Storage Location
 
-The storage location is managed internally by RasterDataSources.jl. When using automatic storage, the exact path is handled by Julia's Scratch.jl package and will be in your system's scratch directory.
+`RasterDataSources.rasterpath()` will return the current data storage path.
 
 
-RasterDataSources was based on code from the `SimpleSDMDataSoures.jl` package by Timothée Poisot.
+_RasterDataSources was originally based on code from the `SimpleSDMDataSoures.jl` package by Timothée Poisot._
