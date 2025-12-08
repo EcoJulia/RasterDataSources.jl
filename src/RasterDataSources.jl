@@ -12,7 +12,7 @@ using Dates,
       ASCIIrasters,
       DelimitedFiles
 
-import JSON.Parser as JP
+import JSON
 
 export WorldClim, CHELSA, EarthEnv, AWAP, ALWB, SRTM, MODIS
 
