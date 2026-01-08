@@ -17,7 +17,7 @@ end
 """
     Lists available layers for a given MODIS Product
 
-Looks in `joinpath(ENV["RASTERDATASOURCES_PATH"]/MODIS/layers` for
+Looks in the storage directory under `MODIS/layers` for
 a file with the right name. If not found, sends a request to the server
 to get the list.
 

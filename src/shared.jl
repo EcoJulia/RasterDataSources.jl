@@ -1,3 +1,6 @@
+const RDS_PATH_STRING = "ENV[\"RASTERDATASOURCES_PATH\"] = \"/path/to/your/data\""
+const STARTUP_PATH_STRING = "`[julia folder]/config/startup.jl`"
+
 # Vector layers are allowed, but converted to `Tuple` immediatedly.
 function getraster(T::Type, layers::AbstractArray; kw...)
     getraster(T, (layers...,); kw...)
@@ -62,6 +65,7 @@ function _maybe_download(uri::URI, filepath, headers = [])
     if !isfile(filepath)
         mkpath(dirname(filepath))
         @info "Starting download for $uri"
+
         try
             HTTP.download(string(uri), filepath, headers)
         catch e
@@ -73,11 +77,58 @@ function _maybe_download(uri::URI, filepath, headers = [])
     filepath
 end
 
+"""
+    rasterpath()
+
+Returns the absolute path to the directory where raster data is stored.
+
+The storage location is determined using the following priority order:
+1. If the `RASTERDATASOURCES_PATH` environment variable is set and points to a valid directory, that path is used
+2. If no environment variable is set, a persistent scratch directory is automatically created using Scratch.jl
+
+The scratch directory persists across Julia sessions and package updates, ensuring downloaded data is not lost.
+If scratch directory creation fails, an error is thrown with instructions to manually set the environment variable.
+
+# Examples
+```julia
+# With environment variable set
+$RDS_PATH_STRING
+rasterpath()  # Returns "/path/to/your/data"
+
+# Without environment variable (automatic scratch directory)
+rasterpath()  # Returns something like "/Users/username/.julia/scratchspaces/12345.../raster_data"
+```
+"""
 function rasterpath()
-    if haskey(ENV, "RASTERDATASOURCES_PATH") && isdir(ENV["RASTERDATASOURCES_PATH"])
-        ENV["RASTERDATASOURCES_PATH"]
-    else
-        error("You must set `ENV[\"RASTERDATASOURCES_PATH\"]` to a path in your system")
+    # Priority 1: Use environment variable if set and valid
+    if haskey(ENV, "RASTERDATASOURCES_PATH")
+        path = ENV["RASTERDATASOURCES_PATH"]
+        isdir(path) || error("Your RASTERDATASOURCES_PATH is not a directory: $path")
+        return path
+    end
+
+    # Priority 2: Use scratch directory
+    try
+        scratch_dir = @get_scratch!("raster_data")
+        if isempty(readdir(scratch_dir)) # If this is the first use, print info in the REPL
+            @info """
+                Created scratch directory for raster data storage: 
+                $scratch_dir. 
+                Make sure there is adequate space, some datasets are 100GB+. 
+                For a custom location set $RDS_PATH_STRING 
+                in your $STARTUP_PATH_STRING file."
+                """ maxlog=1
+        end
+        return scratch_dir
+    catch e
+        error(
+            """
+            Failed to create scratch directory for raster data storage.
+            Please set $RDS_PATH_STRING manually 
+            in your $STARTUP_PATH_STRING.
+            Error: $e
+            """
+        )
     end
 end
 

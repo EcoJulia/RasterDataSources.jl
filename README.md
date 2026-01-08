@@ -57,14 +57,24 @@ Install as usual with:
 ] add RasterDataSources
 ```
 
-To download data you will need to specify a folder to put it in. You can do this
-by assigning the environment variable `RASTERDATASOURCES_PATH`:
+### Storage Configuration
+
+RasterDataSources.jl handles data storage for you. By default, it will create a 
+persistent scratch directory to store downloaded raster data.
+However, raster data may be 100s of GB, or more. So make sure there is room in your home directory. 
+
+#### Custom Storage Location
+
+To put data in a custom location, set `RASTERDATASOURCES_PATH` in your
+environment, usually in your `[juliadir]/config/startup.jl` file:
 
 ```julia
-ENV["RASTERDATASOURCES_PATH"] = "/home/user/Data/"
+ENV["RASTERDATASOURCES_PATH"] = "/path/to/your/data"
 ```
 
-This can be put in your `startup.jl` file or the system environment.
+#### Finding Your Storage Location
+
+`RasterDataSources.rasterpath()` will return the current data storage path.
 
 
-RasterDataSources was based on code from the `SimpleSDMDataSoures.jl` package by Timothée Poisot.
+_RasterDataSources was originally based on code from the `SimpleSDMDataSoures.jl` package by Timothée Poisot._
