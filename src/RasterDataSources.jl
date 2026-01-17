@@ -10,11 +10,12 @@ using Dates,
       URIs,
       ZipFile,
       ASCIIrasters,
-      DelimitedFiles
+      DelimitedFiles,
+      CodecZlib
 
 import JSON
 
-export WorldClim, CHELSA, EarthEnv, AWAP, ALWB, SRTM, MODIS
+export WorldClim, CHELSA, EarthEnv, AWAP, ALWB, SRTM, MODIS, CRU
 
 export BioClim, BioClimPlus, Climate, Weather, Elevation, LandCover, HabitatHeterogeneity
 
@@ -70,6 +71,9 @@ include("modis/shared.jl")
 include("modis/products.jl")
 include("modis/utilities.jl")
 include("modis/examples.jl")
+
+include("cru/shared.jl")
+include("cru/crucl2.0.jl")
 
 include("interface.jl")
 
