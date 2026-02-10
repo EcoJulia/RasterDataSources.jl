@@ -59,7 +59,7 @@ function modis_request(T::Type{<:ModisProduct}, layer, lat, lon, km_ab, km_lr, f
 
     r = HTTP.request("GET", URI(base_uri * query), ["Accept" => "application/json"])
 
-    body = JP.parse(String(r.body))
+    body = JSON.parse(String(r.body))
 
     # The server outputs data in a nested JSON array that we can
     # parse manually : the highest level is a metadata array with
