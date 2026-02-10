@@ -14,7 +14,7 @@ using Dates,
 
 import JSON
 
-export WorldClim, CHELSA, EarthEnv, AWAP, ALWB, SRTM, MODIS
+export WorldClim, CHELSA, EarthEnv, AWAP, ALWB, SRTM, MODIS, TerraClimate
 
 export BioClim, BioClimPlus, Climate, Weather, Elevation, LandCover, HabitatHeterogeneity
 
@@ -38,6 +38,8 @@ export ECO4ESIPTJPL,ECO4WUE,GEDI03,GEDI04_B,MCD12Q1,MCD12Q2,MCD15A2H,
     VNP13A1, VNP15A2H, VNP21A2, VNP22Q2
 
 export Values, Deciles
+
+export Historical, Plus2C, Plus4C
 
 export getraster
 
@@ -63,6 +65,8 @@ include("earthenv/habitatheterogeneity.jl")
 include("awap/awap.jl")
 
 include("alwb/alwb.jl")
+
+include("terraclimate/terraclimate.jl")
 
 include("srtm/srtm.jl")
 
