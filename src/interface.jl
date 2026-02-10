@@ -12,8 +12,8 @@ and return the filename/s of the selected files.
 
 `getraster` can be called with any `RasterDataSource`. See the docstrings of these types
 for the specific keywords and arguments. `RasterDataSource` with documented `getraster` usage are
-[`WorldClim`](@ref), [`EarthEnv`](@ref), [`CHELSA`](@ref), [`AWAP`](@ref), [`ALWB`](@ref), 
-and [`MODIS`](@ref). All these implementations follow the template specified below.
+[`WorldClim`](@ref), [`EarthEnv`](@ref), [`CHELSA`](@ref), [`AWAP`](@ref), [`ALWB`](@ref),
+[`ERA5`](@ref), and [`MODIS`](@ref). All these implementations follow the template specified below.
 
 # Arguments
 
