@@ -14,7 +14,7 @@ using Dates,
 
 import JSON
 
-export WorldClim, CHELSA, EarthEnv, AWAP, ALWB, SRTM, MODIS
+export WorldClim, CHELSA, EarthEnv, AWAP, ALWB, SRTM, MODIS, ERA5
 
 export BioClim, BioClimPlus, Climate, Weather, Elevation, LandCover, HabitatHeterogeneity
 
@@ -64,6 +64,13 @@ include("awap/awap.jl")
 
 include("alwb/alwb.jl")
 
+<<<<<<< Updated upstream
+=======
+include("terraclimate/terraclimate.jl")
+
+include("era5/era5.jl")
+
+>>>>>>> Stashed changes
 include("srtm/srtm.jl")
 
 include("modis/shared.jl")
