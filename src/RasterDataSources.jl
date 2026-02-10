@@ -15,7 +15,7 @@ using Dates,
 import JSON
 
 export WorldClim, CHELSA, EarthEnv, AWAP, ALWB, SRTM, MODIS, NCEP
-export DailyPressure, DailySurface, DailySurfaceReanalysis2, MonthlyPressure, MonthlySurface, SurfaceGauss
+export SixHourlyPressure, SixHourlySurface, DailyPressure, DailySurface, DailySurfaceReanalysis2, MonthlyPressure, MonthlySurface, SurfaceGauss
 
 export BioClim, BioClimPlus, Climate, Weather, Elevation, LandCover, HabitatHeterogeneity
 
