@@ -70,10 +70,10 @@ Download TerraClimate data for the specified scenario.
 # Example
 ```julia
 julia> getraster(TerraClimate, :tmax; date=Date(2020))
-"/path/to/storage/TerraClimate/historical/TerraClimate_tmax_2020.nc"
+"/path/to/storage/TerraClimate/Historical/TerraClimate_tmax_2020.nc"
 
 julia> getraster(TerraClimate{Plus2C}, :tmax; date=Date(2000))
-"/path/to/storage/TerraClimate/plus2c/TerraClimate_2c_tmax_2000.nc"
+"/path/to/storage/TerraClimate/Plus2C/TerraClimate_2c_tmax_2000.nc"
 ```
 
 Returns the filepath/s of the downloaded or pre-existing files.
@@ -116,10 +116,8 @@ rastername(::Type{TerraClimate{Plus4C}}, layer; date) =
     "TerraClimate_4c_$(layer)_$(year(date)).nc"
 
 # Paths
-rasterpath(::Type{<:TerraClimate}) = joinpath(rasterpath(), "TerraClimate")
-rasterpath(::Type{TerraClimate{Historical}}) = joinpath(rasterpath(TerraClimate), "historical")
-rasterpath(::Type{TerraClimate{Plus2C}}) = joinpath(rasterpath(TerraClimate), "plus2c")
-rasterpath(::Type{TerraClimate{Plus4C}}) = joinpath(rasterpath(TerraClimate), "plus4c")
+rasterpath(::Type{TerraClimate}) = joinpath(rasterpath(), "TerraClimate")
+rasterpath(::Type{TerraClimate{S}}) where S = joinpath(rasterpath(TerraClimate), string(S))
 rasterpath(T::Type{<:TerraClimate}, layer; date) =
     joinpath(rasterpath(T), rastername(T, layer; date))
 
