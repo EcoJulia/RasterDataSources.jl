@@ -70,22 +70,20 @@ getraster(NCEP{DailyPressure}, :hgt; date=Date(2001), dataset="reanalysis")
 struct NCEP{C<:NCEPCategory} <: RasterDataSource end
 
 # Mappings from user-friendly layer names to filename parts
-const SIXHOURLY_PRESSURE_MAP = (hgt = "hgt", rhum = "rhum", shum = "shum", air = "air", uwnd = "uwnd", vwnd = "vwnd", omega = "omega")
+const PRESSURE_MAP = (hgt = "hgt", rhum = "rhum", shum = "shum", air = "air", uwnd = "uwnd", vwnd = "vwnd", omega = "omega")
 const SIXHOURLY_SURFACE_MAP = (pr_wtr = "pr_wtr.eatm", pres_sfc = "pres.sfc", lftx = "lftx.sfc")
 const SURFACEGAUSS_MAP = (tmax = "tmax.2m.gauss", tmin = "tmin.2m.gauss", air_2m = "air.2m.gauss", shum_2m = "shum.2m.gauss", prate = "prate.sfc.gauss", pres = "pres.sfc.gauss", dswrf = "dswrf.sfc.gauss", dlwrf = "dlwrf.sfc.gauss", ulwrf = "ulwrf.sfc.gauss", uwnd_10m = "uwnd.10m.gauss", vwnd_10m = "vwnd.10m.gauss", tcdc = "tcdc.eatm.gauss")
-const DAILY_PRESSURE_MAP = (hgt = "hgt", rhum = "rhum", shum = "shum", air = "air", uwnd = "uwnd", vwnd = "vwnd", omega = "omega")
 const DAILY_SURFACE_MAP = (slp = "slp",)
 const DAILY_SURFACE_REANALYSIS2_MAP = (mslp = "mslp", pres_sfc = "pres.sfc", pr_wtr_eatm = "pr_wtr.eatm")
-const MONTHLY_PRESSURE_MAP = (hgt = "hgt", rhum = "rhum", shum = "shum", air = "air", uwnd = "uwnd", vwnd = "vwnd", omega = "omega")
 const MONTHLY_SURFACE_MAP = (slp = "slp", pr_wtr = "pr_wtr")
 
 # Define the layers for each category using the user-friendly keys
-layers(::Type{<:NCEP{SixHourlyPressure}}) = keys(SIXHOURLY_PRESSURE_MAP)
+layers(::Type{<:NCEP{SixHourlyPressure}}) = keys(PRESSURE_MAP)
 layers(::Type{<:NCEP{SixHourlySurface}}) = keys(SIXHOURLY_SURFACE_MAP)
-layers(::Type{<:NCEP{DailyPressure}}) = keys(DAILY_PRESSURE_MAP)
+layers(::Type{<:NCEP{DailyPressure}}) = keys(PRESSURE_MAP)
 layers(::Type{<:NCEP{DailySurface}}) = keys(DAILY_SURFACE_MAP)
 layers(::Type{<:NCEP{DailySurfaceReanalysis2}}) = keys(DAILY_SURFACE_REANALYSIS2_MAP)
-layers(::Type{<:NCEP{MonthlyPressure}}) = keys(MONTHLY_PRESSURE_MAP)
+layers(::Type{<:NCEP{MonthlyPressure}}) = keys(PRESSURE_MAP)
 layers(::Type{<:NCEP{MonthlySurface}}) = keys(MONTHLY_SURFACE_MAP)
 layers(::Type{<:NCEP{SurfaceGauss}}) = keys(SURFACEGAUSS_MAP)
 
@@ -105,10 +103,10 @@ end
 function _getraster(T::Type{<:NCEP}, layers::Union{Tuple,Symbol}, dates::AbstractArray, dataset)
     _getraster.(T, Ref(layers), dates, Ref(dataset))
 end
-function _getraster(T::Type{<:NCEP{C}}, layers::Tuple, date::Dates.TimeType, dataset) where {C}
+function _getraster(T::Type{<:NCEP}, layers::Tuple, date::Dates.TimeType, dataset)
     _map_layers(T, layers, date, dataset)
 end
-function _getraster(T::Type{<:NCEP{C}}, layer::Symbol, date::Dates.TimeType, dataset) where {C}
+function _getraster(T::Type{<:NCEP}, layer::Symbol, date::Dates.TimeType, dataset)
     _check_layer(T, layer)
     raster_path = rasterpath(T, layer; date=date, dataset=dataset)
     mkpath(dirname(raster_path))
@@ -119,56 +117,40 @@ function _getraster(T::Type{<:NCEP{C}}, layer::Symbol, date::Dates.TimeType, dat
     return raster_path
 end
 
-_get_filename_part(::Type{<:NCEP{SixHourlyPressure}}, layer) = SIXHOURLY_PRESSURE_MAP[layer]
+_get_filename_part(::Type{<:NCEP{SixHourlyPressure}}, layer) = PRESSURE_MAP[layer]
 _get_filename_part(::Type{<:NCEP{SixHourlySurface}}, layer) = SIXHOURLY_SURFACE_MAP[layer]
-_get_filename_part(::Type{<:NCEP{DailyPressure}}, layer) = DAILY_PRESSURE_MAP[layer]
+_get_filename_part(::Type{<:NCEP{DailyPressure}}, layer) = PRESSURE_MAP[layer]
 _get_filename_part(::Type{<:NCEP{DailySurface}}, layer) = DAILY_SURFACE_MAP[layer]
 _get_filename_part(::Type{<:NCEP{DailySurfaceReanalysis2}}, layer) = DAILY_SURFACE_REANALYSIS2_MAP[layer]
-_get_filename_part(::Type{<:NCEP{MonthlyPressure}}, layer) = MONTHLY_PRESSURE_MAP[layer]
+_get_filename_part(::Type{<:NCEP{MonthlyPressure}}, layer) = PRESSURE_MAP[layer]
 _get_filename_part(::Type{<:NCEP{MonthlySurface}}, layer) = MONTHLY_SURFACE_MAP[layer]
 _get_filename_part(::Type{<:NCEP{SurfaceGauss}}, layer) = SURFACEGAUSS_MAP[layer]
 
-# Centralized logic for generating category paths, always using forward slashes
-function _category_path(::Type{C}, dataset) where C <: NCEPCategory
-    if C == SixHourlyPressure
-        return "pressure"
-    elseif C == SixHourlySurface
-        return "surface"
-    elseif C == DailyPressure
-        return "Dailies/pressure"
-    elseif C == DailySurface || C == DailySurfaceReanalysis2
-        return "Dailies/surface"
-    elseif C == MonthlyPressure
-        return "Monthlies/pressure"
-    elseif C == MonthlySurface
-        return "Monthlies/surface"
-    elseif C == SurfaceGauss
-        return dataset == "reanalysis" ? "surface_gauss" : "gaussian_grid"
-    else
-        throw(ArgumentError("Unknown NCEP category $C"))
-    end
-end
+_category_path(::Type{SixHourlyPressure}, _) = ("pressure",)
+_category_path(::Type{SixHourlySurface}, _) = ("surface",)
+_category_path(::Type{DailyPressure}, _) = ("Dailies", "pressure")
+_category_path(::Type{DailySurface}, _) = ("Dailies", "surface")
+_category_path(::Type{DailySurfaceReanalysis2}, _) = ("Dailies", "surface")
+_category_path(::Type{MonthlyPressure}, _) = ("Monthlies", "pressure")
+_category_path(::Type{MonthlySurface}, _) = ("Monthlies", "surface")
+_category_path(::Type{SurfaceGauss}, dataset) = (dataset == "reanalysis" ? "surface_gauss" : "gaussian_grid",)
 
 rasterpath(T::Type{<:NCEP}) = joinpath(rasterpath(), "NCEP")
 function rasterpath(T::Type{<:NCEP{C}}, layer; date, dataset) where {C}
     filename_part = _get_filename_part(T, layer)
-    # Use forward slashes for the category path to be consistent
-    path_parts = split(_category_path(C, dataset), '/')
-    joinpath(rasterpath(T), dataset, path_parts..., rastername(T, filename_part; date=date))
+    joinpath(rasterpath(T), dataset, _category_path(C, dataset)..., rastername(T, filename_part; date))
 end
 
 # Filename depends on the category
-rastername(::Type{<:NCEP{<:Union{SixHourlyPressure, SixHourlySurface, DailyPressure, DailySurface, DailySurfaceReanalysis2, SurfaceGauss}}}, filename_part; date) = "$(filename_part).$(year(date)).nc"
-rastername(::Type{<:NCEP{<:Union{MonthlyPressure, MonthlySurface}}}, filename_part; date) = "$(filename_part).mon.mean.nc"
+rastername(::Type{<:NCEP{<:Union{SixHourlyPressure, SixHourlySurface, DailyPressure, DailySurface, DailySurfaceReanalysis2, SurfaceGauss}}}, filename_part; date) = "$filename_part.$(year(date)).nc"
+rastername(::Type{<:NCEP{<:Union{MonthlyPressure, MonthlySurface}}}, filename_part; date) = "$filename_part.mon.mean.nc"
 
 function rasterurl(T::Type{<:NCEP{C}}, layer; date, dataset) where {C}
     filename_part = _get_filename_part(T, layer)
     base_url = "https://downloads.psl.noaa.gov/Datasets/ncep.$(dataset)/"
-    path = _category_path(C, dataset)
-    name = rastername(T, filename_part; date=date)
-    uri = URI(base_url)
-    # Manually join with forward slashes for the URL
-    return URI(string(uri, path, "/", name))
+    path = join(_category_path(C, dataset), "/")
+    name = rastername(T, filename_part; date)
+    return URI(string(base_url, path, "/", name))
 end
 
 _dateformat(::Type{<:NCEP}) = DateFormat("yyyymmdd")
