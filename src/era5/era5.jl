@@ -97,7 +97,7 @@ end
 
 getraster_keywords(::Type{ERA5}) = (:date,)
 
-function _getraster(T::Type{ERA5}, layers, dates::Tuple)
+function _getraster(T::Type{ERA5}, layers, dates::Tuple{<:Any,<:Any})
     _getraster(T, layers, date_sequence(T, dates))
 end
 function _getraster(T::Type{ERA5}, layers, dates::AbstractArray)
@@ -115,31 +115,24 @@ function _getraster(T::Type{ERA5}, layer::Symbol, date::Dates.TimeType)
     path
 end
 
-# Helper to get the last day of the month
-function _lastday(date::Dates.TimeType)
-    Dates.daysinmonth(date)
-end
+_lastday(date::Dates.TimeType) = Dates.daysinmonth(date)
+_yearmonth(date::Dates.TimeType) = "$(year(date))$(lpad(month(date), 2, '0'))"
 
 # File naming: e5.oper.an.sfc.128_167_2t.ll025sc.2020010100_2020013123.nc
 function rastername(::Type{ERA5}, layer::Symbol; date)
-    table, param, shortname = getproperty(ERA5_LAYER_CODES, layer)
-    y = year(date)
-    m = lpad(month(date), 2, '0')
-    startdate = "$(y)$(m)0100"
-    enddate = "$(y)$(m)$(_lastday(date))23"
-    "$(ERA5_PRODUCT).$(table)_$(lpad(param, 3, '0'))_$(shortname).ll025sc.$(startdate)_$(enddate).nc"
+    table, param, shortname = ERA5_LAYER_CODES[layer]
+    ym = _yearmonth(date)
+    startdate = "$(ym)0100"
+    enddate = "$ym$(_lastday(date))23"
+    "$ERA5_PRODUCT.$(table)_$(lpad(param, 3, '0'))_$shortname.ll025sc.$(startdate)_$enddate.nc"
 end
 
 # Paths
 rasterpath(::Type{ERA5}) = joinpath(rasterpath(), "ERA5")
-rasterpath(::Type{ERA5}, date::Dates.TimeType) =
-    joinpath(rasterpath(ERA5), ERA5_PRODUCT, "$(year(date))$(lpad(month(date), 2, '0'))")
+rasterpath(::Type{ERA5}, date::Dates.TimeType) = joinpath(rasterpath(ERA5), ERA5_PRODUCT, _yearmonth(date))
 rasterpath(T::Type{ERA5}, layer::Symbol; date) =
     joinpath(rasterpath(T, date), rastername(T, layer; date))
 
 # URLs
-rasterurl(::Type{ERA5}, layer::Symbol; date) = let
-    y = year(date)
-    m = lpad(month(date), 2, '0')
-    joinpath(ERA5_URI, ERA5_PRODUCT, "$(y)$(m)", rastername(ERA5, layer; date))
-end
+rasterurl(::Type{ERA5}, layer::Symbol; date) =
+    joinpath(ERA5_URI, ERA5_PRODUCT, _yearmonth(date), rastername(ERA5, layer; date))
