@@ -70,10 +70,10 @@ Download TerraClimate data for the specified scenario.
 # Example
 ```julia
 julia> getraster(TerraClimate, :tmax; date=Date(2020))
-"/path/to/storage/TerraClimate/Historical/TerraClimate_tmax_2020.nc"
+"/path/to/storage/TerraClimate/historical/TerraClimate_tmax_2020.nc"
 
 julia> getraster(TerraClimate{Plus2C}, :tmax; date=Date(2000))
-"/path/to/storage/TerraClimate/Plus2C/TerraClimate_2c_tmax_2000.nc"
+"/path/to/storage/TerraClimate/plus2c/TerraClimate_2c_tmax_2000.nc"
 ```
 
 Returns the filepath/s of the downloaded or pre-existing files.
@@ -89,7 +89,7 @@ end
 
 getraster_keywords(::Type{<:TerraClimate}) = (:date,)
 
-function _getraster(T::Type{<:TerraClimate}, layers, dates::Tuple)
+function _getraster(T::Type{<:TerraClimate}, layers, dates::Tuple{<:Any,<:Any})
     _getraster(T, layers, date_sequence(T, dates))
 end
 function _getraster(T::Type{<:TerraClimate}, layers, dates::AbstractArray)
@@ -107,24 +107,29 @@ function _getraster(T::Type{<:TerraClimate}, layer::Symbol, date::Dates.TimeType
     path
 end
 
+# Scenario-specific dispatch helpers
+_scenario_path(::Type{Historical}) = "historical"
+_scenario_path(::Type{Plus2C}) = "plus2c"
+_scenario_path(::Type{Plus4C}) = "plus4c"
+
+_scenario_prefix(::Type{Historical}) = ""
+_scenario_prefix(::Type{Plus2C}) = "2c_"
+_scenario_prefix(::Type{Plus4C}) = "4c_"
+
+_scenario_uri(::Type{Historical}) = TERRACLIMATE_URI
+_scenario_uri(::Type{Plus2C}) = joinpath(TERRACLIMATE_FUTURE_URI, "data_plus2C")
+_scenario_uri(::Type{Plus4C}) = joinpath(TERRACLIMATE_FUTURE_URI, "data_plus4C")
+
 # File naming
-rastername(::Type{TerraClimate{Historical}}, layer; date) =
-    "TerraClimate_$(layer)_$(year(date)).nc"
-rastername(::Type{TerraClimate{Plus2C}}, layer; date) =
-    "TerraClimate_2c_$(layer)_$(year(date)).nc"
-rastername(::Type{TerraClimate{Plus4C}}, layer; date) =
-    "TerraClimate_4c_$(layer)_$(year(date)).nc"
+rastername(::Type{TerraClimate{S}}, layer; date) where {S} =
+    "TerraClimate_$(_scenario_prefix(S))$(layer)_$(year(date)).nc"
 
 # Paths
 rasterpath(::Type{TerraClimate}) = joinpath(rasterpath(), "TerraClimate")
-rasterpath(::Type{TerraClimate{S}}) where S = joinpath(rasterpath(TerraClimate), string(S))
+rasterpath(::Type{TerraClimate{S}}) where {S} = joinpath(rasterpath(TerraClimate), _scenario_path(S))
 rasterpath(T::Type{<:TerraClimate}, layer; date) =
     joinpath(rasterpath(T), rastername(T, layer; date))
 
 # URLs
-rasterurl(T::Type{TerraClimate{Historical}}, layer; date) =
-    joinpath(TERRACLIMATE_URI, rastername(T, layer; date))
-rasterurl(T::Type{TerraClimate{Plus2C}}, layer; date) =
-    joinpath(TERRACLIMATE_FUTURE_URI, "data_plus2C", rastername(T, layer; date))
-rasterurl(T::Type{TerraClimate{Plus4C}}, layer; date) =
-    joinpath(TERRACLIMATE_FUTURE_URI, "data_plus4C", rastername(T, layer; date))
+rasterurl(T::Type{TerraClimate{S}}, layer; date) where {S} =
+    joinpath(_scenario_uri(S), rastername(T, layer; date))
