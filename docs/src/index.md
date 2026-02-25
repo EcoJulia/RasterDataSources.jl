@@ -65,6 +65,12 @@ RasterDataSources.layerkeys(T::Type{<:ModisProduct})
 TerraClimate
 ```
 
+## NCEP
+
+```@docs
+NCEP
+```
+
 # Datasets
 
 ```@docs
