@@ -20,6 +20,7 @@ Currently sources include:
 | ALWB      | http://www.bom.gov.au/water/landscape/   | Complete                                 |
 | SRTM      | https://www2.jpl.nasa.gov/srtm/          | Complete                                 |
 | MODIS     | https://modis.ornl.gov                   | Complete (beta)                          |
+| NCEP      | https://psl.noaa.gov/data/gridded/data.ncep.reanalysis.html | Complete |
 
 Please open an issue if you need more datasets added, or (even better) open a pull request 
 following the form of the other datasets where possible.

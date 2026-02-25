@@ -59,6 +59,12 @@ ModisProduct
 RasterDataSources.layerkeys(T::Type{<:ModisProduct})
 ```
 
+## NCEP
+
+```@docs
+NCEP
+```
+
 # Datasets
 
 ```@docs

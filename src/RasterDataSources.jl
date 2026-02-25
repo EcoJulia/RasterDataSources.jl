@@ -14,7 +14,8 @@ using Dates,
 
 import JSON
 
-export WorldClim, CHELSA, EarthEnv, AWAP, ALWB, SRTM, MODIS
+export WorldClim, CHELSA, EarthEnv, AWAP, ALWB, SRTM, MODIS, NCEP
+export SixHourlyPressure, SixHourlySurface, DailyPressure, DailySurface, DailySurfaceReanalysis2, MonthlyPressure, MonthlySurface, SurfaceGauss
 
 export BioClim, BioClimPlus, Climate, Weather, Elevation, LandCover, HabitatHeterogeneity
 
@@ -70,6 +71,8 @@ include("modis/shared.jl")
 include("modis/products.jl")
 include("modis/utilities.jl")
 include("modis/examples.jl")
+
+include("ncep/ncep.jl")
 
 include("interface.jl")
 
