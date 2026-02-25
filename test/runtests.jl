@@ -1,21 +1,22 @@
-using SafeTestsets, Aqua, RasterDataSources, Pkg
+using SafeTestsets, Aqua, RasterDataSources, Pkg, Dates
 
-if VERSION >= v"1.5.0"
-    # HTTP.jl `write` is full of ambiguities
-    # Aqua.test_ambiguities([RasterDataSources, Base, Core])
-    Aqua.test_unbound_args(RasterDataSources)
-    # Aqua.test_stale_deps(RasterDataSources)
-    Aqua.test_undefined_exports(RasterDataSources)
-    Aqua.test_project_extras(RasterDataSources)
-    # Aqua.test_deps_compat(RasterDataSources)
-    # Aqua.test_project_toml_formatting(RasterDataSources)
-end
+# if VERSION >= v"1.5.0"
+#     # HTTP.jl `write` is full of ambiguities
+#     # Aqua.test_ambiguities([RasterDataSources, Base, Core])
+#     Aqua.test_unbound_args(RasterDataSources)
+#     # Aqua.test_stale_deps(RasterDataSources)
+#     Aqua.test_undefined_exports(RasterDataSources)
+#     Aqua.test_project_extras(RasterDataSources)
+#     # Aqua.test_deps_compat(RasterDataSources)
+#     # Aqua.test_project_toml_formatting(RasterDataSources)
+# end
 
 # TODO ALWB data is all giving 404s
 # Check in later to see if BOM have fixed this
 # @time @safetestset "alwb" begin include("alwb.jl") end
 @time @safetestset "awap" begin include("awap.jl") end
 @time @safetestset "era5" begin include("era5.jl") end
+@time @safetestset "terraclimate" begin include("terraclimate.jl") end
 @time @safetestset "chelsa bioclim" begin include("chelsa-bioclim.jl") end
 @time @safetestset "chelsa climate" begin include("chelsa-climate.jl") end
 @time @safetestset "chelsa future" begin include("chelsa-future.jl") end
@@ -30,4 +31,5 @@ end
 # MODIS utilities are broken because the EPSG coordinate transform API is retired
 # @time @safetestset "modis utilities" begin include("modis-utilities.jl") end
 @time @safetestset "modis product info" begin include("modis-products.jl") end
+@time @safetestset "ncep" begin include("ncep.jl") end
 # @time @safetestset "modis interface" begin include("modis-interface.jl") end

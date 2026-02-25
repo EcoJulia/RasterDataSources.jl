@@ -14,7 +14,7 @@ using Dates,
 
 import JSON
 
-export WorldClim, CHELSA, EarthEnv, AWAP, ALWB, SRTM, MODIS, ERA5
+export WorldClim, CHELSA, EarthEnv, AWAP, ALWB, SRTM, MODIS, ERA5, NCEP, TerraClimate
 
 export BioClim, BioClimPlus, Climate, Weather, Elevation, LandCover, HabitatHeterogeneity
 
@@ -37,9 +37,13 @@ export ECO4ESIPTJPL,ECO4WUE,GEDI03,GEDI04_B,MCD12Q1,MCD12Q2,MCD15A2H,
     MYD17A2H, MYD17A3HGF, MYD21A2, SIF005, SIF_ANN, VNP09A1, VNP09H1, 
     VNP13A1, VNP15A2H, VNP21A2, VNP22Q2
 
+export SixHourlyPressure, SixHourlySurface, DailyPressure, DailySurface, DailySurfaceReanalysis2, MonthlyPressure, MonthlySurface, SurfaceGauss
+
 export Values, Deciles
 
 export getraster, layername, CachedCloudSource
+
+export Historical, Plus2C, Plus4C
 
 include("types.jl")
 include("shared.jl")
@@ -66,12 +70,16 @@ include("alwb/alwb.jl")
 
 include("era5/era5.jl")
 
+include("terraclimate/terraclimate.jl")
+
 include("srtm/srtm.jl")
 
 include("modis/shared.jl")
 include("modis/products.jl")
 include("modis/utilities.jl")
 include("modis/examples.jl")
+
+include("ncep/ncep.jl")
 
 include("interface.jl")
 
