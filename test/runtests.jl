@@ -15,6 +15,7 @@ using SafeTestsets, Aqua, RasterDataSources, Pkg, Dates
 # Check in later to see if BOM have fixed this
 # @time @safetestset "alwb" begin include("alwb.jl") end
 @time @safetestset "awap" begin include("awap.jl") end
+@time @safetestset "terraclimate" begin include("terraclimate.jl") end
 @time @safetestset "chelsa bioclim" begin include("chelsa-bioclim.jl") end
 @time @safetestset "chelsa climate" begin include("chelsa-climate.jl") end
 @time @safetestset "chelsa future" begin include("chelsa-future.jl") end

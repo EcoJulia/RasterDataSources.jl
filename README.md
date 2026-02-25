@@ -11,16 +11,17 @@ to ecology, but will have a lot of crossover with other sciences.
 
 Currently sources include:
 
-| Source    | URL                                      | Status                                   |
-| --------- | ---------------------------------------- | ---------------------------------------- |
-| CHELSA    | https://chelsa-climate.org               | BioClim, BioClimPlus, and Climate     |
-| WorldClim | https://www.worldclim.org                | Climate, Weather, BioClim, and Elevation |
-| EarthEnv  | http://www.earthenv.org                  | LandCover and HabitatHeterogeneity       |
-| AWAP      | http://www.bom.gov.au/jsp/awap/index.jsp | Complete                                 |
-| ALWB      | http://www.bom.gov.au/water/landscape/   | Complete                                 |
-| SRTM      | https://www2.jpl.nasa.gov/srtm/          | Complete                                 |
-| MODIS     | https://modis.ornl.gov                   | Complete (beta)                          |
-| NCEP      | https://psl.noaa.gov/data/gridded/data.ncep.reanalysis.html | Complete |
+| Source       | URL                                      | Status                                   |
+| ------------ | ---------------------------------------- | ---------------------------------------- |
+| CHELSA       | https://chelsa-climate.org               | BioClim, BioClimPlus, and Climate        |
+| WorldClim    | https://www.worldclim.org                | Climate, Weather, BioClim, and Elevation |
+| EarthEnv     | http://www.earthenv.org                  | LandCover and HabitatHeterogeneity       |
+| AWAP         | http://www.bom.gov.au/jsp/awap/index.jsp | Complete                                 |
+| ALWB         | http://www.bom.gov.au/water/landscape/   | Complete                                 |
+| SRTM         | https://www2.jpl.nasa.gov/srtm/          | Complete                                 |
+| MODIS        | https://modis.ornl.gov                   | Complete (beta)                          |
+| TerraClimate | https://www.climatologylab.org/terraclimate.html | Historical, Plus2C, Plus4C       |
+| NCEP         | https://psl.noaa.gov/data/gridded/data.ncep.reanalysis.html | Complete              |
 
 Please open an issue if you need more datasets added, or (even better) open a pull request 
 following the form of the other datasets where possible.
