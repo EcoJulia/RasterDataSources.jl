@@ -39,7 +39,7 @@ export ECO4ESIPTJPL,ECO4WUE,GEDI03,GEDI04_B,MCD12Q1,MCD12Q2,MCD15A2H,
 
 export Values, Deciles
 
-export getraster
+export getraster, layername, CachedCloudSource
 
 include("types.jl")
 include("shared.jl")

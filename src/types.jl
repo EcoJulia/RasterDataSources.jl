@@ -1,9 +1,37 @@
 """
-    RasterDataSource 
+    RasterDataSource
 
-Abstract supertype for raster data collections.  
+Abstract supertype for raster data collections.
 """
 abstract type RasterDataSource end
+
+"""
+    CachedCloudSource
+
+A reference to a cloud-hosted dataset with local caching.
+
+Contains the remote URL and local cache path. Downstream packages
+(e.g., Zarr.jl, Rasters.jl) can use this to create caching stores.
+
+# Fields
+- `url::String`: Remote URL of the dataset
+- `cache::String`: Local directory path for caching
+
+# Example
+```julia
+source = getraster(ERA5)
+source.url    # "https://storage.googleapis.com/..."
+source.cache  # "/path/to/RasterDataSources/ERA5/..."
+
+# In Zarr.jl:
+store = Zarr.CachingHTTPStore(source.url, source.cache)
+ds = zopen(Zarr.ConsolidatedStore(store, ""))
+```
+"""
+struct CachedCloudSource
+    url::String
+    cache::String
+end
 
 """
     RasterDataSet
