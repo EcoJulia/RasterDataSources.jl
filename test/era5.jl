@@ -1,37 +1,25 @@
-using RasterDataSources, URIs, Test, Dates
-using RasterDataSources: rastername, rasterurl, rasterpath
+using RasterDataSources, Test
+using RasterDataSources: rasterpath, layername, layers, CachedCloudSource
 
 @testset "ERA5" begin
-
-    era5_path = joinpath(ENV["RASTERDATASOURCES_PATH"], "ERA5")
+    # Test rasterpath returns the cache directory
+    era5_path = joinpath(ENV["RASTERDATASOURCES_PATH"], "ERA5", "arco-era5-zarr")
     @test rasterpath(ERA5) == era5_path
 
-    @test rastername(ERA5, :t2m; date=Date(2020, 1)) == "e5.oper.an.sfc.128_167_2t.ll025sc.2020010100_2020013123.nc"
-    @test rastername(ERA5, :t2m; date=Date(2020, 2)) == "e5.oper.an.sfc.128_167_2t.ll025sc.2020020100_2020022923.nc"
+    # Test layers returns available layer symbols
+    @test :t2m in layers(ERA5)
+    @test :sp in layers(ERA5)
+    @test :tp in layers(ERA5)
 
-    @test rasterpath(ERA5, :t2m; date=Date(2020, 1)) ==
-        joinpath(era5_path, "e5.oper.an.sfc", "202001", "e5.oper.an.sfc.128_167_2t.ll025sc.2020010100_2020013123.nc")
+    # Test layername converts symbols to ARCO-ERA5 variable names
+    @test layername(ERA5, :t2m) == "2m_temperature"
+    @test layername(ERA5, :sp) == "surface_pressure"
+    @test layername(ERA5, :tp) == "total_precipitation"
 
-    @test rasterurl(ERA5, :t2m; date=Date(2020, 1)) ==
-        URI(scheme="https", host="nsf-ncar-era5.s3.us-west-2.amazonaws.com",
-            path="/e5.oper.an.sfc/202001/e5.oper.an.sfc.128_167_2t.ll025sc.2020010100_2020013123.nc")
-
-    @test RasterDataSources.getraster_keywords(ERA5) == (:date,)
-
-    # Test actual download
-    raster_path = joinpath(era5_path, "e5.oper.an.sfc", "202001", "e5.oper.an.sfc.128_167_2t.ll025sc.2020010100_2020013123.nc")
-    @test getraster(ERA5, :t2m; date=DateTime(2020, 1, 1)) == raster_path
-    @test isfile(raster_path)
-
-    # Test tuple of layers returns NamedTuple
-    raster_path_sp = joinpath(era5_path, "e5.oper.an.sfc", "202001", "e5.oper.an.sfc.128_134_sp.ll025sc.2020010100_2020013123.nc")
-    result = getraster(ERA5, (:t2m, :sp); date=DateTime(2020, 1, 1))
-    @test result == (t2m=raster_path, sp=raster_path_sp)
-    @test isfile(raster_path_sp)
-
-    # Test array of layers
-    @test getraster(ERA5, [:t2m]; date=DateTime(2020, 1, 1)) == (t2m=raster_path,)
-
-    # Test array of dates
-    @test getraster(ERA5, :t2m; date=[DateTime(2020, 1, 1)]) == [raster_path]
+    # Test getraster returns a CachedCloudSource
+    source = getraster(ERA5)
+    @test source isa CachedCloudSource
+    @test source.url == "https://storage.googleapis.com/gcp-public-data-arco-era5/ar/full_37-1h-0p25deg-chunk-1.zarr-v3"
+    @test source.cache == era5_path
+    @test isdir(source.cache)
 end
