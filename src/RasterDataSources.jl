@@ -14,7 +14,7 @@ using Dates,
 
 import JSON
 
-export WorldClim, CHELSA, EarthEnv, AWAP, ALWB, SRTM, MODIS, NCEP, TerraClimate
+export WorldClim, CHELSA, EarthEnv, AWAP, ALWB, SRTM, MODIS, ERA5, NCEP, TerraClimate
 
 export BioClim, BioClimPlus, Climate, Weather, Elevation, LandCover, HabitatHeterogeneity
 
@@ -41,9 +41,9 @@ export SixHourlyPressure, SixHourlySurface, DailyPressure, DailySurface, DailySu
 
 export Values, Deciles
 
-export Historical, Plus2C, Plus4C
+export getraster, layername, CachedCloudSource
 
-export getraster
+export Historical, Plus2C, Plus4C
 
 include("types.jl")
 include("shared.jl")
@@ -67,6 +67,8 @@ include("earthenv/habitatheterogeneity.jl")
 include("awap/awap.jl")
 
 include("alwb/alwb.jl")
+
+include("era5/era5.jl")
 
 include("terraclimate/terraclimate.jl")
 

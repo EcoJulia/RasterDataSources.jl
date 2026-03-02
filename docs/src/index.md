@@ -45,6 +45,12 @@ CHELSA
 EarthEnv
 ```
 
+## ERA5
+
+```@docs
+ERA5
+```
+
 ## WorldClim
 
 ```@docs
