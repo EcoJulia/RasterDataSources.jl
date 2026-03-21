@@ -113,8 +113,8 @@ _scenario_path(::Type{Plus2C}) = "plus2c"
 _scenario_path(::Type{Plus4C}) = "plus4c"
 
 _scenario_prefix(::Type{Historical}) = ""
-_scenario_prefix(::Type{Plus2C}) = "2c_"
-_scenario_prefix(::Type{Plus4C}) = "4c_"
+_scenario_prefix(::Type{Plus2C}) = "plus2C_"
+_scenario_prefix(::Type{Plus4C}) = "plus4C_"
 
 _scenario_uri(::Type{Historical}) = TERRACLIMATE_URI
 _scenario_uri(::Type{Plus2C}) = joinpath(TERRACLIMATE_FUTURE_URI, "data_plus2C")
