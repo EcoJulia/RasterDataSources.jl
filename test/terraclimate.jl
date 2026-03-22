@@ -10,8 +10,8 @@ using RasterDataSources: rastername, rasterurl, rasterpath
     @test rasterpath(TerraClimate{Plus4C}) == joinpath(terraclimate_path, "plus4c")
 
     @test rastername(TerraClimate{Historical}, :tmax; date=Date(2020, 1)) == "TerraClimate_tmax_2020.nc"
-    @test rastername(TerraClimate{Plus2C}, :tmax; date=Date(2000, 1)) == "TerraClimate_2c_tmax_2000.nc"
-    @test rastername(TerraClimate{Plus4C}, :tmax; date=Date(2000, 1)) == "TerraClimate_4c_tmax_2000.nc"
+    @test rastername(TerraClimate{Plus2C}, :tmax; date=Date(2000, 1)) == "TerraClimate_plus2C_tmax_2000.nc"
+    @test rastername(TerraClimate{Plus4C}, :tmax; date=Date(2000, 1)) == "TerraClimate_plus4C_tmax_2000.nc"
 
     @test rasterpath(TerraClimate{Historical}, :tmax; date=Date(2020, 1)) ==
         joinpath(terraclimate_path, "historical", "TerraClimate_tmax_2020.nc")
@@ -19,9 +19,9 @@ using RasterDataSources: rastername, rasterurl, rasterpath
     @test rasterurl(TerraClimate{Historical}, :tmax; date=Date(2020, 1)) ==
         URI(scheme="https", host="climate.northwestknowledge.net", path="/TERRACLIMATE-DATA/TerraClimate_tmax_2020.nc")
     @test rasterurl(TerraClimate{Plus2C}, :tmax; date=Date(2000, 1)) ==
-        URI(scheme="https", host="thredds.northwestknowledge.net", path="/thredds/fileServer/TERRACLIMATE_ALL/data_plus2C/TerraClimate_2c_tmax_2000.nc")
+        URI(scheme="https", host="thredds.northwestknowledge.net", path="/thredds/fileServer/TERRACLIMATE_ALL/data_plus2C/TerraClimate_plus2C_tmax_2000.nc")
     @test rasterurl(TerraClimate{Plus4C}, :tmax; date=Date(2000, 1)) ==
-        URI(scheme="https", host="thredds.northwestknowledge.net", path="/thredds/fileServer/TERRACLIMATE_ALL/data_plus4C/TerraClimate_4c_tmax_2000.nc")
+        URI(scheme="https", host="thredds.northwestknowledge.net", path="/thredds/fileServer/TERRACLIMATE_ALL/data_plus4C/TerraClimate_plus4C_tmax_2000.nc")
 
     @test RasterDataSources.getraster_keywords(TerraClimate) == (:date,)
     @test RasterDataSources.getraster_keywords(TerraClimate{Historical}) == (:date,)
