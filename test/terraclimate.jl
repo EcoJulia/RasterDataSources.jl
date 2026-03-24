@@ -27,23 +27,25 @@ using RasterDataSources: rastername, rasterurl, rasterpath
     @test RasterDataSources.getraster_keywords(TerraClimate{Historical}) == (:date,)
     @test RasterDataSources.getraster_keywords(TerraClimate{Plus2C}) == (:date,)
 
-    # Test actual download - historical
-    raster_path = joinpath(terraclimate_path, "historical", "TerraClimate_tmax_2023.nc")
-    @test getraster(TerraClimate{Historical}, :tmax; date=DateTime(2023, 01, 01)) == raster_path
-    @test isfile(raster_path)
+    if !Sys.iswindows()
+        # Test actual download - historical
+        raster_path = joinpath(terraclimate_path, "historical", "TerraClimate_tmax_2023.nc")
+        @test getraster(TerraClimate{Historical}, :tmax; date=DateTime(2023, 01, 01)) == raster_path
+        @test isfile(raster_path)
 
-    # Test convenience method (TerraClimate without parameter -> Historical)
-    @test getraster(TerraClimate, :tmax; date=DateTime(2023, 01, 01)) == raster_path
+        # Test convenience method (TerraClimate without parameter -> Historical)
+        @test getraster(TerraClimate, :tmax; date=DateTime(2023, 01, 01)) == raster_path
 
-    # Test tuple of layers returns NamedTuple
-    raster_path_tmin = joinpath(terraclimate_path, "historical", "TerraClimate_tmin_2023.nc")
-    result = getraster(TerraClimate{Historical}, (:tmax, :tmin); date=DateTime(2023, 01, 01))
-    @test result == (tmax=raster_path, tmin=raster_path_tmin)
-    @test isfile(raster_path_tmin)
+        # Test tuple of layers returns NamedTuple
+        raster_path_tmin = joinpath(terraclimate_path, "historical", "TerraClimate_tmin_2023.nc")
+        result = getraster(TerraClimate{Historical}, (:tmax, :tmin); date=DateTime(2023, 01, 01))
+        @test result == (tmax=raster_path, tmin=raster_path_tmin)
+        @test isfile(raster_path_tmin)
 
-    # Test array of layers
-    @test getraster(TerraClimate{Historical}, [:tmax]; date=DateTime(2023, 01, 01)) == (tmax=raster_path,)
+        # Test array of layers
+        @test getraster(TerraClimate{Historical}, [:tmax]; date=DateTime(2023, 01, 01)) == (tmax=raster_path,)
 
-    # Test array of dates
-    @test getraster(TerraClimate{Historical}, :tmax; date=[DateTime(2023, 01, 01)]) == [raster_path]
+        # Test array of dates
+        @test getraster(TerraClimate{Historical}, :tmax; date=[DateTime(2023, 01, 01)]) == [raster_path]
+    end
 end
