@@ -43,14 +43,14 @@ climate and climatic water balance.
 See: [climatologylab.org/terraclimate](https://www.climatologylab.org/terraclimate.html)
 
 The dataset contains NetCDF files with monthly data. Each file covers one year
-and contains 12 monthly layers.
+and contains 12 monthly layers. Coverage is from years 1950-present.
 
 The available layers are: `$(layers(TerraClimate{Historical}))`.
 
 Available scenarios:
-- `TerraClimate{Historical}` or just `TerraClimate`: Historical data (1958-2024)
-- `TerraClimate{Plus2C}`: +2°C warming scenario (1985-2015)
-- `TerraClimate{Plus4C}`: +4°C warming scenario (1985-2015)
+- `TerraClimate{Historical}` or just `TerraClimate`: Historical data
+- `TerraClimate{Plus2C}`: +2°C warming scenario
+- `TerraClimate{Plus4C}`: +4°C warming scenario
 
 `getraster` for `TerraClimate` must use a `date` keyword to specify the year to download.
 
@@ -73,7 +73,7 @@ julia> getraster(TerraClimate, :tmax; date=Date(2020))
 "/path/to/storage/TerraClimate/historical/TerraClimate_tmax_2020.nc"
 
 julia> getraster(TerraClimate{Plus2C}, :tmax; date=Date(2000))
-"/path/to/storage/TerraClimate/plus2c/TerraClimate_2c_tmax_2000.nc"
+"/path/to/storage/TerraClimate/plus2c/TerraClimate_plus2C_tmax_2000.nc"
 ```
 
 Returns the filepath/s of the downloaded or pre-existing files.
@@ -113,8 +113,8 @@ _scenario_path(::Type{Plus2C}) = "plus2c"
 _scenario_path(::Type{Plus4C}) = "plus4c"
 
 _scenario_prefix(::Type{Historical}) = ""
-_scenario_prefix(::Type{Plus2C}) = "2c_"
-_scenario_prefix(::Type{Plus4C}) = "4c_"
+_scenario_prefix(::Type{Plus2C}) = "plus2C_"
+_scenario_prefix(::Type{Plus4C}) = "plus4C_"
 
 _scenario_uri(::Type{Historical}) = TERRACLIMATE_URI
 _scenario_uri(::Type{Plus2C}) = joinpath(TERRACLIMATE_FUTURE_URI, "data_plus2C")
