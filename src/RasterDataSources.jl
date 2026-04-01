@@ -14,7 +14,7 @@ using Dates,
 
 import JSON
 
-export WorldClim, CHELSA, EarthEnv, AWAP, ALWB, SRTM, MODIS, ERA5, NCEP, TerraClimate
+export WorldClim, CHELSA, EarthEnv, AWAP, ALWB, SRTM, MODIS, ERA5, NCEP, TerraClimate, SoilGrids
 
 export BioClim, BioClimPlus, Climate, Weather, Elevation, LandCover, HabitatHeterogeneity
 
@@ -41,7 +41,7 @@ export SixHourlyPressure, SixHourlySurface, DailyPressure, DailySurface, DailySu
 
 export Values, Deciles
 
-export getraster, layername, CachedCloudSource
+export getraster, layername, CachedCloudSource, depths
 
 export Historical, Plus2C, Plus4C
 
@@ -80,6 +80,8 @@ include("modis/utilities.jl")
 include("modis/examples.jl")
 
 include("ncep/ncep.jl")
+
+include("soilgrids/soilgrids.jl")
 
 include("interface.jl")
 

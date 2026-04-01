@@ -325,3 +325,24 @@ struct VNP13A1 <: ModisProduct end
 struct VNP15A2H <: ModisProduct end
 struct VNP21A2 <: ModisProduct end
 struct VNP22Q2 <: ModisProduct end
+
+"""
+    SoilGrids <: RasterDataSource
+
+Global gridded soil property data at 250 m resolution from ISRIC World Soil Information.
+Data is served as GDAL Virtual Raster (VRT) files that reference remote GeoTIFF tile mosaics.
+
+Use `depth` and `quantile` keywords with `getraster`:
+- `depth`: e.g. `"0-5cm"`, `"5-15cm"`, `"15-30cm"`, `"30-60cm"`, `"60-100cm"`, `"100-200cm"`
+  (`:ocs` layer only supports `"0-30cm"`)
+- `quantile`: one of `"Q0.05"`, `"mean"`, `"Q0.5"`, `"Q0.95"`, `"uncertainty"`
+
+# Examples
+```julia
+getraster(SoilGrids, :clay; depth="0-5cm", quantile="mean")
+getraster(SoilGrids, (:clay, :sand); depth="5-15cm", quantile="Q0.05")
+getraster(SoilGrids, :clay; depth=["0-5cm", "5-15cm"])  # returns Vector
+getraster(SoilGrids; depth="0-5cm")                     # all layers as NamedTuple
+```
+"""
+struct SoilGrids <: RasterDataSource end
