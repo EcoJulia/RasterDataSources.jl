@@ -84,4 +84,20 @@ function _getraster(T::Type{SoilGrids}, layer::Symbol, depth::AbstractString, qu
     path = rasterpath(T, layer; depth, quantile)
     url  = rasterurl(T, layer; depth, quantile)
     _maybe_download(url, path)
+    _patch_soilgrids_vrt!(path, url)
+    path
+end
+
+# Patch the downloaded VRT so tile SourceFilenames use absolute /vsicurl/ URLs
+# instead of relative paths (which only resolve on ISRIC's server).
+function _patch_soilgrids_vrt!(path::AbstractString, url::URI)
+    vrt = read(path, String)
+    contains(vrt, "/vsicurl/") && return nothing  # already patched
+    vrt_name   = splitext(basename(path))[1]      # e.g. "clay_0-5cm_mean"
+    remote_base = string(url)[1:end-4]             # strip ".vrt"
+    patched = replace(vrt,
+        "relativeToVRT=\"1\">./$(vrt_name)/" =>
+            "relativeToVRT=\"0\">/vsicurl/$(remote_base)/")
+    write(path, patched)
+    return nothing
 end
