@@ -346,3 +346,28 @@ getraster(SoilGrids; depth="0-5cm")                     # all layers as NamedTup
 ```
 """
 struct SoilGrids <: RasterDataSource end
+
+"""
+    SLGA <: RasterDataSource
+
+Soil and Landscape Grid of Australia at ~90 m (3 arcsecond) resolution from CSIRO/TERN.
+Files are Cloud Optimised GeoTIFFs in WGS84 (EPSG:4326), covering continental Australia.
+
+Available layers (see `RasterDataSources.SLGA_ATTRS` for descriptions and units):
+`clay`, `silt`, `sand`, `bdod`, `soc`, `phc`, `phw`, `awc`, `ece`, `cec`,
+`nto`, `pto`, `avp`, `dul`, `l15`, `cfg`, `der`, `des`
+
+Use `depth` and `component` keywords with `getraster`:
+- `depth`: one of `"0-5cm"`, `"5-15cm"`, `"15-30cm"`, `"30-60cm"`, `"60-100cm"`, `"100-200cm"`
+  (`:der` only supports `"0-999cm"`, `:des` only `"0-200cm"`)
+- `component`: `"EV"` (estimated value, default), `"05"` (5th percentile), `"95"` (95th percentile)
+
+# Examples
+```julia
+getraster(SLGA, :clay; depth="0-5cm", component="EV")
+getraster(SLGA, (:clay, :sand); depth="5-15cm", component="05")
+getraster(SLGA, :clay; depth=["0-5cm", "5-15cm"])   # returns Vector
+getraster(SLGA, :der)                                 # single-depth layer
+```
+"""
+struct SLGA <: RasterDataSource end
