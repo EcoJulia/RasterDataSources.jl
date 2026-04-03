@@ -79,6 +79,7 @@ end
 
     # Validation error
     @test_throws ArgumentError getraster(SLGA_CFG; depth="0-999cm")
+    @test_throws ArgumentError getraster(SLGA_CFG; depth="invalid")
 
     # Keywords trait
     @test RasterDataSources.getraster_keywords(SLGA_CFG) == (:depth,)

@@ -41,6 +41,10 @@ function rasterurls(T::Type{SLGA_CFG}; depth)
 end
 
 function getraster(T::Type{SLGA_CFG}; depth="0-5cm")
+    _getraster_cfg(T, depth)
+end
+
+function _getraster_cfg(T::Type{SLGA_CFG}, depth::AbstractString)
     depth in depths(T) || throw(ArgumentError(
         "Depth \"$depth\" is not valid for SLGA_CFG. Valid depths: $(join(depths(T), ", "))"))
     paths = rasterpaths(T; depth)
@@ -48,6 +52,6 @@ function getraster(T::Type{SLGA_CFG}; depth="0-5cm")
     map(_maybe_download, urls, paths)
 end
 
-function getraster(T::Type{SLGA_CFG}; depth::AbstractArray)
-    map(d -> getraster(T; depth=d), depth)
+function _getraster_cfg(T::Type{SLGA_CFG}, depth::AbstractArray)
+    map(d -> _getraster_cfg(T, d), depth)
 end
