@@ -355,7 +355,9 @@ Files are Cloud Optimised GeoTIFFs in WGS84 (EPSG:4326), covering continental Au
 
 Available layers (see `RasterDataSources.SLGA_ATTRS` for descriptions and units):
 `clay`, `silt`, `sand`, `bdod`, `soc`, `phc`, `phw`, `awc`, `ece`, `cec`,
-`nto`, `pto`, `avp`, `dul`, `l15`, `cfg`, `der`, `des`
+`nto`, `pto`, `avp`, `dul`, `l15`, `der`, `des`
+
+Coarse fragments (`cfg`) have a distinct multi-file structure; use [`SLGA_CFG`](@ref) instead.
 
 Use `depth` and `component` keywords with `getraster`:
 - `depth`: one of `"0-5cm"`, `"5-15cm"`, `"15-30cm"`, `"30-60cm"`, `"60-100cm"`, `"100-200cm"`
@@ -371,3 +373,24 @@ getraster(SLGA, :der)                                 # single-depth layer
 ```
 """
 struct SLGA <: RasterDataSource end
+
+"""
+    SLGA_CFG <: RasterDataSource
+
+Coarse fragments (>=2 mm, % vol) from the Soil and Landscape Grid of Australia.
+
+CFG has a distinct file structure from other SLGA layers: each depth produces 7 files —
+six coarse fragment probability class maps and one dominant class map.
+
+`getraster` takes a `depth` keyword and returns a `NamedTuple` with keys
+`:class1`–`:class6` and `:dominant`.
+
+# Examples
+```julia
+paths = getraster(SLGA_CFG; depth="0-5cm")
+paths.class1    # estimated probability of coarse fragment class 1
+paths.dominant  # dominant coarse fragment class
+getraster(SLGA_CFG; depth=["0-5cm", "5-15cm"])  # returns Vector{NamedTuple}
+```
+"""
+struct SLGA_CFG <: RasterDataSource end

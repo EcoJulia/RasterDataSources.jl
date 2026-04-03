@@ -14,7 +14,7 @@ using Dates,
 
 import JSON
 
-export WorldClim, CHELSA, EarthEnv, AWAP, ALWB, SRTM, MODIS, ERA5, NCEP, TerraClimate, SoilGrids, SLGA
+export WorldClim, CHELSA, EarthEnv, AWAP, ALWB, SRTM, MODIS, ERA5, NCEP, TerraClimate, SoilGrids, SLGA, SLGA_CFG
 
 export BioClim, BioClimPlus, Climate, Weather, Elevation, LandCover, HabitatHeterogeneity
 
@@ -84,6 +84,7 @@ include("ncep/ncep.jl")
 include("soilgrids/soilgrids.jl")
 
 include("slga/slga.jl")
+include("slga/cfg.jl")
 
 include("interface.jl")
 
