@@ -18,7 +18,6 @@ const SLGA_ATTRS = (
     avp  = (code="AVP", description="Available phosphorus (Colwell)",           units="mg/kg",    date="20220826", suffix="_N_P_AU_TRN_N"),
     dul  = (code="DUL", description="Drained upper limit (field capacity)",     units="% vol",    date="20210614", suffix="_N_P_AU_TRN_N"),
     l15  = (code="L15", description="Lower limit (wilting point, -1500 kPa)",  units="% vol",    date="20210614", suffix="_N_P_AU_TRN_N"),
-    cfg  = (code="CFG", description="Coarse fragments (>=2 mm)",                units="% vol",    date="20221006", suffix="_N_P_AU_TRN_N"),
     der  = (code="DER", description="Depth to a restricting layer",             units="m",        date="20150601", suffix="_N_P_AU_NAT_C"),
     des  = (code="DES", description="Depth of soil (regolith)",                 units="m",        date="20190901", suffix="_N_P_AU_TRN_C"),
 )
