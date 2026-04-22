@@ -326,16 +326,36 @@ struct VNP15A2H <: ModisProduct end
 struct VNP21A2 <: ModisProduct end
 struct VNP22Q2 <: ModisProduct end
 
+function _soilgrids_layer_table()
+    header = """
+| Key      | Description                          |
+|----------|--------------------------------------|
+"""
+    rows = [
+        "| $(k) | $(v) |"
+        for (k, v) in pairs(SOILGRIDS_LAYERS)
+    ]
+    return header * join(rows, "\n")
+end
+
 """
     SoilGrids <: RasterDataSource
 
 Global gridded soil property data at 250 m resolution from ISRIC World Soil Information.
 Data is served as GDAL Virtual Raster (VRT) files that reference remote GeoTIFF tile mosaics.
 
+## Available layers
+
+$(_soilgrids_layer_table())
+
+## Depths and quantiles
+
 Use `depth` and `quantile` keywords with `getraster`:
-- `depth`: e.g. `"0-5cm"`, `"5-15cm"`, `"15-30cm"`, `"30-60cm"`, `"60-100cm"`, `"100-200cm"`
-  (`:ocs` layer only supports `"0-30cm"`)
-- `quantile`: one of `"Q0.05"`, `"mean"`, `"Q0.5"`, `"Q0.95"`, `"uncertainty"`
+
+- `depth`: $(join(SOILGRIDS_DEPTHS, ", "))
+  - `:ocs` only supports $(join(SOILGRIDS_OCS_DEPTHS, ", "))
+
+- `quantile`: $(join(SOILGRIDS_QUANTILES, ", "))
 
 # Examples
 ```julia
