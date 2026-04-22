@@ -39,7 +39,7 @@ const SLGA_COMPONENTS = ("EV", "05", "95")
 # Single-depth layers and their fixed depths
 const SLGA_SINGLE_DEPTHS = (der="0-999cm", des="0-200cm")
 
-layers(::Type{SLGA}) = keys(SLGA_ATTRS)
+layers(::Type{SLGA}) = Tuple(keys(SLGA_ATTRS))
 
 depths(::Type{SLGA})                = SLGA_DEPTHS
 depths(T::Type{SLGA}, layer::Symbol) = _slga_depths(T, layer)
