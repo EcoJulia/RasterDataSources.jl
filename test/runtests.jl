@@ -17,6 +17,7 @@ using SafeTestsets, Aqua, RasterDataSources, Pkg, Dates
 @time @safetestset "awap" begin include("awap.jl") end
 @time @safetestset "era5" begin include("era5.jl") end
 @time @safetestset "terraclimate" begin include("terraclimate.jl") end
+@time @safetestset "gridmet" begin include("gridmet.jl") end
 @time @safetestset "chelsa bioclim" begin include("chelsa-bioclim.jl") end
 @time @safetestset "chelsa climate" begin include("chelsa-climate.jl") end
 @time @safetestset "chelsa future" begin include("chelsa-future.jl") end
