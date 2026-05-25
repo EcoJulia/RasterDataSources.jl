@@ -99,17 +99,30 @@ function getraster(T::Type{<:MODIS{X}}, args...; kwargs...) where {X}
     throw("Unrecognized MODIS product.")
 end
 
-getraster_keywords(::Type{<:Union{MODIS,ModisProduct}}) = (:lat, :lon, :km_ab, :km_lr, :date, :end)
+getraster_keywords(::Type{<:Union{MODIS,ModisProduct}}) = (:lat, :lon, :km_ab, :km_lr, :extent, :date, :end)
 
 function getraster(
     T::Type{<:ModisProduct},
     layer::Union{Tuple,Symbol,Int} = layerkeys(T);
-    lat::Real,
-    lon::Real,
-    km_ab::Int,
-    km_lr::Int,
+    extent::Union{Extents.Extent,Nothing} = nothing,
+    lat::Union{Real,Nothing} = nothing,
+    lon::Union{Real,Nothing} = nothing,
+    km_ab::Union{Int,Nothing} = nothing,
+    km_lr::Union{Int,Nothing} = nothing,
     date::Union{Tuple,AbstractVector,String,Date,DateTime},
 )
+    if !isnothing(extent)
+        p = extent_to_modis_params(extent)
+        lat = something(lat, p.lat)
+        lon = something(lon, p.lon)
+        km_ab = something(km_ab, p.km_ab)
+        km_lr = something(km_lr, p.km_lr)
+    end
+    isnothing(lat)   && throw(ArgumentError("`lat` keyword is required (or provide `extent`)"))
+    isnothing(lon)   && throw(ArgumentError("`lon` keyword is required (or provide `extent`)"))
+    isnothing(km_ab) && throw(ArgumentError("`km_ab` keyword is required (or provide `extent`)"))
+    isnothing(km_lr) && throw(ArgumentError("`km_lr` keyword is required (or provide `extent`)"))
+
     # first check all arguments
     check_layers(T, layer)
     check_kwargs(T; lat = lat, lon = lon, km_ab = km_ab, km_lr = km_lr, date = date)

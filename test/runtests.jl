@@ -31,5 +31,6 @@ using SafeTestsets, Aqua, RasterDataSources, Pkg, Dates
 # MODIS utilities are broken because the EPSG coordinate transform API is retired
 # @time @safetestset "modis utilities" begin include("modis-utilities.jl") end
 @time @safetestset "modis product info" begin include("modis-products.jl") end
+@time @safetestset "modis extent" begin include("modis-extent.jl") end
 @time @safetestset "ncep" begin include("ncep.jl") end
 # @time @safetestset "modis interface" begin include("modis-interface.jl") end

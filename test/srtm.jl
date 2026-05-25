@@ -1,5 +1,5 @@
 
-using RasterDataSources, URIs, Test, Dates
+using RasterDataSources, URIs, Test, Dates, Extents
 using RasterDataSources: rasterpath, zipurl, zipname
 
 @testset "SRTM" begin
@@ -20,6 +20,14 @@ using RasterDataSources: rasterpath, zipurl, zipname
     @test getraster(SRTM; bounds=((lon1, lon1), (lat1, lat1))) == reshape([raster_path1], 1, 1)
     lon2, lat2 = -171, 55   # Coordinates of [3000, 3000] pixel of tile x=2, y=2
     @test getraster(SRTM; bounds=((lon1, lon2), (lat2, lat1))) == permutedims([raster_path1 raster_path2])
+    # `extent` is the canonical spatial keyword; `bounds` is the legacy alias.
+    ext = Extent(X=(lon1, lon2), Y=(lat2, lat1))
+    @test getraster(SRTM; extent=ext) == permutedims([raster_path1 raster_path2])
+    @test getraster(SRTM; bounds=ext) == permutedims([raster_path1 raster_path2])
+    @test RasterDataSources.bounds_to_tile_indices(SRTM, ext) ==
+          RasterDataSources.bounds_to_tile_indices(SRTM, ((lon1, lon2), (lat2, lat1)))
+    # Passing both `extent` and `bounds` together errors
+    @test_throws ArgumentError getraster(SRTM; extent=ext, bounds=((lon1, lon2), (lat2, lat1)))
 
-    @test RasterDataSources.getraster_keywords(SRTM) == (:bounds, :tile_index)
+    @test RasterDataSources.getraster_keywords(SRTM) == (:bounds, :extent, :tile_index)
 end

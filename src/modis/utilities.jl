@@ -101,6 +101,27 @@ function meters_to_latlon(d::Real, lat::Real)
     return (dlat, dlon)
 end
 
+# Inverse of `meters_to_latlon`. Uses the same flat-Earth/sind approximation,
+# so error is <1% even for ~10° extents — fine for the MODIS API's 100km cap.
+function latlon_to_meters(dlat::Real, dlon::Real, lat::Real)
+    meters_lat = dlat * π * EARTH_POL_RADIUS / 180
+    meters_lon = sind(dlon) * cosd(lat) * EARTH_EQ_RADIUS
+    return (meters_lat, meters_lon)
+end
+
+# Convert an `Extent` (degrees, with `X`=lon, `Y`=lat) to the MODIS API's
+# centre-plus-half-width parameterisation.
+function extent_to_modis_params(extent::Extents.Extent)
+    xs, ys = extent.X, extent.Y
+    lon = (xs[1] + xs[2]) / 2
+    lat = (ys[1] + ys[2]) / 2
+    meters_lat, meters_lon = latlon_to_meters((ys[2] - ys[1]) / 2,
+                                              (xs[2] - xs[1]) / 2, lat)
+    km_ab = round(Int, meters_lat / 1000)
+    km_lr = round(Int, meters_lon / 1000)
+    return (; lat, lon, km_ab, km_lr)
+end
+
 function _maybe_prepare_params(xllcorner::Real, yllcorner::Real, nrows::Int, cellsize::Real)
     filepath = joinpath(
         rasterpath(),
