@@ -31,7 +31,7 @@ const HAS_SRTM_TILE = BitArray([
     0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  1  1  0  0  0  0  0  0  1  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  1  0  0  0  0
 ])
 
-getraster_keywords(::Type{SRTM}) = (:bounds, :tile_index)
+getraster_keywords(::Type{SRTM}) = (:bounds, :extent, :tile_index)
 
 function _raster_tile_stem(tile_index::CartesianIndex)
     y, x = tile_index.I
@@ -78,6 +78,9 @@ end
 function bounds_to_tile_indices(::Type{SRTM}, bounds::NTuple{4,Real})
     bounds_to_tile_indices(SRTM, ((bounds[1], bounds[3]), (bounds[2], bounds[4])))
 end
+function bounds_to_tile_indices(::Type{SRTM}, ext::Extents.Extent)
+    bounds_to_tile_indices(SRTM, (ext.X, ext.Y))
+end
 function bounds_to_tile_indices(::Type{SRTM}, (xs, ys)::NTuple{2,NTuple{2,Real}})
     _check_order(xs)
     _check_order(ys)
@@ -99,19 +102,19 @@ for op in (:getraster, :rastername, :rasterpath, :zipname, :zipurl, :zippath)
         end
         # Bounds to tile indices dispatch
         $_op(T::Type{SRTM}, bounds::Tuple) = $_op(T, bounds_to_tile_indices(T, bounds))
+        $_op(T::Type{SRTM}, bounds::Extents.Extent) = $_op(T, bounds_to_tile_indices(T, bounds))
 
-        # Public function definition with key-word arguments
-        function $op(T::Type{SRTM}; bounds=nothing, tile_index=nothing)
-            if isnothing(bounds) & isnothing(tile_index)
+        # Public function definition with key-word arguments. `extent` is the
+        # canonical spatial keyword; `bounds` is the legacy alias.
+        function $op(T::Type{SRTM}; bounds=nothing, extent=nothing, tile_index=nothing)
+            n_set = !isnothing(bounds) + !isnothing(extent) + !isnothing(tile_index)
+            if n_set == 0
                 :op === :getraster || return joinpath(rasterpath(), "SRTM")
-                throw(ArgumentError("One of `bounds` or `tile_index` kwarg must be specified"))
-            elseif !isnothing(bounds) & !isnothing(tile_index)
-                throw(ArgumentError("Only one of `bounds` or `tile_index` should be specified. " *
-                                    "found `bounds`=$bounds and `tile_index`=$tile_index"))
-            else
-                # Call the internal function without key-word arguments
-                return $_op(T, isnothing(tile_index) ? bounds : tile_index)
+                throw(ArgumentError("One of `extent`, `bounds` or `tile_index` kwarg must be specified"))
+            elseif n_set > 1
+                throw(ArgumentError("Pass only one of `extent`, `bounds` or `tile_index`"))
             end
+            return $_op(T, something(extent, bounds, tile_index))
         end
     end
 end
