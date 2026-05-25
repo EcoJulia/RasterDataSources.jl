@@ -94,15 +94,8 @@ sinusoidal_to_latlon(args...) =
 const EARTH_EQ_RADIUS = 6378137
 const EARTH_POL_RADIUS = 6356752
 
-function meters_to_latlon(d::Real, lat::Real)
-    dlon = asind(d / (cosd(lat) * EARTH_EQ_RADIUS))
-    dlat = d * 180 / (π * EARTH_POL_RADIUS)
-
-    return (dlat, dlon)
-end
-
-# Inverse of `meters_to_latlon`. Uses the same flat-Earth/sind approximation,
-# so error is <1% even for ~10° extents — fine for the MODIS API's 100km cap.
+# Flat-Earth/sind approximation. Error is <1% even for ~10° extents — fine
+# for the MODIS API's 100km cap.
 function latlon_to_meters(dlat::Real, dlon::Real, lat::Real)
     meters_lat = dlat * π * EARTH_POL_RADIUS / 180
     meters_lon = sind(dlon) * cosd(lat) * EARTH_EQ_RADIUS
@@ -122,19 +115,21 @@ function extent_to_modis_params(extent::Extents.Extent)
     return (; lat, lon, km_ab, km_lr)
 end
 
-function _maybe_prepare_params(xllcorner::Real, yllcorner::Real, nrows::Int, cellsize::Real)
+# MODIS sinusoidal projection — sphere with R = 6371007.181 m, central
+# meridian 0. This is the canonical CRS for all MODIS L3 products. Written
+# as a `.prj` sidecar so GDAL/Rasters reads our ASCII grids in their native
+# projection (the data values lie on a sinusoidal grid; saving them as a
+# WGS84 rectangle misplaces every pixel away from the lower-left corner).
+const MODIS_SINUSOIDAL_WKT = "PROJCS[\"MODIS Sinusoidal\",GEOGCS[\"Custom\",DATUM[\"Custom\",SPHEROID[\"Custom\",6371007.181,0]],PRIMEM[\"Greenwich\",0],UNIT[\"degree\",0.0174532925199433]],PROJECTION[\"Sinusoidal\"],PARAMETER[\"longitude_of_center\",0],PARAMETER[\"false_easting\",0],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1]]"
+
+# Convert sinusoidal LL corner to WGS84 lat/lon for use as the cache
+# filename only (the file's geographic data stays in sinusoidal meters).
+function _maybe_prepare_params(xllcorner::Real, yllcorner::Real, cellsize::Real)
     filepath = joinpath(
         rasterpath(),
         "MODIS",
         "headers",
-        string(xllcorner) *
-        "," *
-        string(yllcorner) *
-        "," *
-        string(cellsize) *
-        "," *
-        string(nrows) *
-        ".csv",
+        string(xllcorner) * "," * string(yllcorner) * "," * string(cellsize) * ".csv",
     )
 
     if isfile(filepath)
@@ -143,24 +138,15 @@ function _maybe_prepare_params(xllcorner::Real, yllcorner::Real, nrows::Int, cel
         end
         pars = parse.(Float64, split(pars_str, ","))
     else
-        # coordinates in sin projection ; we want upper-left in WGS84
-        # convert coordinates
-        xll, yll = sinusoidal_to_latlon(xllcorner, yllcorner)
-
-        # convert cell size in meters to degrees in lat and lon directions
-        dy, dx = meters_to_latlon(cellsize, yll) # watch out, this is a Tuple{Float64, Float64}
-
-        pars = [xll, yll, dx, dy]
-        # store in file
-        pars_str = join(string.(pars), ",")
+        xll_wgs, yll_wgs = sinusoidal_to_latlon(xllcorner, yllcorner)
+        pars = [xll_wgs, yll_wgs]
         mkpath(dirname(filepath))
         open(filepath, "w") do f
-            write(f, pars_str)
+            write(f, join(string.(pars), ","))
         end
     end
 
-    # return a NamedTuple
-    return (xll = pars[1], yll = pars[2], dx = pars[3], dy = pars[4])
+    return (xll_wgs = pars[1], yll_wgs = pars[2])
 end
 
 """
@@ -185,7 +171,10 @@ function process_subset(T::Type{<:ModisProduct}, subset::Vector{Any}, pars::Name
     xll = parse(Float64, pars[:xll])
     yll = parse(Float64, pars[:yll])
 
-    pars = _maybe_prepare_params(xll, yll, nrows, cellsize)
+    # WGS84 lat/lon of the LL corner are used only for the cache filename;
+    # the .asc itself stores the raw sinusoidal coordinates from the MODIS
+    # response, with a .prj sidecar declaring the sinusoidal CRS.
+    name_pars = _maybe_prepare_params(xll, yll, cellsize)
 
     path_out = String[]
 
@@ -193,15 +182,21 @@ function process_subset(T::Type{<:ModisProduct}, subset::Vector{Any}, pars::Name
         date = subset[i]["calendar_date"]
         band = subset[i]["band"]
 
-        filepath = rasterpath(T, band; lat = pars[:yll], lon = pars[:xll], date = date)
-        
+        filepath = rasterpath(T, band; lat = name_pars.yll_wgs, lon = name_pars.xll_wgs, date = date)
+
         mat = permutedims(reshape(subset[i]["data"], (ncols, nrows)))
 
         mkpath(dirname(filepath)) # prepare directories if they dont exist
 
         if !isfile(filepath)
             @info "Creating raster file $(basename(filepath)) in $(dirname(filepath))"
-            write_ascii(filepath, mat; ncols = ncols, nrows = nrows, nodatavalue = -3000.0, pars...)
+            write_ascii(filepath, mat; ncols = ncols, nrows = nrows,
+                        xll = xll, yll = yll, dx = cellsize, dy = cellsize,
+                        nodatavalue = -3000.0)
+            prj_path = replace(filepath, r"\.asc$" => ".prj")
+            open(prj_path, "w") do f
+                write(f, MODIS_SINUSOIDAL_WKT)
+            end
         else
             @info "Raster file $(basename(filepath)) already exists in $(dirname(filepath))"
         end
