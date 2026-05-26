@@ -23,6 +23,7 @@ Currently sources include:
 | MODIS        | https://modis.ornl.gov                   | Complete (beta)                          |
 | TerraClimate | https://www.climatologylab.org/terraclimate.html | Historical, Plus2C, Plus4C       |
 | NCEP         | https://psl.noaa.gov/data/gridded/data.ncep.reanalysis.html | Complete              |
+| SLGA         | https://esoil.io/TERNLandscapes/Public/Products/TERN/SLGA | Soil attributes and CoarseFragments |
 
 Please open an issue if you need more datasets added, or (even better) open a pull request 
 following the form of the other datasets where possible.
