@@ -102,6 +102,14 @@ function latlon_to_meters(dlat::Real, dlon::Real, lat::Real)
     return (meters_lat, meters_lon)
 end
 
+# Inverse of `latlon_to_meters`: how many degrees of lat/lon span `meters`
+# in each direction at latitude `lat`.
+function meters_to_latlon(meters::Real, lat::Real)
+    dlat = meters * 180 / (π * EARTH_POL_RADIUS)
+    dlon = asind(meters / (cosd(lat) * EARTH_EQ_RADIUS))
+    return (dlat, dlon)
+end
+
 # Convert an `Extent` (degrees, with `X`=lon, `Y`=lat) to the MODIS API's
 # centre-plus-half-width parameterisation.
 function extent_to_modis_params(extent::Extents.Extent)
