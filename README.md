@@ -20,6 +20,7 @@ Currently sources include:
 | ALWB         | http://www.bom.gov.au/water/landscape/   | Complete                                 |
 | ERA5         | https://registry.opendata.aws/nsf-ncar-era5/ | Complete                             |
 | SRTM         | https://www2.jpl.nasa.gov/srtm/          | Complete                                 |
+| CopernicusDEM | https://registry.opendata.aws/copernicus-dem/ | GLO-30 (30m) and GLO-90 (90m)       |
 | MODIS        | https://modis.ornl.gov                   | Complete (beta)                          |
 | TerraClimate | https://www.climatologylab.org/terraclimate.html | Historical, Plus2C, Plus4C       |
 | NCEP         | https://psl.noaa.gov/data/gridded/data.ncep.reanalysis.html | Complete              |
