@@ -42,7 +42,8 @@ struct CopernicusDEM <: RasterDataSource end
 include_dependency(joinpath(@__DIR__, "coverage.txt"))
 const _COPERNICUS_DEM_COVERAGE =
     readdlm(joinpath(@__DIR__, "coverage.txt"), Int)
-
+# 30M and 90M are not identical tile sets - 90M has 25 extra tiles
+# The stored matrix is all `3` or `0` except the 25 extra tiles are `2`.
 const HAS_COPERNICUS_DEM_TILE_30M = BitMatrix(_COPERNICUS_DEM_COVERAGE .& 1 .!= 0)
 const HAS_COPERNICUS_DEM_TILE_90M = BitMatrix(_COPERNICUS_DEM_COVERAGE .& 2 .!= 0)
 
