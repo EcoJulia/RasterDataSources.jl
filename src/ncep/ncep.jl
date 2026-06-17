@@ -157,21 +157,19 @@ _category_dir(T::Type{<:NCEP}) = _category_dir(group(T), reanalysis(T), period(T
 _dataset_dir(R) = R == 2 ? "reanalysis2" : "reanalysis"
 
 # Monthly data lives in single `.mon.mean.nc` files; everything else is per-year.
+rastername(T::Type{<:NCEP}, layer; date) = _rastername(period(T), _filename_part(T, layer); date)
 _rastername(::Type{Month}, part; date) = "$part.mon.mean.nc"
 _rastername(::Type, part; date) = "$part.$(year(date)).nc"
-_rastername(T::Type{<:NCEP}, part; date) = _rastername(period(T), part; date)
 
 rasterpath(T::Type{<:NCEP}) = joinpath(rasterpath(), "NCEP")
 function rasterpath(T::Type{<:NCEP{G,R}}, layer; date) where {G,R}
-    part = _filename_part(T, layer)
-    joinpath(rasterpath(T), _dataset_dir(R), _category_dir(T)..., _rastername(T, part; date))
+    joinpath(rasterpath(T), _dataset_dir(R), _category_dir(T)..., rastername(T, layer; date))
 end
 
 function rasterurl(T::Type{<:NCEP{G,R}}, layer; date) where {G,R}
-    part = _filename_part(T, layer)
     base_url = "https://downloads.psl.noaa.gov/Datasets/ncep.$(_dataset_dir(R))/"
     path = join(_category_dir(T), "/")
-    name = _rastername(T, part; date)
+    name = rastername(T, layer; date)
     return URI(string(base_url, path, "/", name))
 end
 
