@@ -1,155 +1,177 @@
 
-# Define category types for NCEP datasets that reflect the directory structure
-abstract type NCEPCategory end
-struct SixHourlyPressure <: NCEPCategory end
-struct SixHourlySurface <: NCEPCategory end
-struct DailyPressure <: NCEPCategory end
-struct DailySurface <: NCEPCategory end
-struct DailySurfaceReanalysis2 <: NCEPCategory end
-struct MonthlyPressure <: NCEPCategory end
-struct MonthlySurface <: NCEPCategory end
-struct SurfaceGauss <: NCEPCategory end
+# NCEP/NCAR Reanalysis 1 and NCEP/DOE Reanalysis 2, organised on orthogonal axes:
+#
+#   group       — product family (variable set + grid):
+#                   Pressure    : pressure-level analysis, 2.5° lat/lon grid
+#                   Surface     : surface analysis, 2.5° lat/lon grid
+#                   SurfaceFlux : surface forecast fluxes on the T62 Gaussian grid
+#                                 (2 m / 10 m vars, radiation, precip)
+#   reanalysis  — 1 (NCEP/NCAR, 1948–) or 2 (NCEP/DOE, 1979–)
+#   period      — temporal resolution. The data is natively 6-hourly; Day and Month
+#                 are aggregate products NOAA publishes for some groups. Native is the
+#                 default, so it is the omittable trailing parameter.
+
+abstract type NCEPGroup end
+struct Pressure    <: NCEPGroup end
+struct Surface     <: NCEPGroup end
+struct SurfaceFlux <: NCEPGroup end
 
 """
-    NCEP{C<:NCEPCategory} <: RasterDataSource
+    SixHour
 
-Data from the NCEP/NCAR Reanalysis 1 (1948-Present) and NCEP/DOE Reanalysis 2 (1979-Present) datasets.
+The native NCEP cadence: four steps per day (00, 06, 12, 18 UTC). The default
+`period` of [`NCEP`](@ref). A singleton rather than `Hour(6)` because 6-hourly is
+the one correct native step — no other sub-daily value exists.
+"""
+struct SixHour end
+
+"""
+    NCEP{Group<:NCEPGroup, Reanalysis, Period} <: RasterDataSource
+
+Data from the NCEP/NCAR Reanalysis 1 (1948–present) and NCEP/DOE Reanalysis 2
+(1979–present) datasets.
 
 See: https://psl.noaa.gov/data/gridded/data.ncep.reanalysis.html
 
 # Type Parameters
-- `C`: The category of data to download. One of `SixHourlyPressure`, `SixHourlySurface`,
-  `DailyPressure`, `DailySurface`, `DailySurfaceReanalysis2`, `MonthlyPressure`,
-  `MonthlySurface`, or `SurfaceGauss`.
+- `Group`: `Pressure`, `Surface`, or `SurfaceFlux`.
+- `Reanalysis`: `1` or `2`.
+- `Period`: `SixHour` (native, default), `Day`, or `Month`.
+
+`NCEP{Surface, 2}` is the native 6-hourly surface analysis from Reanalysis 2;
+`NCEP{Pressure, 1, Day}` is the daily Reanalysis 1 pressure-level aggregate.
 
 ## Usage
 
 ```julia
-getraster(NCEP{<category>}, layer; date, dataset)
+getraster(NCEP{Group, Reanalysis, Period}, layer; date)
 ```
 
 # Keywords
-- `date`: A `Date` or `DateTime` object. The year is used to select the file for daily data.
-- `dataset`: "reanalysis" or "reanalysis2". Defaults to "reanalysis".
+- `date`: A `Date` or `DateTime`. The year selects the file for sub-monthly data.
 
 # Layers
-| Layer Symbol | Description | Units | Categories |
+| Layer Symbol | Description | Units | Group |
 | :--- | :--- | :--- | :--- |
-| `:tmax` | Max Temperature | K | `SurfaceGauss` |
-| `:tmin` | Min Temperature | K | `SurfaceGauss` |
-| `:air_2m` | Air Temperature (2m) | K | `SurfaceGauss` |
-| `:shum_2m` | Specific Humidity (2m) | kg/kg | `SurfaceGauss` |
-| `:prate` | Precipitation Rate | Kg/m²/s | `SurfaceGauss` |
-| `:pres` | Pressure | Pa | `SurfaceGauss` |
-| `:dswrf` | Downward Shortwave Flux | W/m² | `SurfaceGauss` |
-| `:dlwrf` | Downward Longwave Flux | W/m² | `SurfaceGauss` |
-| `:ulwrf` | Upward Longwave Flux | W/m² | `SurfaceGauss` |
-| `:uwnd_10m` | U-Wind (10m) | m/s | `SurfaceGauss` |
-| `:vwnd_10m` | V-Wind (10m) | m/s | `SurfaceGauss` |
-| `:tcdc` | Total Cloud Cover | % | `SurfaceGauss` (2005 only) |
-| `:hgt` | Geopotential Height | m | `SixHourlyPressure`, `DailyPressure`, `MonthlyPressure` |
-| `:rhum` | Relative Humidity | % | `SixHourlyPressure`, `DailyPressure`, `MonthlyPressure` |
-| `:shum` | Specific Humidity | kg/kg | `SixHourlyPressure`, `DailyPressure`, `MonthlyPressure` |
-| `:air` | Air Temperature | K | `SixHourlyPressure`, `DailyPressure`, `MonthlyPressure` |
-| `:uwnd` | U-Wind | m/s | `SixHourlyPressure`, `DailyPressure`, `MonthlyPressure` |
-| `:vwnd` | V-Wind | m/s | `SixHourlyPressure`, `DailyPressure`, `MonthlyPressure` |
-| `:omega` | Vertical Velocity | Pa/s | `SixHourlyPressure`, `DailyPressure`, `MonthlyPressure` |
-| `:slp` | Sea Level Pressure | Pa | `DailySurface`, `MonthlySurface` |
-| `:pr_wtr` | Precipitable Water | kg/m² | `SixHourlySurface`, `MonthlySurface` |
-| `:pres_sfc` | Surface Pressure | Pa | `SixHourlySurface`, `DailySurfaceReanalysis2` |
-| `:lftx` | Surface Lifted Index | K | `SixHourlySurface` |
-| `:mslp` | Mean Sea Level Pressure | Pa | `DailySurfaceReanalysis2` |
-| `:pres_sfc` | Surface Pressure | Pa | `DailySurfaceReanalysis2` |
-| `:pr_wtr_eatm`| Precipitable Water | kg/m² | `DailySurfaceReanalysis2` |
+| `:tmax` | Max Temperature | K | `SurfaceFlux` |
+| `:tmin` | Min Temperature | K | `SurfaceFlux` |
+| `:air_2m` | Air Temperature (2m) | K | `SurfaceFlux` |
+| `:shum_2m` | Specific Humidity (2m) | kg/kg | `SurfaceFlux` |
+| `:prate` | Precipitation Rate | Kg/m²/s | `SurfaceFlux` |
+| `:pres` | Pressure | Pa | `SurfaceFlux` |
+| `:dswrf` | Downward Shortwave Flux | W/m² | `SurfaceFlux` |
+| `:dlwrf` | Downward Longwave Flux | W/m² | `SurfaceFlux` |
+| `:ulwrf` | Upward Longwave Flux | W/m² | `SurfaceFlux` |
+| `:uwnd_10m` | U-Wind (10m) | m/s | `SurfaceFlux` |
+| `:vwnd_10m` | V-Wind (10m) | m/s | `SurfaceFlux` |
+| `:tcdc` | Total Cloud Cover | % | `SurfaceFlux` (2005 only) |
+| `:hgt` | Geopotential Height | m | `Pressure` |
+| `:rhum` | Relative Humidity | % | `Pressure` |
+| `:shum` | Specific Humidity | kg/kg | `Pressure` |
+| `:air` | Air Temperature | K | `Pressure` |
+| `:uwnd` | U-Wind | m/s | `Pressure` |
+| `:vwnd` | V-Wind | m/s | `Pressure` |
+| `:omega` | Vertical Velocity | Pa/s | `Pressure` |
+| `:pr_wtr` | Precipitable Water | kg/m² | `Surface` (6-hourly, monthly) |
+| `:pres_sfc` | Surface Pressure | Pa | `Surface` (6-hourly; daily R2) |
+| `:lftx` | Surface Lifted Index | K | `Surface` (6-hourly) |
+| `:slp` | Sea Level Pressure | Pa | `Surface` (daily/monthly, R1) |
+| `:mslp` | Mean Sea Level Pressure | Pa | `Surface` (daily, R2) |
+| `:pr_wtr_eatm`| Precipitable Water | kg/m² | `Surface` (daily, R2) |
 
 # Example
 ```julia
-getraster(NCEP{DailyPressure}, :hgt; date=Date(2001), dataset="reanalysis")
+getraster(NCEP{Pressure, 1, Day}, :hgt; date=Date(2001))
 ```
 """
-struct NCEP{C<:NCEPCategory} <: RasterDataSource end
+struct NCEP{G<:NCEPGroup, R, P} <: RasterDataSource end
+
+group(::Type{<:NCEP{G}})        where {G<:NCEPGroup} = G
+reanalysis(::Type{<:NCEP{G,R}}) where {G,R}         = R
+period(::Type{<:NCEP{G,R,P}})   where {G,R,P}       = P
+period(::Type{NCEP{G,R}})       where {G,R}         = SixHour   # trailing param omitted → native
 
 # Mappings from user-friendly layer names to filename parts
 const PRESSURE_MAP = (hgt = "hgt", rhum = "rhum", shum = "shum", air = "air", uwnd = "uwnd", vwnd = "vwnd", omega = "omega")
-const SIXHOURLY_SURFACE_MAP = (pr_wtr = "pr_wtr.eatm", pres_sfc = "pres.sfc", lftx = "lftx.sfc")
-const SURFACEGAUSS_MAP = (tmax = "tmax.2m.gauss", tmin = "tmin.2m.gauss", air_2m = "air.2m.gauss", shum_2m = "shum.2m.gauss", prate = "prate.sfc.gauss", pres = "pres.sfc.gauss", dswrf = "dswrf.sfc.gauss", dlwrf = "dlwrf.sfc.gauss", ulwrf = "ulwrf.sfc.gauss", uwnd_10m = "uwnd.10m.gauss", vwnd_10m = "vwnd.10m.gauss", tcdc = "tcdc.eatm.gauss")
-const DAILY_SURFACE_MAP = (slp = "slp",)
-const DAILY_SURFACE_REANALYSIS2_MAP = (mslp = "mslp", pres_sfc = "pres.sfc", pr_wtr_eatm = "pr_wtr.eatm")
-const MONTHLY_SURFACE_MAP = (slp = "slp", pr_wtr = "pr_wtr")
+const SURFACE_MAP = (pr_wtr = "pr_wtr.eatm", pres_sfc = "pres.sfc", lftx = "lftx.sfc")
+const SURFACE_DAILY_MAP = (slp = "slp",)
+const SURFACE_DAILY_R2_MAP = (mslp = "mslp", pres_sfc = "pres.sfc", pr_wtr_eatm = "pr_wtr.eatm")
+const SURFACE_MONTHLY_MAP = (slp = "slp", pr_wtr = "pr_wtr")
+const SURFACEFLUX_MAP = (tmax = "tmax.2m.gauss", tmin = "tmin.2m.gauss", air_2m = "air.2m.gauss", shum_2m = "shum.2m.gauss", prate = "prate.sfc.gauss", pres = "pres.sfc.gauss", dswrf = "dswrf.sfc.gauss", dlwrf = "dlwrf.sfc.gauss", ulwrf = "ulwrf.sfc.gauss", uwnd_10m = "uwnd.10m.gauss", vwnd_10m = "vwnd.10m.gauss", tcdc = "tcdc.eatm.gauss")
 
-# Define the layers for each category using the user-friendly keys
-layers(::Type{<:NCEP{SixHourlyPressure}}) = keys(PRESSURE_MAP)
-layers(::Type{<:NCEP{SixHourlySurface}}) = keys(SIXHOURLY_SURFACE_MAP)
-layers(::Type{<:NCEP{DailyPressure}}) = keys(PRESSURE_MAP)
-layers(::Type{<:NCEP{DailySurface}}) = keys(DAILY_SURFACE_MAP)
-layers(::Type{<:NCEP{DailySurfaceReanalysis2}}) = keys(DAILY_SURFACE_REANALYSIS2_MAP)
-layers(::Type{<:NCEP{MonthlyPressure}}) = keys(PRESSURE_MAP)
-layers(::Type{<:NCEP{MonthlySurface}}) = keys(MONTHLY_SURFACE_MAP)
-layers(::Type{<:NCEP{SurfaceGauss}}) = keys(SURFACEGAUSS_MAP)
+# Layer name → filename-part map for a given (group, reanalysis, period).
+# Pressure is uniform; Surface's published variables differ by period and reanalysis.
+_layer_map(::Type{Pressure}, R, P) = PRESSURE_MAP
+_layer_map(::Type{SurfaceFlux}, R, ::Type{SixHour}) = SURFACEFLUX_MAP
+_layer_map(::Type{Surface}, R, ::Type{SixHour}) = SURFACE_MAP
+_layer_map(::Type{Surface}, R, ::Type{Day}) = R == 2 ? SURFACE_DAILY_R2_MAP : SURFACE_DAILY_MAP
+_layer_map(::Type{Surface}, R, ::Type{Month}) = SURFACE_MONTHLY_MAP
 
-# The data is stored in yearly files for 6-hourly and daily data
-date_step(::Type{<:NCEP{<:Union{SixHourlyPressure, SixHourlySurface, DailyPressure, DailySurface, DailySurfaceReanalysis2, SurfaceGauss}}}) = Year(1)
-# Monthly data is in single files, so date step is irrelevant for file selection
-date_step(::Type{<:NCEP{<:Union{MonthlyPressure, MonthlySurface}}}) = Year(100) # Effectively a single step
+_layer_map(T::Type{<:NCEP}) = _layer_map(group(T), reanalysis(T), period(T))
 
-getraster(T::Type{<:NCEP}, layer::Union{Tuple,Symbol}; date, dataset="reanalysis") =
-    _getraster(T, layer, date, dataset)
+layers(T::Type{<:NCEP}) = keys(_layer_map(T))
 
-getraster_keywords(::Type{<:NCEP}) = (:date, :dataset)
+# Yearly files for sub-monthly data; monthly data is a single file (date irrelevant).
+date_step(T::Type{<:NCEP}) = _date_step(period(T))
+_date_step(::Type{Month}) = Year(100)
+_date_step(::Type{<:Any}) = Year(1)
 
-function _getraster(T::Type{<:NCEP}, layer::Union{Tuple,Symbol}, dates::Tuple{<:Any,<:Any}, dataset)
-    _getraster(T, layer, date_sequence(T, dates), dataset)
+getraster(T::Type{<:NCEP}, layer::Union{Tuple,Symbol}; date) = _getraster(T, layer, date)
+
+getraster_keywords(::Type{<:NCEP}) = (:date,)
+
+function _getraster(T::Type{<:NCEP}, layer::Union{Tuple,Symbol}, dates::Tuple{<:Any,<:Any})
+    _getraster(T, layer, date_sequence(T, dates))
 end
-function _getraster(T::Type{<:NCEP}, layers::Union{Tuple,Symbol}, dates::AbstractArray, dataset)
-    _getraster.(T, Ref(layers), dates, Ref(dataset))
+function _getraster(T::Type{<:NCEP}, layers::Union{Tuple,Symbol}, dates::AbstractArray)
+    _getraster.(T, Ref(layers), dates)
 end
-function _getraster(T::Type{<:NCEP}, layers::Tuple, date::Dates.TimeType, dataset)
-    _map_layers(T, layers, date, dataset)
+function _getraster(T::Type{<:NCEP}, layers::Tuple, date::Dates.TimeType)
+    _map_layers(T, layers, date)
 end
-function _getraster(T::Type{<:NCEP}, layer::Symbol, date::Dates.TimeType, dataset)
+function _getraster(T::Type{<:NCEP}, layer::Symbol, date::Dates.TimeType)
     _check_layer(T, layer)
-    raster_path = rasterpath(T, layer; date=date, dataset=dataset)
+    raster_path = rasterpath(T, layer; date=date)
     mkpath(dirname(raster_path))
     if !isfile(raster_path)
-        url = rasterurl(T, layer; date=date, dataset=dataset)
+        url = rasterurl(T, layer; date=date)
         _maybe_download(url, raster_path)
     end
     return raster_path
 end
 
-_get_filename_part(::Type{<:NCEP{SixHourlyPressure}}, layer) = PRESSURE_MAP[layer]
-_get_filename_part(::Type{<:NCEP{SixHourlySurface}}, layer) = SIXHOURLY_SURFACE_MAP[layer]
-_get_filename_part(::Type{<:NCEP{DailyPressure}}, layer) = PRESSURE_MAP[layer]
-_get_filename_part(::Type{<:NCEP{DailySurface}}, layer) = DAILY_SURFACE_MAP[layer]
-_get_filename_part(::Type{<:NCEP{DailySurfaceReanalysis2}}, layer) = DAILY_SURFACE_REANALYSIS2_MAP[layer]
-_get_filename_part(::Type{<:NCEP{MonthlyPressure}}, layer) = PRESSURE_MAP[layer]
-_get_filename_part(::Type{<:NCEP{MonthlySurface}}, layer) = MONTHLY_SURFACE_MAP[layer]
-_get_filename_part(::Type{<:NCEP{SurfaceGauss}}, layer) = SURFACEGAUSS_MAP[layer]
+_filename_part(T::Type{<:NCEP}, layer) = _layer_map(T)[layer]
 
-_category_path(::Type{SixHourlyPressure}, _) = ("pressure",)
-_category_path(::Type{SixHourlySurface}, _) = ("surface",)
-_category_path(::Type{DailyPressure}, _) = ("Dailies", "pressure")
-_category_path(::Type{DailySurface}, _) = ("Dailies", "surface")
-_category_path(::Type{DailySurfaceReanalysis2}, _) = ("Dailies", "surface")
-_category_path(::Type{MonthlyPressure}, _) = ("Monthlies", "pressure")
-_category_path(::Type{MonthlySurface}, _) = ("Monthlies", "surface")
-_category_path(::Type{SurfaceGauss}, dataset) = (dataset == "reanalysis" ? "surface_gauss" : "gaussian_grid",)
+# Server subdirectory for the (group, reanalysis, period). The Gaussian-grid flux
+# directory is named differently between the two reanalyses.
+_category_dir(::Type{Pressure}, R, ::Type{SixHour}) = ("pressure",)
+_category_dir(::Type{Pressure}, R, ::Type{Day})     = ("Dailies", "pressure")
+_category_dir(::Type{Pressure}, R, ::Type{Month})   = ("Monthlies", "pressure")
+_category_dir(::Type{Surface}, R, ::Type{SixHour})  = ("surface",)
+_category_dir(::Type{Surface}, R, ::Type{Day})      = ("Dailies", "surface")
+_category_dir(::Type{Surface}, R, ::Type{Month})    = ("Monthlies", "surface")
+_category_dir(::Type{SurfaceFlux}, R, ::Type{SixHour}) = (R == 2 ? "gaussian_grid" : "surface_gauss",)
+
+_category_dir(T::Type{<:NCEP}) = _category_dir(group(T), reanalysis(T), period(T))
+
+_dataset_dir(R) = R == 2 ? "reanalysis2" : "reanalysis"
+
+# Monthly data lives in single `.mon.mean.nc` files; everything else is per-year.
+_rastername(::Type{Month}, part; date) = "$part.mon.mean.nc"
+_rastername(::Type, part; date) = "$part.$(year(date)).nc"
+_rastername(T::Type{<:NCEP}, part; date) = _rastername(period(T), part; date)
 
 rasterpath(T::Type{<:NCEP}) = joinpath(rasterpath(), "NCEP")
-function rasterpath(T::Type{<:NCEP{C}}, layer; date, dataset) where {C}
-    filename_part = _get_filename_part(T, layer)
-    joinpath(rasterpath(T), dataset, _category_path(C, dataset)..., rastername(T, filename_part; date))
+function rasterpath(T::Type{<:NCEP{G,R}}, layer; date) where {G,R}
+    part = _filename_part(T, layer)
+    joinpath(rasterpath(T), _dataset_dir(R), _category_dir(T)..., _rastername(T, part; date))
 end
 
-# Filename depends on the category
-rastername(::Type{<:NCEP{<:Union{SixHourlyPressure, SixHourlySurface, DailyPressure, DailySurface, DailySurfaceReanalysis2, SurfaceGauss}}}, filename_part; date) = "$filename_part.$(year(date)).nc"
-rastername(::Type{<:NCEP{<:Union{MonthlyPressure, MonthlySurface}}}, filename_part; date) = "$filename_part.mon.mean.nc"
-
-function rasterurl(T::Type{<:NCEP{C}}, layer; date, dataset) where {C}
-    filename_part = _get_filename_part(T, layer)
-    base_url = "https://downloads.psl.noaa.gov/Datasets/ncep.$(dataset)/"
-    path = join(_category_path(C, dataset), "/")
-    name = rastername(T, filename_part; date)
+function rasterurl(T::Type{<:NCEP{G,R}}, layer; date) where {G,R}
+    part = _filename_part(T, layer)
+    base_url = "https://downloads.psl.noaa.gov/Datasets/ncep.$(_dataset_dir(R))/"
+    path = join(_category_dir(T), "/")
+    name = _rastername(T, part; date)
     return URI(string(base_url, path, "/", name))
 end
 
