@@ -1,9 +1,5 @@
 const GADS_URI = URI(scheme="https", host="zenodo.org", path="/records/19246341/files")
 
-const GADS_LAYERS = (
-    optdepth = (description="Spectral aerosol optical depth", units="dimensionless"),
-)
-
 @doc """
     GADS <: RasterDataSource
 
@@ -27,49 +23,25 @@ See: [zenodo.org/records/19246341](https://zenodo.org/records/19246341) and
 Reference: Koepke, P., Hess, M., Schult, I., and Shettle, E.P. (1997). Global Aerosol Data Set.
 MPI-Report No. 243, Max-Planck-Institut für Meteorologie, Hamburg.
 
-The available layers are: `$(keys(GADS_LAYERS))`.
-
 # Usage with `getraster`
-    getraster(source::Type{GADS}, [layer])
-
-# Arguments
-- `layer`: `Symbol` or `Tuple` of `Symbol` from `$(keys(GADS_LAYERS))`.
-    Without a `layer` argument all layers are downloaded and a `NamedTuple` of paths returned.
+    getraster(source::Type{GADS})
 
 # Example
 ```julia
-julia> getraster(GADS, :optdepth)
-"/path/to/storage/GADS/gads.nc"
-
 julia> getraster(GADS)
-(optdepth = "/path/to/storage/GADS/gads.nc",)
+"/path/to/storage/GADS/gads.nc"
 ```
 
-Returns the filepath/s of the downloaded or pre-existing files.
+Returns the filepath of the downloaded or pre-existing file.
 """ GADS
 struct GADS <: RasterDataSource end
 
-layers(::Type{GADS}) = keys(GADS_LAYERS)
 getraster_keywords(::Type{GADS}) = ()
 
-rastername(::Type{GADS}, layer::Symbol) = "gads.nc"
+rastername(::Type{GADS}) = "gads.nc"
+rasterpath(T::Type{GADS}) = joinpath(rasterpath(), "GADS", rastername(T))
+rasterurl(T::Type{GADS}) = joinpath(GADS_URI, rastername(T))
 
-rasterpath(::Type{GADS}) = joinpath(rasterpath(), "GADS")
-rasterpath(T::Type{GADS}, layer::Symbol) = joinpath(rasterpath(T), rastername(T, layer))
-
-rasterurl(T::Type{GADS}, layer::Symbol) = joinpath(GADS_URI, rastername(T, layer))
-
-function getraster(T::Type{GADS}, layers::Union{Tuple,Symbol})
-    _getraster(T, layers)
-end
-
-function _getraster(T::Type{GADS}, layers::Tuple)
-    _map_layers(T, layers)
-end
-
-function _getraster(T::Type{GADS}, layer::Symbol)
-    _check_layer(T, layer)
-    path = rasterpath(T, layer)
-    url  = rasterurl(T, layer)
-    _maybe_download(url, path)
+function getraster(T::Type{GADS})
+    _maybe_download(rasterurl(T), rasterpath(T))
 end
