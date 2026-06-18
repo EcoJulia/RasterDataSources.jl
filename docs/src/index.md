@@ -83,6 +83,18 @@ NCEP
 CopernicusDEM
 ```
 
+## SRTM
+
+```@docs
+SRTM
+```
+
+## SLGA
+
+```@docs
+SLGA
+```
+
 # Datasets
 
 ```@docs
