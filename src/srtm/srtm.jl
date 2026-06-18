@@ -1,4 +1,37 @@
 
+"""
+    SRTM <: RasterDataSource
+
+The Shuttle Radar Topography Mission digital elevation model at ~90 m (3 arcsecond)
+resolution, served from the CGIAR-CSI SRTM 4.1 mirror as GeoTIFFs in WGS84.
+
+The dataset is split into 5°×5° tiles spanning latitudes 60°N to 60°S. Oceanic tiles
+that contain no land are absent from the dataset.
+
+See: [SRTM at CGIAR-CSI](https://srtm.csi.cgiar.org)
+
+# Usage with `getraster`
+
+    getraster(SRTM; extent) => Matrix{String}
+    getraster(SRTM; bounds) => Matrix{String}
+    getraster(SRTM; tile_index) => String
+
+## Keywords
+
+- `extent`: an `Extents.Extent`, the canonical spatial selector. All 5°×5° tiles
+    intersecting the extent are downloaded, returning a `Matrix` of file paths.
+- `bounds`: a legacy alias for `extent`, also accepting a `Tuple` of `(longitudes, latitudes)` bounds.
+- `tile_index`: a `CartesianIndex` (or `CartesianIndices`) addressing tiles directly.
+    Mostly used internally.
+
+## Example
+
+```julia
+using RasterDataSources, Extents
+# tiles intersecting an extent over Italy
+getraster(SRTM; extent=Extent(X=(10, 12), Y=(41, 43)))
+```
+"""
 struct SRTM <: RasterDataSource end
 
 # SRTM Mirror with 5x5 degree tiles
