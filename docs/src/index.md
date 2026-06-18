@@ -106,6 +106,7 @@ Weather
 Elevation
 LandCover
 HabitatHeterogeneity
+CoarseFragments
 Future
 ```
 
