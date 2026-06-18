@@ -1,6 +1,6 @@
 const GADS_URI = URI(scheme="https", host="zenodo.org", path="/records/19246341/files")
 
-@doc """
+"""
     GADS <: RasterDataSource
 
 A global 5-degree gridded product of spectral aerosol optical depths, derived from the
@@ -33,7 +33,7 @@ julia> getraster(GADS)
 ```
 
 Returns the filepath of the downloaded or pre-existing file.
-""" GADS
+"""
 struct GADS <: RasterDataSource end
 
 getraster_keywords(::Type{GADS}) = ()
