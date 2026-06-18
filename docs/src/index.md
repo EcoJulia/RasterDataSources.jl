@@ -77,6 +77,12 @@ TerraClimate
 NCEP
 ```
 
+## CopernicusDEM
+
+```@docs
+CopernicusDEM
+```
+
 # Datasets
 
 ```@docs
