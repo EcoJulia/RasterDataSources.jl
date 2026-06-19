@@ -36,4 +36,5 @@ using SafeTestsets, Aqua, RasterDataSources, Pkg, Dates
 @time @safetestset "modis extent" begin include("modis-extent.jl") end
 @time @safetestset "ncep" begin include("ncep.jl") end
 @time @safetestset "slga" begin include("slga.jl") end
+@time @safetestset "cpcsoil" begin include("cpcsoil.jl") end
 # @time @safetestset "modis interface" begin include("modis-interface.jl") end
