@@ -95,6 +95,13 @@ SRTM
 SLGA
 ```
 
+## CPCSoil
+
+```@docs
+Mean
+CPCSoil
+```
+
 # Datasets
 
 ```@docs

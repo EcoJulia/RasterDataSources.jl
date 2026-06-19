@@ -25,6 +25,7 @@ Currently sources include:
 | TerraClimate | https://www.climatologylab.org/terraclimate.html | Historical, Plus2C, Plus4C       |
 | NCEP         | https://psl.noaa.gov/data/gridded/data.ncep.reanalysis.html | Complete              |
 | SLGA         | https://esoil.io/TERNLandscapes/Public/Pages/SLGA/index.html | Soil attributes and CoarseFragments |
+| CPCSoil      | https://psl.noaa.gov/data/gridded/data.cpcsoil.html | LTM climatology and historical monthly means |
 
 Please open an issue if you need more datasets added, or (even better) open a pull request 
 following the form of the other datasets where possible.
