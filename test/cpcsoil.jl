@@ -25,13 +25,13 @@ using RasterDataSources: rastername, rasterurl, rasterpath
         @test_throws ArgumentError getraster(CPCSoil; period="2000-2030")
     end
 
-    @testset "CPCSoilMean" begin
+    @testset "Mean" begin
         path = joinpath(cpcsoil_dir, "soilw.mon.mean.v2.nc")
-        @test rasterpath(CPCSoil{CPCSoilMean}) == path
-        @test rastername(CPCSoil{CPCSoilMean}) == "soilw.mon.mean.v2.nc"
-        @test rasterurl(CPCSoil{CPCSoilMean}) == URI(scheme="https", host="psl.noaa.gov",
+        @test rasterpath(CPCSoil{Mean}) == path
+        @test rastername(CPCSoil{Mean}) == "soilw.mon.mean.v2.nc"
+        @test rasterurl(CPCSoil{Mean}) == URI(scheme="https", host="psl.noaa.gov",
             path="/thredds/fileServer/Datasets/cpcsoil/soilw.mon.mean.v2.nc")
-        @test RasterDataSources.getraster_keywords(CPCSoil{CPCSoilMean}) == ()
+        @test RasterDataSources.getraster_keywords(CPCSoil{Mean}) == ()
     end
 
     if !Sys.iswindows()

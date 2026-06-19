@@ -98,7 +98,7 @@ SLGA
 ## CPCSoil
 
 ```@docs
-CPCSoilMean
+Mean
 CPCSoil
 ```
 

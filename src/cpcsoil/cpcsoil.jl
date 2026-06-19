@@ -4,19 +4,6 @@ const CPCSOIL_URI = URI(scheme="https", host="psl.noaa.gov",
 const CPCSOIL_LTM_PERIODS = ("1991-2020", "1981-2010")
 
 """
-    CPCSoilMean
-
-Type parameter for [`CPCSoil`](@ref) selecting the full historical monthly
-mean time series (`soilw.mon.mean.v2.nc`, 254 MB) rather than a long-term
-mean climatology.
-
-```julia
-getraster(CPCSoil{CPCSoilMean})
-```
-"""
-struct CPCSoilMean end
-
-"""
     CPCSoil{X} <: RasterDataSource
 
 Monthly soil moisture data from the NOAA Climate Prediction Center (CPC),
@@ -30,7 +17,7 @@ Use the `period` keyword to select the climatology:
 - `"1991-2020"` (default, 9.5 MB)
 - `"1981-2010"` (3.2 MB)
 
-**Historical monthly means** — `CPCSoil{CPCSoilMean}`:
+**Historical monthly means** — `CPCSoil{Mean}`:
 Full monthly time series from 1948 to present (254 MB).
 
 See: [psl.noaa.gov/data/gridded/data.cpcsoil.html](https://psl.noaa.gov/data/gridded/data.cpcsoil.html)
@@ -41,7 +28,7 @@ monthly soil moisture data set at 0.5° resolution for 1948 to present.
 
 # Usage with `getraster`
     getraster(source::Type{CPCSoil}; period="1991-2020")
-    getraster(source::Type{CPCSoil{CPCSoilMean}})
+    getraster(source::Type{CPCSoil{Mean}})
 
 # Examples
 ```julia
@@ -51,7 +38,7 @@ julia> getraster(CPCSoil)
 julia> getraster(CPCSoil; period="1981-2010")
 "/path/to/storage/CPCSoil/soilw.mon.1981-2010.ltm.v2.nc"
 
-julia> getraster(CPCSoil{CPCSoilMean})
+julia> getraster(CPCSoil{Mean})
 "/path/to/storage/CPCSoil/soilw.mon.mean.v2.nc"
 ```
 
@@ -82,16 +69,16 @@ function getraster(T::Type{CPCSoil}; period=defperiod(T))
     _maybe_download(rasterurl(T; period), rasterpath(T; period))
 end
 
-getraster_keywords(::Type{CPCSoil{CPCSoilMean}}) = ()
+getraster_keywords(::Type{CPCSoil{Mean}}) = ()
 
-rastername(::Type{CPCSoil{CPCSoilMean}}) = "soilw.mon.mean.v2.nc"
+rastername(::Type{CPCSoil{Mean}}) = "soilw.mon.mean.v2.nc"
 
-rasterpath(T::Type{CPCSoil{CPCSoilMean}}) =
+rasterpath(T::Type{CPCSoil{Mean}}) =
     joinpath(rasterpath(), "CPCSoil", rastername(T))
 
-rasterurl(T::Type{CPCSoil{CPCSoilMean}}) =
+rasterurl(T::Type{CPCSoil{Mean}}) =
     joinpath(CPCSOIL_URI, rastername(T))
 
-function getraster(T::Type{CPCSoil{CPCSoilMean}})
+function getraster(T::Type{CPCSoil{Mean}})
     _maybe_download(rasterurl(T), rasterpath(T))
 end
