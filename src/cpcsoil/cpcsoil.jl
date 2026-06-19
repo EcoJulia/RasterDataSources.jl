@@ -69,12 +69,13 @@ end
 
 getraster_keywords(::Type{CPCSoil}) = (:period,)
 
-rastername(::Type{CPCSoil}; period) = "soilw.mon.$(period).ltm.v2.nc"
+rastername(::Type{CPCSoil}; period=defperiod(CPCSoil)) = "soilw.mon.$(period).ltm.v2.nc"
 
-rasterpath(::Type{CPCSoil}) = joinpath(rasterpath(), "CPCSoil")
-rasterpath(T::Type{CPCSoil}; period) = joinpath(rasterpath(T), rastername(T; period))
+rasterpath(T::Type{CPCSoil}; period=defperiod(T)) =
+    joinpath(rasterpath(), "CPCSoil", rastername(T; period))
 
-rasterurl(T::Type{CPCSoil}; period) = joinpath(CPCSOIL_URI, rastername(T; period))
+rasterurl(T::Type{CPCSoil}; period=defperiod(T)) =
+    joinpath(CPCSOIL_URI, rastername(T; period))
 
 function getraster(T::Type{CPCSoil}; period=defperiod(T))
     _check_period(T, period)
