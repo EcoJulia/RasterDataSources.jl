@@ -95,6 +95,12 @@ SRTM
 SLGA
 ```
 
+## CRUCL2
+
+```@docs
+CRUCL2
+```
+
 # Datasets
 
 ```@docs
