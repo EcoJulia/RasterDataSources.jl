@@ -94,11 +94,23 @@ SRTM
 ```@docs
 SLGA
 ```
-
 ## GADS
 
 ```@docs
 GADS
+```
+
+## CRUCL2
+
+```@docs
+CRUCL2
+```
+
+## CPCSoil
+
+```@docs
+Mean
+CPCSoil
 ```
 
 # Datasets

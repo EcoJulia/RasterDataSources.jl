@@ -275,6 +275,18 @@ See the [`EarthEnv`](@ref) docs for implementation details.
 struct HabitatHeterogeneity <: RasterDataSet end
 
 """
+    Mean
+
+Type parameter for data sources that provide a long-term mean (or historical mean)
+product in addition to a climatological one. Currently used with [`CPCSoil`](@ref):
+
+```julia
+getraster(CPCSoil{Mean})  # full monthly time series 1948–present
+```
+"""
+struct Mean end
+
+"""
     ModisProduct <: RasterDataSet
 
 Abstract supertype for [`MODIS`](@ref)/VIIRS products. 
