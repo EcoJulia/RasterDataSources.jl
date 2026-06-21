@@ -101,7 +101,7 @@ const SURFACEFLUX_MAP = (tmax = "tmax.2m.gauss", tmin = "tmin.2m.gauss", air_2m 
 
 # Layer name → filename-part map for a given (group, reanalysis, period).
 # Pressure is uniform; Surface's published variables differ by period and reanalysis.
-_layer_map(::Type{Pressure}, R, P) = PRESSURE_MAP
+_layer_map(::Type{PressureLevels}, R, P) = PRESSURE_MAP
 _layer_map(::Type{SurfaceFlux}, R, ::Type{SixHour}) = SURFACEFLUX_MAP
 _layer_map(::Type{Surface}, R, ::Type{SixHour}) = SURFACE_MAP
 _layer_map(::Type{Surface}, R, ::Type{Day}) = R == 2 ? SURFACE_DAILY_R2_MAP : SURFACE_DAILY_MAP
