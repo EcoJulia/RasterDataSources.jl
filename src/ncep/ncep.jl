@@ -2,17 +2,16 @@
 # NCEP/NCAR Reanalysis 1 and NCEP/DOE Reanalysis 2, organised on orthogonal axes:
 #
 #   group       — product family (variable set + grid):
-#                   Pressure    : pressure-level analysis, 2.5° lat/lon grid
-#                   Surface     : surface analysis, 2.5° lat/lon grid
+#                   PressureLevels : pressure-level analysis, 2.5° lat/lon grid
+#                   Surface : surface analysis, 2.5° lat/lon grid
 #                   SurfaceFlux : surface forecast fluxes on the T62 Gaussian grid
 #                                 (2 m / 10 m vars, radiation, precip)
 #   reanalysis  — 1 (NCEP/NCAR, 1948–) or 2 (NCEP/DOE, 1979–)
 #   period      — temporal resolution. The data is natively 6-hourly; Day and Month
 #                 are aggregate products NOAA publishes for some groups. Native is the
 #                 default, so it is the omittable trailing parameter.
-
 abstract type NCEPGroup end
-struct Pressure    <: NCEPGroup end
+struct PressureLevels    <: NCEPGroup end
 struct Surface     <: NCEPGroup end
 struct SurfaceFlux <: NCEPGroup end
 
@@ -28,18 +27,19 @@ struct SixHour end
 """
     NCEP{Group<:NCEPGroup, Reanalysis, Period} <: RasterDataSource
 
-Data from the NCEP/NCAR Reanalysis 1 (1948–present) and NCEP/DOE Reanalysis 2
+Data from the NCEP/NCAR Reanalysis 1 (1948–2026) and NCEP/DOE Reanalysis 2
 (1979–present) datasets.
 
-See: https://psl.noaa.gov/data/gridded/data.ncep.reanalysis.html
+See: https://psl.noaa.gov/data/gridded/data.ncep.reanalysis.html and
+  https://psl.noaa.gov/data/gridded/data.ncep.reanalysis2.html
 
 # Type Parameters
-- `Group`: `Pressure`, `Surface`, or `SurfaceFlux`.
+- `Group`: `PressureLevels`, `Surface`, or `SurfaceFlux`.
 - `Reanalysis`: `1` or `2`.
 - `Period`: `SixHour` (native, default), `Day`, or `Month`.
 
 `NCEP{Surface, 2}` is the native 6-hourly surface analysis from Reanalysis 2;
-`NCEP{Pressure, 1, Day}` is the daily Reanalysis 1 pressure-level aggregate.
+`NCEP{PressureLevels, 1, Day}` is the daily Reanalysis 1 pressure-level aggregate.
 
 ## Usage
 
@@ -65,13 +65,13 @@ getraster(NCEP{Group, Reanalysis, Period}, layer; date)
 | `:uwnd_10m` | U-Wind (10m) | m/s | `SurfaceFlux` |
 | `:vwnd_10m` | V-Wind (10m) | m/s | `SurfaceFlux` |
 | `:tcdc` | Total Cloud Cover | % | `SurfaceFlux` (2005 only) |
-| `:hgt` | Geopotential Height | m | `Pressure` |
-| `:rhum` | Relative Humidity | % | `Pressure` |
-| `:shum` | Specific Humidity | kg/kg | `Pressure` |
-| `:air` | Air Temperature | K | `Pressure` |
-| `:uwnd` | U-Wind | m/s | `Pressure` |
-| `:vwnd` | V-Wind | m/s | `Pressure` |
-| `:omega` | Vertical Velocity | Pa/s | `Pressure` |
+| `:hgt` | Geopotential Height | m | `PressureLevels` |
+| `:rhum` | Relative Humidity | % | `PressureLevels` |
+| `:shum` | Specific Humidity | kg/kg | `PressureLevels` |
+| `:air` | Air Temperature | K | `PressureLevels` |
+| `:uwnd` | U-Wind | m/s | `PressureLevels` |
+| `:vwnd` | V-Wind | m/s | `PressureLevels` |
+| `:omega` | Vertical Velocity | Pa/s | `PressureLevels` |
 | `:pr_wtr` | Precipitable Water | kg/m² | `Surface` (6-hourly, monthly) |
 | `:pres_sfc` | Surface Pressure | Pa | `Surface` (6-hourly; daily R2) |
 | `:lftx` | Surface Lifted Index | K | `Surface` (6-hourly) |
@@ -81,7 +81,7 @@ getraster(NCEP{Group, Reanalysis, Period}, layer; date)
 
 # Example
 ```julia
-getraster(NCEP{Pressure, 1, Day}, :hgt; date=Date(2001))
+getraster(NCEP{PressureLevels, 1, Day}, :hgt; date=Date(2001))
 ```
 """
 struct NCEP{G<:NCEPGroup, R, P} <: RasterDataSource end
@@ -144,9 +144,9 @@ _filename_part(T::Type{<:NCEP}, layer) = _layer_map(T)[layer]
 
 # Server subdirectory for the (group, reanalysis, period). The Gaussian-grid flux
 # directory is named differently between the two reanalyses.
-_category_dir(::Type{Pressure}, R, ::Type{SixHour}) = ("pressure",)
-_category_dir(::Type{Pressure}, R, ::Type{Day})     = ("Dailies", "pressure")
-_category_dir(::Type{Pressure}, R, ::Type{Month})   = ("Monthlies", "pressure")
+_category_dir(::Type{PressureLevels}, R, ::Type{SixHour}) = ("pressure",)
+_category_dir(::Type{PressureLevels}, R, ::Type{Day})     = ("Dailies", "pressure")
+_category_dir(::Type{PressureLevels}, R, ::Type{Month})   = ("Monthlies", "pressure")
 _category_dir(::Type{Surface}, R, ::Type{SixHour})  = ("surface",)
 _category_dir(::Type{Surface}, R, ::Type{Day})      = ("Dailies", "surface")
 _category_dir(::Type{Surface}, R, ::Type{Month})    = ("Monthlies", "surface")
