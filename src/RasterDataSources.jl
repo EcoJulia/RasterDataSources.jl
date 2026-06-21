@@ -15,7 +15,7 @@ using Dates,
 
 import JSON
 
-export WorldClim, CHELSA, EarthEnv, AWAP, ALWB, SRTM, CopernicusDEM, MODIS, ERA5, NCEP, TerraClimate, GRIDMET, SLGA, CoarseFragments, CPCSoil, Mean
+export WorldClim, CHELSA, EarthEnv, AWAP, ALWB, SRTM, CopernicusDEM, MODIS, ERA5, NCEP, TerraClimate, GRIDMET, SLGA, CoarseFragments, CRUCL2, CPCSoil, Mean
 
 export BioClim, BioClimPlus, Climate, Weather, Elevation, LandCover, HabitatHeterogeneity
 
@@ -88,6 +88,8 @@ include("gridmet/gridmet.jl")
 
 include("slga/slga.jl")
 include("slga/coarsefragments.jl")
+
+include("crucl2/crucl2.jl")
 
 include("cpcsoil/cpcsoil.jl")
 
