@@ -29,9 +29,6 @@ See: [zenodo.org/records/20754689](https://zenodo.org/records/20754689) and
 Reference: New, M., Lister, D., Hulme, M. and Makin, I., 2002. A high-resolution data set of
 surface climate over global land areas. *Climate Research*, 21: 1–25.
 
-# Usage with `getraster`
-    getraster(source::Type{CRUCL2})
-
 # Example
 ```julia
 julia> getraster(CRUCL2)
