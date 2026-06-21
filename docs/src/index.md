@@ -94,6 +94,11 @@ SRTM
 ```@docs
 SLGA
 ```
+## GADS
+
+```@docs
+GADS
+```
 
 ## CRUCL2
 

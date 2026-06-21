@@ -25,6 +25,7 @@ Currently sources include:
 | TerraClimate | https://www.climatologylab.org/terraclimate.html | Historical, Plus2C, Plus4C       |
 | NCEP         | https://psl.noaa.gov/data/gridded/data.ncep.reanalysis.html | Complete              |
 | SLGA         | https://esoil.io/TERNLandscapes/Public/Pages/SLGA/index.html | Soil attributes and CoarseFragments |
+| GADS         | https://zenodo.org/records/19246341      | Spectral aerosol optical depths          |
 | CRUCL2       | https://zenodo.org/records/20754689      | Monthly mean climate 1961–1990           |
 | CPCSoil      | https://psl.noaa.gov/data/gridded/data.cpcsoil.html | LTM climatology and historical monthly means |
 
