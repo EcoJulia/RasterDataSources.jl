@@ -38,7 +38,7 @@ export ECO4ESIPTJPL,ECO4WUE,GEDI03,GEDI04_B,MCD12Q1,MCD12Q2,MCD15A2H,
     MYD17A2H, MYD17A3HGF, MYD21A2, SIF005, SIF_ANN, VNP09A1, VNP09H1, 
     VNP13A1, VNP15A2H, VNP21A2, VNP22Q2
 
-export SixHourlyPressure, SixHourlySurface, DailyPressure, DailySurface, DailySurfaceReanalysis2, MonthlyPressure, MonthlySurface, SurfaceGauss
+export Pressure, Surface, SurfaceFlux, SixHour
 
 export Values, Deciles
 
