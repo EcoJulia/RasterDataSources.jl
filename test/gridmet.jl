@@ -8,19 +8,27 @@ using RasterDataSources: rastername, rasterurl, rasterpath
 
     @test rastername(GRIDMET, :tmmx; date=Date(2020, 6, 15)) == "tmmx_2020.nc"
     @test rastername(GRIDMET, :pr;   date=Date(1979, 1, 1))  == "pr_1979.nc"
+    @test rastername(GRIDMET, :elev) == "metdata_elevationdata.nc"
 
     @test rasterpath(GRIDMET, :tmmx; date=Date(2020, 6, 15)) ==
         joinpath(gridmet_path, "tmmx", "tmmx_2020.nc")
+    @test rasterpath(GRIDMET, :elev) ==
+        joinpath(gridmet_path, "elev", "metdata_elevationdata.nc")
 
     @test rasterurl(GRIDMET, :tmmx; date=Date(2020)) ==
         URI(scheme="https", host="www.northwestknowledge.net", path="/metdata/data/tmmx_2020.nc")
+    @test rasterurl(GRIDMET, :elev) ==
+        URI("http://thredds.northwestknowledge.net:8080/thredds/fileServer/MET/elev/metdata_elevationdata.nc")
 
     @test RasterDataSources.getraster_keywords(GRIDMET) == (:date,)
     @test RasterDataSources.layers(GRIDMET) == (
         :tmmx, :tmmn, :pr, :rmax, :rmin, :sph, :srad, :th, :vs, :etr, :pet,
-        :vpd, :erc, :bi, :fm1, :fm100, :pdsi, :z, :spi, :spei, :eddi,
+        :vpd, :erc, :bi, :fm1, :fm100, :pdsi, :z, :spi, :spei, :eddi, :elev,
     )
     @test RasterDataSources.date_step(GRIDMET) == Year(1)
+
+    # date is required for dated layers, but not for :elev
+    @test_throws ArgumentError getraster(GRIDMET, :tmmx)
 
     if !Sys.iswindows()
         # Test actual download
@@ -37,5 +45,10 @@ using RasterDataSources: rastername, rasterurl, rasterpath
         # Tuple of dates expands across the year range
         @test getraster(GRIDMET, :tmmx; date=(Date(2019), Date(2020))) ==
             [joinpath(gridmet_path, "tmmx", "tmmx_2019.nc"), raster_path]
+
+        # Static elevation layer, no date required
+        raster_path_elev = joinpath(gridmet_path, "elev", "metdata_elevationdata.nc")
+        @test getraster(GRIDMET, :elev) == raster_path_elev
+        @test isfile(raster_path_elev)
     end
 end

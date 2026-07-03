@@ -1,4 +1,5 @@
 const GRIDMET_URI = URI(scheme="https", host="www.northwestknowledge.net", path="/metdata/data")
+const GRIDMET_ELEV_URI = URI("http://thredds.northwestknowledge.net:8080/thredds/fileServer/MET/elev/metdata_elevationdata.nc")
 
 const GRIDMET_LAYERS = (
     tmmx = (description="Maximum near-surface air temperature",                    units="K"),
@@ -22,6 +23,7 @@ const GRIDMET_LAYERS = (
     spi  = (description="Standardized Precipitation Index",                       units="unitless"),
     spei = (description="Standardized Precipitation-Evapotranspiration Index",    units="unitless"),
     eddi = (description="Evaporative Demand Drought Index",                        units="unitless"),
+    elev = (description="Elevation",                                              units="m"),
 )
 
 @doc """
@@ -37,7 +39,8 @@ contains daily layers for the full calendar year. Coverage is from 1979 to prese
 
 The available layers are: `$(keys(GRIDMET_LAYERS))`.
 
-`getraster` for `GRIDMET` requires a `date` keyword to specify the year to download.
+`getraster` for `GRIDMET` requires a `date` keyword to specify the year to download,
+except for the static `elev` layer, which is a single unchanging file and ignores `date`.
 
 # Usage with `getraster`
     getraster(source::Type{GRIDMET}, [layer]; date)
@@ -49,6 +52,7 @@ The available layers are: `$(keys(GRIDMET_LAYERS))`.
 # Keywords
 - `date`: a `Date`, `AbstractVector` of `Date`, or a `Tuple` of start and end dates.
     Only the year component is used. For multiple dates, a `Vector` of paths is returned.
+    Not required when `layer` is `:elev`.
 
 # Example
 ```julia
@@ -60,6 +64,9 @@ julia> getraster(GRIDMET, (:tmmx, :pr); date=Date(2020))
 
 julia> getraster(GRIDMET, :tmmx; date=(Date(2018), Date(2020)))
 [".../tmmx_2018.nc", ".../tmmx_2019.nc", ".../tmmx_2020.nc"]
+
+julia> getraster(GRIDMET, :elev)
+"/path/to/storage/GRIDMET/elev/metdata_elevationdata.nc"
 ```
 
 Returns the filepath/s of the downloaded or pre-existing files.
@@ -71,16 +78,17 @@ date_step(::Type{GRIDMET}) = Year(1)
 date_range(::Type{GRIDMET}) = (Date(1979, 1, 1), Date(2025, 12, 31))
 getraster_keywords(::Type{GRIDMET}) = (:date,)
 
-rastername(::Type{GRIDMET}, layer::Symbol; date) = "$(layer)_$(year(date)).nc"
+rastername(::Type{GRIDMET}, layer::Symbol; date=nothing) =
+    layer === :elev ? "metdata_elevationdata.nc" : "$(layer)_$(year(date)).nc"
 
 rasterpath(::Type{GRIDMET}) = joinpath(rasterpath(), "GRIDMET")
-rasterpath(T::Type{GRIDMET}, layer::Symbol; date) =
+rasterpath(T::Type{GRIDMET}, layer::Symbol; date=nothing) =
     joinpath(rasterpath(T), string(layer), rastername(T, layer; date))
 
-rasterurl(T::Type{GRIDMET}, layer::Symbol; date) =
-    joinpath(GRIDMET_URI, rastername(T, layer; date))
+rasterurl(T::Type{GRIDMET}, layer::Symbol; date=nothing) =
+    layer === :elev ? GRIDMET_ELEV_URI : joinpath(GRIDMET_URI, rastername(T, layer; date))
 
-function getraster(T::Type{GRIDMET}, layers::Union{Tuple,Symbol}; date)
+function getraster(T::Type{GRIDMET}, layers::Union{Tuple,Symbol}; date=nothing)
     _getraster(T, layers, date)
 end
 
@@ -90,11 +98,14 @@ end
 function _getraster(T::Type{GRIDMET}, layers, dates::AbstractArray)
     _getraster.(T, Ref(layers), dates)
 end
-function _getraster(T::Type{GRIDMET}, layers::Tuple, date::Dates.TimeType)
+function _getraster(T::Type{GRIDMET}, layers::Tuple, date::Union{Dates.TimeType,Nothing})
     _map_layers(T, layers, date)
 end
-function _getraster(T::Type{GRIDMET}, layer::Symbol, date::Dates.TimeType)
+function _getraster(T::Type{GRIDMET}, layer::Symbol, date::Union{Dates.TimeType,Nothing})
     _check_layer(T, layer)
+    if layer !== :elev && date === nothing
+        throw(ArgumentError("`date` keyword is required for GRIDMET layer `$layer`"))
+    end
     path = rasterpath(T, layer; date)
     url  = rasterurl(T, layer; date)
     _maybe_download(url, path)
