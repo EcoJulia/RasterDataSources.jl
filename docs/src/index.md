@@ -94,6 +94,12 @@ SRTM
 ```@docs
 SLGA
 ```
+
+## SILO
+
+```@docs
+SILO
+```
 ## GADS
 
 ```@docs
