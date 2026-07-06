@@ -29,6 +29,7 @@ Currently sources include:
 | CRUCL2       | https://zenodo.org/records/20754689      | Monthly mean climate 1961–1990           |
 | CPCSoil      | https://psl.noaa.gov/data/gridded/data.cpcsoil.html | LTM climatology and historical monthly means |
 | SILO         | https://www.longpaddock.qld.gov.au/silo/about/overview/ | Complete                          |
+| BARRA        | https://opus.nci.org.au/pages/viewpage.action?pageId=264241166 | Near-surface variables (BARRA-R2, BARRA-C2) |
 
 Please open an issue if you need more datasets added, or (even better) open a pull request 
 following the form of the other datasets where possible.
