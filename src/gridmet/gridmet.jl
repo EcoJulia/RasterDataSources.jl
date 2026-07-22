@@ -1,4 +1,5 @@
 const GRIDMET_URI = URI(scheme="https", host="www.northwestknowledge.net", path="/metdata/data")
+const GRIDMET_ELEV_URI = URI("http://thredds.northwestknowledge.net:8080/thredds/fileServer/MET/elev/metdata_elevationdata.nc")
 
 const GRIDMET_LAYERS = (
     tmmx = (description="Maximum near-surface air temperature",                    units="K"),
@@ -25,30 +26,37 @@ const GRIDMET_LAYERS = (
 )
 
 @doc """
-    GRIDMET <: RasterDataSource
+    GRIDMET{X} <: RasterDataSource
 
 Data from the gridMET dataset (also known as METDATA), a high-resolution (~4 km)
 daily gridded surface meteorological dataset covering the contiguous United States.
 
 See: [climatologylab.org/gridmet](https://www.climatologylab.org/gridmet.html)
 
-Data are served as annual NetCDF files, one per variable per year. Each file
-contains daily layers for the full calendar year. Coverage is from 1979 to present.
+Two products are available:
+
+**Daily meteorology** — `GRIDMET` (default):
+Annual NetCDF files, one per variable per year, each containing daily layers for the
+full calendar year. Coverage is from 1979 to present.
 
 The available layers are: `$(keys(GRIDMET_LAYERS))`.
 
-`getraster` for `GRIDMET` requires a `date` keyword to specify the year to download.
+**Static elevation** — `GRIDMET{Elevation}`:
+A single NetCDF file giving the ~4 km elevation grid used by gridMET. No `date` keyword.
 
 # Usage with `getraster`
     getraster(source::Type{GRIDMET}, [layer]; date)
+    getraster(source::Type{GRIDMET{Elevation}}, [layer])
 
 # Arguments
-- `layer`: `Symbol` or `Tuple` of `Symbol` from `$(keys(GRIDMET_LAYERS))`.
-    Without a `layer` argument all layers are downloaded and a `NamedTuple` of paths returned.
+- `layer`: `Symbol` or `Tuple` of `Symbol` from `$(keys(GRIDMET_LAYERS))` for `GRIDMET`,
+    or `:elev` for `GRIDMET{Elevation}`. Without a `layer` argument all layers are
+    downloaded and a `NamedTuple` of paths returned.
 
 # Keywords
 - `date`: a `Date`, `AbstractVector` of `Date`, or a `Tuple` of start and end dates.
     Only the year component is used. For multiple dates, a `Vector` of paths is returned.
+    Applies only to `GRIDMET`, not `GRIDMET{Elevation}`.
 
 # Example
 ```julia
@@ -60,11 +68,16 @@ julia> getraster(GRIDMET, (:tmmx, :pr); date=Date(2020))
 
 julia> getraster(GRIDMET, :tmmx; date=(Date(2018), Date(2020)))
 [".../tmmx_2018.nc", ".../tmmx_2019.nc", ".../tmmx_2020.nc"]
+
+julia> getraster(GRIDMET{Elevation}, :elev)
+"/path/to/storage/GRIDMET/elev/metdata_elevationdata.nc"
 ```
 
 Returns the filepath/s of the downloaded or pre-existing files.
 """ GRIDMET
-struct GRIDMET <: RasterDataSource end
+struct GRIDMET{X} <: RasterDataSource end
+
+# --- Daily meteorology (bare GRIDMET) --------------------------------------
 
 layers(::Type{GRIDMET}) = keys(GRIDMET_LAYERS)
 date_step(::Type{GRIDMET}) = Year(1)
@@ -98,4 +111,23 @@ function _getraster(T::Type{GRIDMET}, layer::Symbol, date::Dates.TimeType)
     path = rasterpath(T, layer; date)
     url  = rasterurl(T, layer; date)
     _maybe_download(url, path)
+end
+
+# --- Static elevation (GRIDMET{Elevation}) ---------------------------------
+
+layers(::Type{GRIDMET{Elevation}}) = (:elev,)
+getraster_keywords(::Type{GRIDMET{Elevation}}) = ()
+
+rastername(::Type{GRIDMET{Elevation}}, layer::Symbol) = "metdata_elevationdata.nc"
+rasterpath(T::Type{GRIDMET{Elevation}}, layer::Symbol) =
+    joinpath(rasterpath(GRIDMET), string(layer), rastername(T, layer))
+rasterurl(::Type{GRIDMET{Elevation}}, layer::Symbol) = GRIDMET_ELEV_URI
+
+getraster(T::Type{GRIDMET{Elevation}}, layers::Union{Tuple,Symbol}) =
+    _getraster(T, layers)
+
+_getraster(T::Type{GRIDMET{Elevation}}, layers::Tuple) = _map_layers(T, layers)
+function _getraster(T::Type{GRIDMET{Elevation}}, layer::Symbol)
+    _check_layer(T, layer)
+    _maybe_download(rasterurl(T, layer), rasterpath(T, layer))
 end
