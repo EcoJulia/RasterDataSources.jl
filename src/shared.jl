@@ -11,6 +11,9 @@ getraster(T::Type; kw...) = getraster(T, layers(T); kw...)
 Trait for defining data source keywords, which returns
 a `NTuple{N,Symbol}`.
 
+Only lists the source-specific keywords. `update`, which is accepted by every
+`getraster` method, is not included.
+
 The default fallback method returns `()`.
 """
 getraster_keywords(::Type{<:RasterDataSource}) = ()
@@ -58,8 +61,8 @@ function _date_error(date, daterange)
     error("The requested dataset covers the period from $startyear-$endyear, which does not include $date")
 end         
 
-function _maybe_download(uri::URI, filepath, headers = [])
-    if !isfile(filepath)
+function _maybe_download(uri::URI, filepath, headers = []; update::Bool=false)
+    if update || !isfile(filepath)
         mkpath(dirname(filepath))
         @info "Starting download for $uri"
         try

@@ -49,6 +49,8 @@ Coverage is from 1889 to present for most variables, 1957 for `mslp`, and
 # Keywords
 - `date`: a `Date`, `AbstractVector` of `Date`, or a `Tuple` of start and end dates.
     Only the year component is used. For multiple dates, a `Vector` of paths is returned.
+- `update`: `Bool`, defaults to `false`. If `true`, re-download files even when a local
+    copy already exists. Useful for the current year, which SILO updates in place.
 
 # Example
 ```julia
@@ -65,9 +67,9 @@ julia> getraster(SILO, :daily_rain; date=(Date(2018), Date(2020)))
 Returns the filepath/s of the downloaded or pre-existing files.
 
 !!! note
-    `getraster` never re-downloads an existing local file, so the current
-    year's data will go stale as SILO updates it. Delete the local file to
-    force a refresh.
+    By default `getraster` will not re-download an existing local file, so the
+    current year's data will go stale as SILO updates it. Pass `update=true`
+    to force a refresh.
 """ SILO
 struct SILO <: RasterDataSource end
 
@@ -85,20 +87,20 @@ rasterpath(T::Type{SILO}, layer::Symbol; date) =
 rasterurl(T::Type{SILO}, layer::Symbol; date) =
     joinpath(SILO_URI, string(layer), rastername(T, layer; date))
 
-function getraster(T::Type{SILO}, layers::Union{Tuple,Symbol}; date)
-    _getraster(T, layers, date)
+function getraster(T::Type{SILO}, layers::Union{Tuple,Symbol}; date, update::Bool=false)
+    _getraster(T, layers, date; update)
 end
 
-function _getraster(T::Type{SILO}, layers, dates::Tuple{<:Any,<:Any})
-    _getraster(T, layers, date_sequence(T, dates))
+function _getraster(T::Type{SILO}, layers, dates::Tuple{<:Any,<:Any}; update::Bool=false)
+    _getraster(T, layers, date_sequence(T, dates); update)
 end
-function _getraster(T::Type{SILO}, layers, dates::AbstractArray)
-    _getraster.(T, Ref(layers), dates)
+function _getraster(T::Type{SILO}, layers, dates::AbstractArray; update::Bool=false)
+    map(d -> _getraster(T, layers, d; update), dates)
 end
-function _getraster(T::Type{SILO}, layers::Tuple, date::Dates.TimeType)
-    _map_layers(T, layers, date)
+function _getraster(T::Type{SILO}, layers::Tuple, date::Dates.TimeType; update::Bool=false)
+    _map_layers(T, layers, date; update)
 end
-function _getraster(T::Type{SILO}, layer::Symbol, date::Dates.TimeType)
+function _getraster(T::Type{SILO}, layer::Symbol, date::Dates.TimeType; update::Bool=false)
     _check_layer(T, layer)
     minyear = _silo_min_year(layer)
     year(date) >= minyear || throw(ArgumentError(
@@ -106,5 +108,5 @@ function _getraster(T::Type{SILO}, layer::Symbol, date::Dates.TimeType)
     ))
     path = rasterpath(T, layer; date)
     url  = rasterurl(T, layer; date)
-    _maybe_download(url, path)
+    _maybe_download(url, path; update)
 end
