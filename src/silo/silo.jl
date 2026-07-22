@@ -1,24 +1,10 @@
 const SILO_URI = URI(scheme="https", host="s3-ap-southeast-2.amazonaws.com", path="/silo-open-data/Official/annual")
 
 const SILO_LAYERS = (
-    daily_rain          = (description="Daily rainfall",                                                          units="mm"),
-    et_morton_actual    = (description="Morton's areal actual evapotranspiration",                                units="mm"),
-    et_morton_potential = (description="Morton's point potential evapotranspiration",                             units="mm"),
-    et_morton_wet       = (description="Morton's wet-environment areal potential evapotranspiration over land",   units="mm"),
-    et_short_crop       = (description="FAO56 short crop",                                                        units="mm"),
-    et_tall_crop        = (description="ASCE tall crop",                                                         units="mm"),
-    evap_morton_lake    = (description="Morton's shallow lake evaporation",                                      units="mm"),
-    evap_pan            = (description="Class A pan evaporation",                                                units="mm"),
-    evap_syn            = (description="Synthetic estimate",                                                     units="mm"),
-    max_temp            = (description="Maximum temperature",                                                    units="°C"),
-    min_temp            = (description="Minimum temperature",                                                    units="°C"),
-    monthly_rain        = (description="Monthly rainfall",                                                       units="mm"),
-    mslp                = (description="Mean sea level pressure",                                                units="hPa"),
-    radiation           = (description="Solar exposure, consisting of both direct and diffuse components",       units="MJ/m^2"),
-    rh_tmax             = (description="Relative humidity at the time of maximum temperature",                   units="%"),
-    rh_tmin             = (description="Relative humidity at the time of minimum temperature",                   units="%"),
-    vp                  = (description="Vapour pressure",                                                        units="hPa"),
-    vp_deficit          = (description="Vapour pressure deficit",                                                units="hPa"),
+    :daily_rain, :et_morton_actual, :et_morton_potential, :et_morton_wet,
+    :et_short_crop, :et_tall_crop, :evap_morton_lake, :evap_pan, :evap_syn,
+    :max_temp, :min_temp, :monthly_rain, :mslp, :radiation,
+    :rh_tmax, :rh_tmin, :vp, :vp_deficit,
 )
 
 # Some variables have shorter coverage than the general 1889-present range.
@@ -43,7 +29,7 @@ Coverage is from 1889 to present for most variables, 1957 for `mslp`, and
     getraster(source::Type{SILO}, [layer]; date)
 
 # Arguments
-- `layer`: `Symbol` or `Tuple` of `Symbol` from `$(keys(SILO_LAYERS))`.
+- `layer`: `Symbol` or `Tuple` of `Symbol` from `$(SILO_LAYERS)`.
     Without a `layer` argument all layers are downloaded and a `NamedTuple` of paths returned.
 
 # Keywords
@@ -73,7 +59,7 @@ Returns the filepath/s of the downloaded or pre-existing files.
 """ SILO
 struct SILO <: RasterDataSource end
 
-layers(::Type{SILO}) = keys(SILO_LAYERS)
+layers(::Type{SILO}) = SILO_LAYERS
 date_step(::Type{SILO}) = Year(1)
 date_range(::Type{SILO}) = (Date(1889, 1, 1), Date(year(today()), 12, 31))
 getraster_keywords(::Type{SILO}) = (:date,)
