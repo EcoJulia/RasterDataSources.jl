@@ -1,5 +1,5 @@
 
-using RasterDataSources, Test, Dates
+using RasterDataSources, Test, Dates, HTTP
 using URIs: URI
 using RasterDataSources: rastername, rasterpath, rasterurl, layers, getraster_keywords
 
@@ -92,12 +92,23 @@ using RasterDataSources: rastername, rasterpath, rasterurl, layers, getraster_ke
     end
 
     @testset "getraster download" begin
-        # Test actual download - uses a small monthly file
+        # Test actual download - uses a small monthly file. The NOAA PSL
+        # server periodically becomes unreachable from CI; probe it first
+        # and skip if it isn't answering, so a server outage doesn't fail
+        # the whole test suite.
         raster_path = joinpath(ENV["RASTERDATASOURCES_PATH"], "NCEP", "reanalysis", "Monthlies", "surface", "slp.mon.mean.nc")
-        @test getraster(NCEP{Surface, 1, Month}, :slp; date=Date(2001)) == raster_path
-        @test isfile(raster_path)
-
-        # Test tuple of layers
-        @test getraster(NCEP{Surface, 1, Month}, (:slp,); date=Date(2001)) == (slp=raster_path,)
+        server_reachable = try
+            HTTP.head("https://downloads.psl.noaa.gov/"; retry=false, connect_timeout=10, readtimeout=10)
+            true
+        catch e
+            @warn "Skipping NCEP download tests: NOAA PSL server unreachable" exception=e
+            false
+        end
+        if server_reachable
+            @test getraster(NCEP{Surface, 1, Month}, :slp; date=Date(2001)) == raster_path
+            @test isfile(raster_path)
+            # Test tuple of layers
+            @test getraster(NCEP{Surface, 1, Month}, (:slp,); date=Date(2001)) == (slp=raster_path,)
+        end
     end
 end

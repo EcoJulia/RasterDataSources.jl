@@ -2,6 +2,7 @@
 Aqua = "4c88cf16-eb10-579e-8560-4a9242c79595"
 Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
 Extents = "411431e0-e8b7-467b-b5e0-f676ba4f2910"
+HTTP = "cd3eb016-35fb-5094-929b-558a96fad6f3"
 Pkg = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
 Proj = "c94c279d-25a6-4763-9509-64d165bea63e"
 RasterDataSources = "3cb90ccd-e1b6-4867-9617-4276c8b2ca36"
