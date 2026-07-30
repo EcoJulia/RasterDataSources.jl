@@ -29,6 +29,7 @@ Currently sources include:
 | CRUCL2       | https://zenodo.org/records/20754689      | Monthly mean climate 1961–1990           |
 | CPCSoil      | https://psl.noaa.gov/data/gridded/data.cpcsoil.html | LTM climatology and historical monthly means |
 | SILO         | https://www.longpaddock.qld.gov.au/silo/about/overview/ | Complete                          |
+| SoilGrids    | https://www.isric.org/explore/soilgrids  | Soil properties, extent-based tile download |
 
 Please open an issue if you need more datasets added, or (even better) open a pull request 
 following the form of the other datasets where possible.

@@ -1,4 +1,5 @@
-using RasterDataSources, URIs, Test
+import Proj
+using RasterDataSources, URIs, Extents, Test
 using RasterDataSources: rastername, rasterpath, rasterurl, layers
 
 @testset "SoilGrids" begin
@@ -14,53 +15,53 @@ using RasterDataSources: rastername, rasterpath, rasterurl, layers
     @test depths(SoilGrids, :clay) == ("0-5cm", "5-15cm", "15-30cm", "30-60cm", "60-100cm", "100-200cm")
     @test depths(SoilGrids, :ocs) == ("0-30cm",)
 
-    # Filenames
-    @test rastername(SoilGrids, :clay; depth="0-5cm", quantile="mean") == "clay_0-5cm_mean.vrt"
-    @test rastername(SoilGrids, :ocs; depth="0-30cm", quantile="Q0.05") == "ocs_0-30cm_Q0.05.vrt"
-    @test rastername(SoilGrids, :sand; depth="15-30cm", quantile="Q0.95") == "sand_15-30cm_Q0.95.vrt"
-
-    # Paths
     @test rasterpath(SoilGrids) == soilgrids_path
-    clay_path = joinpath(soilgrids_path, "clay", "clay_0-5cm_mean.vrt")
-    @test rasterpath(SoilGrids, :clay; depth="0-5cm", quantile="mean") == clay_path
+    @test RasterDataSources.getraster_keywords(SoilGrids) == (:extent, :depth, :quantile)
 
-    # URLs
-    @test rasterurl(SoilGrids, :clay; depth="0-5cm", quantile="mean") ==
-        URI(scheme="https", host="files.isric.org",
-            path="/soilgrids/latest/data/clay/clay_0-5cm_mean.vrt")
-    @test rasterurl(SoilGrids, :ocs; depth="0-30cm", quantile="Q0.05") ==
-        URI(scheme="https", host="files.isric.org",
-            path="/soilgrids/latest/data/ocs/ocs_0-30cm_Q0.05.vrt")
-
-    # Validation errors
+    # Validation errors — checked before `extent` is required, so no network access.
     @test_throws ArgumentError getraster(SoilGrids, :clay; depth="0-30cm", quantile="mean")
     @test_throws ArgumentError getraster(SoilGrids, :clay; depth="0-5cm", quantile="Q0.99")
     @test_throws ArgumentError getraster(SoilGrids, :not_a_layer; depth="0-5cm", quantile="mean")
 
-    # Download — single layer
-    path = getraster(SoilGrids, :clay; depth="0-5cm", quantile="mean")
-    @test path == clay_path
-    @test isfile(path)
+    # `extent` is required — SoilGrids is a global 250 m dataset.
+    @test_throws ArgumentError getraster(SoilGrids, :clay; depth="0-5cm", quantile="mean")
 
-    # Download — Tuple → NamedTuple
-    result = getraster(SoilGrids, (:clay, :sand); depth="0-5cm", quantile="mean")
+    # A small extent that resolves to a single real tile.
+    extent = Extent(X=(144.9, 145.1), Y=(-37.9, -37.7))
+    tile_name = "tileSG-028-080_2-1.tif"
+
+    # Introspection — no download of the tile itself, only the small index VRT.
+    @test rastername(SoilGrids, :clay; extent, depth="0-5cm", quantile="mean") == [tile_name]
+    tile_path = joinpath(soilgrids_path, "clay", "clay_0-5cm_mean", "tileSG-028-080", tile_name)
+    @test rasterpath(SoilGrids, :clay; extent, depth="0-5cm", quantile="mean") == [tile_path]
+    @test rasterurl(SoilGrids, :clay; extent, depth="0-5cm", quantile="mean") ==
+        [URI(scheme="https", host="files.isric.org",
+            path="/soilgrids/latest/data/clay/clay_0-5cm_mean/tileSG-028-080/$tile_name")]
+
+    # Download — single layer, real tile data cached locally.
+    paths = getraster(SoilGrids, :clay; extent, depth="0-5cm", quantile="mean")
+    @test paths == [tile_path]
+    @test isfile(tile_path)
+
+    # Second call is served entirely from the local cache (no re-download).
+    @test getraster(SoilGrids, :clay; extent, depth="0-5cm", quantile="mean") == paths
+
+    # Download — Tuple → NamedTuple of Vectors
+    result = getraster(SoilGrids, (:clay, :sand); extent, depth="0-5cm", quantile="mean")
     @test result isa NamedTuple
     @test haskey(result, :clay)
     @test haskey(result, :sand)
-    @test isfile(result.clay)
-    @test isfile(result.sand)
+    @test all(isfile, result.clay)
+    @test all(isfile, result.sand)
 
-    # Download — array of depths → Vector
-    result = getraster(SoilGrids, :clay; depth=["0-5cm", "5-15cm"], quantile="mean")
+    # Download — array of depths → Vector of Vectors
+    result = getraster(SoilGrids, :clay; extent, depth=["0-5cm", "5-15cm"], quantile="mean")
     @test result isa AbstractVector
     @test length(result) == 2
-    @test all(isfile, result)
+    @test all(paths -> all(isfile, paths), result)
 
     # ocs uses its own default depth
-    ocs_path = getraster(SoilGrids, :ocs; quantile="mean")
-    @test endswith(ocs_path, "ocs_0-30cm_mean.vrt")
-    @test isfile(ocs_path)
-
-    # Keywords trait
-    @test RasterDataSources.getraster_keywords(SoilGrids) == (:depth, :quantile)
+    ocs_paths = getraster(SoilGrids, :ocs; extent, quantile="mean")
+    @test only(ocs_paths) |> isfile
+    @test endswith(only(ocs_paths), tile_name)
 end
