@@ -80,6 +80,19 @@ struct GRIDMET{X} <: RasterDataSource end
 # --- Daily meteorology (bare GRIDMET) --------------------------------------
 
 layers(::Type{GRIDMET}) = keys(GRIDMET_LAYERS)
+
+# NetCDF variable name inside each file differs from the product code.
+const GRIDMET_VARNAMES = (
+    tmmx = :air_temperature,
+    tmmn = :air_temperature,
+    pr   = :precipitation_amount,
+    rmax = :relative_humidity,
+    rmin = :relative_humidity,
+    srad = :surface_downwelling_shortwave_flux_in_air,
+    vs   = :wind_speed,
+)
+layerkeys(::Type{GRIDMET}, layer::Symbol) = get(GRIDMET_VARNAMES, layer, layer)
+
 date_step(::Type{GRIDMET}) = Year(1)
 date_range(::Type{GRIDMET}) = (Date(1979, 1, 1), Date(2025, 12, 31))
 getraster_keywords(::Type{GRIDMET}) = (:date,)
@@ -116,6 +129,7 @@ end
 # --- Static elevation (GRIDMET{Elevation}) ---------------------------------
 
 layers(::Type{GRIDMET{Elevation}}) = (:elev,)
+layerkeys(::Type{GRIDMET{Elevation}}, layer::Symbol) = layer === :elev ? :elevation : layer
 getraster_keywords(::Type{GRIDMET{Elevation}}) = ()
 
 rastername(::Type{GRIDMET{Elevation}}, layer::Symbol) = "metdata_elevationdata.nc"
