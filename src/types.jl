@@ -337,3 +337,4 @@ struct VNP13A1 <: ModisProduct end
 struct VNP15A2H <: ModisProduct end
 struct VNP21A2 <: ModisProduct end
 struct VNP22Q2 <: ModisProduct end
+
