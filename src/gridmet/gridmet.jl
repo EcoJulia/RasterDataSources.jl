@@ -81,15 +81,28 @@ struct GRIDMET{X} <: RasterDataSource end
 
 layers(::Type{GRIDMET}) = keys(GRIDMET_LAYERS)
 
-# NetCDF variable name inside each file differs from the product code.
+# The NetCDF variable name inside each file differs from the product code used in
+# the filename/URL, so map every layer to its internal variable name (verified
+# against the file headers on northwestknowledge.net). The Palmer/drought layers
+# (pdsi, z, spi, spei, eddi) are intentionally absent: their annual files 404 at
+# the download URL, so they can't be fetched by the per-year scheme regardless.
 const GRIDMET_VARNAMES = (
     tmmx = :air_temperature,
     tmmn = :air_temperature,
-    pr   = :precipitation_amount,
+    pr = :precipitation_amount,
     rmax = :relative_humidity,
     rmin = :relative_humidity,
+    sph = :specific_humidity,
     srad = :surface_downwelling_shortwave_flux_in_air,
-    vs   = :wind_speed,
+    th = :wind_from_direction,
+    vs = :wind_speed,
+    etr = :potential_evapotranspiration,
+    pet = :potential_evapotranspiration,
+    vpd = :mean_vapor_pressure_deficit,
+    erc = Symbol("energy_release_component-g"),
+    bi = :burning_index_g,
+    fm1 = :dead_fuel_moisture_1hr,
+    fm100 = :dead_fuel_moisture_100hr,
 )
 layerkeys(::Type{GRIDMET}, layer::Symbol) = get(GRIDMET_VARNAMES, layer, layer)
 
