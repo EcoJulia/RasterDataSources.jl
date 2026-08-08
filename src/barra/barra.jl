@@ -51,45 +51,31 @@ Reanalysis for Australia, v2), Australia's regional analog to ERA5.
 
 See: [BARRA2 on NCI](https://opus.nci.org.au/pages/viewpage.action?pageId=264241166)
 
-Data are served as monthly NetCDF files, one per variable per calendar month,
-from NCI's public THREDDS server (no authentication required).
+Monthly NetCDF files (one per variable per month).
 
 # Type Parameters
-- `Product`: `BARRAR2` (coarser regional reanalysis) or `BARRAC2`
-    (convection-permitting downscale).
-- `Domain`: `AUS11`, `AUST11` (both `BARRAR2` only), or `AUST04` (`BARRAC2`
-    only). An invalid `Product`/`Domain` combination throws an `ArgumentError`.
-- `Frequency`: `Hour` ("1hr", the default), `Day` ("day"), or `Month` ("mon").
+- `Product`: `BARRAR2` (regional reanalysis) or `BARRAC2` (convection-permitting).
+- `Domain`: `AUS11`/`AUST11` (`BARRAR2` only) or `AUST04` (`BARRAC2` only).
+    Invalid combinations throw an `ArgumentError`.
+- `Frequency`: `Hour` ("1hr", default), `Day` ("day"), or `Month` ("mon").
 
-The available layers are: `$(keys(merge(BARRA_SURFACE_LAYERS, BARRA_STATIC_LAYERS)))`.
-`orog` and `sftlf` are static (time-invariant) and never require `date`,
-regardless of `Frequency`.
-
-This is a near-surface/single-level subset of BARRA2's full output. It
-excludes pressure-level variables (e.g. `hus850`, `ta500`, `zg700` — over
-200 symbols across dozens of pressure levels) and severe-weather diagnostics
-(e.g. `CAPE`, `MLCIN`), which are not currently supported.
-
-Some layers are unavailable at `Hour` frequency (confirmed absent on the
-server, not published at all) and are excluded from `layers(...)`/throw an
-`ArgumentError` if requested at `Hour`, though they're available at `Day`
-and `Month`: `mrso`, `mrsol`, and `tsl` (for both products), and
-additionally `tasmax` for `BARRAR2` only.
-
-`getraster` for `BARRA` requires a `date` keyword to specify the month to
-download, except for the static layers `orog`/`sftlf`.
+Available layers: `$(keys(merge(BARRA_SURFACE_LAYERS, BARRA_STATIC_LAYERS)))`.
+`orog` and `sftlf` are static and never require `date`. The `mrso`, `mrsol`, `tsl`,
+and `tasmax` are not availble at hourly frequency. Pressure layers not yet
+available.
 
 # Usage with `getraster`
     getraster(source::Type{<:BARRA{Product,Domain,Frequency}}, [layer]; date)
 
 # Arguments
-- `layer`: `Symbol` or `Tuple` of `Symbol` from `$(keys(merge(BARRA_SURFACE_LAYERS, BARRA_STATIC_LAYERS)))`.
-    Without a `layer` argument all layers are downloaded and a `NamedTuple` of paths returned.
+- `layer`: `Symbol` or `Tuple` of `Symbol`s from
+    `$(keys(merge(BARRA_SURFACE_LAYERS, BARRA_STATIC_LAYERS)))`.
+    If omitted, all layers are downloaded and a `NamedTuple` of paths returned.
 
 # Keywords
-- `date`: a `Date`, `AbstractVector` of `Date`, or a `Tuple` of start and end dates.
-    Only the year and month components are used. For multiple dates, a
-    `Vector` of paths is returned. Not required when `layer` is `:orog` or `:sftlf`.
+- `date`: a `Date`, `Vector` of `Date`s, or `(start, end)` `Tuple`. Only year
+    and month are used. Returns a `Vector` of paths for multiple dates.
+    Not required for `:orog` or `:sftlf`.
 
 # Example
 ```julia
