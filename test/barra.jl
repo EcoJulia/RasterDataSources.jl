@@ -47,13 +47,14 @@ using RasterDataSources: rastername, rasterurl, rasterpath
             "mrsol_AUST-04_ERA5_historical_hres_BOM_BARRA-C2_v1_day_197901-197901.nc"
     end
 
-    @testset "static fx layers ignore date and frequency" begin
+    @testset "static layers use the Static frequency and take no date" begin
         name = "orog_AUST-04_ERA5_historical_hres_BOM_BARRA-C2_v1.nc"
-        @test rastername(BARRA{BARRAC2, AUST04}, :orog) == name
-        @test rastername(BARRA{BARRAC2, AUST04, Day}, :orog) == name
-        @test rasterpath(BARRA{BARRAC2, AUST04}, :orog) ==
+        @test RasterDataSources.layers(BARRA{BARRAC2, AUST04, Static}) == (:orog, :sftlf)
+        @test RasterDataSources.getraster_keywords(BARRA{BARRAC2, AUST04, Static}) == ()
+        @test rastername(BARRA{BARRAC2, AUST04, Static}, :orog) == name
+        @test rasterpath(BARRA{BARRAC2, AUST04, Static}, :orog) ==
             joinpath(barra_path, "BARRA-C2", "AUST-04", "fx", "orog", name)
-        @test rasterurl(BARRA{BARRAC2, AUST04}, :sftlf) ==
+        @test rasterurl(BARRA{BARRAC2, AUST04, Static}, :sftlf) ==
             URI("https://thredds.nci.org.au/thredds/fileServer/ob53/output/reanalysis/AUST-04/BOM/ERA5/historical/hres/BARRA-C2/v1/fx/sftlf/latest/sftlf_AUST-04_ERA5_historical_hres_BOM_BARRA-C2_v1.nc")
     end
 
@@ -66,7 +67,7 @@ using RasterDataSources: rastername, rasterurl, rasterpath
         # CI, unlike any dated variable file (~51 MB per variable-month).
         raster_path = joinpath(barra_path, "BARRA-C2", "AUST-04", "fx", "orog",
             "orog_AUST-04_ERA5_historical_hres_BOM_BARRA-C2_v1.nc")
-        @test getraster(BARRA{BARRAC2, AUST04}, :orog) == raster_path
+        @test getraster(BARRA{BARRAC2, AUST04, Static}, :orog) == raster_path
         @test isfile(raster_path)
     end
 end

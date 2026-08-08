@@ -7,7 +7,7 @@ using RasterDataSources: rastername, rasterurl, rasterpath
     @test rasterpath(SILO) == silo_path
 
     @test rastername(SILO, :daily_rain; date=Date(2020, 6, 15)) == "2020.daily_rain.nc"
-    @test rastername(SILO, :max_temp;  date=Date(1979, 1, 1))  == "1979.max_temp.nc"
+    @test rastername(SILO, :max_temp; date=Date(1979, 1, 1)) == "1979.max_temp.nc"
 
     @test rasterpath(SILO, :daily_rain; date=Date(2020, 6, 15)) ==
         joinpath(silo_path, "daily_rain", "2020.daily_rain.nc")

@@ -17,7 +17,7 @@ import JSON
 
 export WorldClim, CHELSA, EarthEnv, AWAP, ALWB, SRTM, CopernicusDEM, MODIS, ERA5, NCEP, TerraClimate, GRIDMET, SLGA, CRUCL2, CPCSoil, GADS, SILO, BARRA
 
-export BARRAR2, BARRAC2, AUS11, AUST11, AUST04
+export BARRAR2, BARRAC2, AUS11, AUST11, AUST04, Static
 
 export BioClim, BioClimPlus, Climate, Weather, Elevation, LandCover, HabitatHeterogeneity, CoarseFragments, Mean
 
