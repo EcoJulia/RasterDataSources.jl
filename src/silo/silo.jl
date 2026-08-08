@@ -93,6 +93,6 @@ function _getraster(T::Type{SILO}, layer::Symbol, date::Dates.TimeType; update::
         "SILO layer `$layer` is only available from $minyear, got $(year(date))"
     ))
     path = rasterpath(T, layer; date)
-    url  = rasterurl(T, layer; date)
+    url = rasterurl(T, layer; date)
     _maybe_download(url, path; update)
 end

@@ -119,6 +119,12 @@ Mean
 CPCSoil
 ```
 
+## BARRA
+
+```@docs
+BARRA
+```
+
 # Datasets
 
 ```@docs
