@@ -15,7 +15,7 @@ using Dates,
 
 import JSON
 
-export WorldClim, CHELSA, EarthEnv, AWAP, ALWB, SRTM, CopernicusDEM, MODIS, ERA5, NCEP, TerraClimate, GRIDMET, SLGA, CRUCL2, CPCSoil, GADS, SILO, BARRA
+export WorldClim, CHELSA, EarthEnv, AWAP, ALWB, SRTM, CopernicusDEM, MODIS, ERA5, NCEP, TerraClimate, GRIDMET, SLGA, CRUCL2, CPCSoil, GADS, SILO, BARRA, SoilGrids
 
 export BARRAR2, BARRAC2, AUS11, AUST11, AUST04, Static
 
@@ -44,7 +44,7 @@ export PressureLevels, Surface, SurfaceFlux, SixHour
 
 export Values, Deciles
 
-export getraster, layername, CachedCloudSource
+export getraster, layername, CachedCloudSource, depths
 
 export Historical, Plus2C, Plus4C
 
@@ -100,6 +100,8 @@ include("gads/gads.jl")
 include("crucl2/crucl2.jl")
 
 include("cpcsoil/cpcsoil.jl")
+
+include("soilgrids/soilgrids.jl")
 
 include("interface.jl")
 

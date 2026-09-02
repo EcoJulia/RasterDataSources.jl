@@ -37,3 +37,4 @@ end
 @time @safetestset "gads" begin include("gads.jl") end
 @time @safetestset "crucl2" begin include("crucl2.jl") end
 @time @safetestset "cpcsoil" begin include("cpcsoil.jl") end
+@time @safetestset "soilgrids" begin include("soilgrids.jl") end

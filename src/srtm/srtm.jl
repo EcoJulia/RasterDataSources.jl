@@ -126,28 +126,8 @@ _check_order((a, b)) = a > b && throw(ArgumentError("Upper bound $b less than lo
 
 for op in (:getraster, :rastername, :rasterpath, :zipname, :zipurl, :zippath)
     _op = Symbol('_', op) # Name of internal function
-    @eval begin
-        # Broadcasting function dispatch
-        function $_op(T::Type{SRTM}, tile_index::CartesianIndices) 
-            broadcast(tile_index) do I
-                HAS_SRTM_TILE[I] ? $_op(T, I) : missing
-            end
-        end
-        # Bounds to tile indices dispatch
-        $_op(T::Type{SRTM}, bounds::Tuple) = $_op(T, bounds_to_tile_indices(T, bounds))
-        $_op(T::Type{SRTM}, bounds::Extents.Extent) = $_op(T, bounds_to_tile_indices(T, bounds))
-
-        # Public function definition with key-word arguments. `extent` is the
-        # canonical spatial keyword; `bounds` is the legacy alias.
-        function $op(T::Type{SRTM}; bounds=nothing, extent=nothing, tile_index=nothing)
-            n_set = !isnothing(bounds) + !isnothing(extent) + !isnothing(tile_index)
-            if n_set == 0
-                :op === :getraster || return joinpath(rasterpath(), "SRTM")
-                throw(ArgumentError("One of `extent`, `bounds` or `tile_index` kwarg must be specified"))
-            elseif n_set > 1
-                throw(ArgumentError("Pass only one of `extent`, `bounds` or `tile_index`"))
-            end
-            return $_op(T, something(extent, bounds, tile_index))
-        end
+    @eval function $op(T::Type{SRTM}; bounds=nothing, extent=nothing, tile_index=nothing)
+        _dispatch_regular_tiles($(QuoteNode(op)), $_op, i -> HAS_SRTM_TILE[i], joinpath(rasterpath(), "SRTM"), T;
+            bounds, extent, tile_index)
     end
 end

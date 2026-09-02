@@ -111,6 +111,65 @@ function _map_layers(T, layers, args...; kw...)
     return NamedTuple{keys}(filenames)
 end
 
+"""
+    _resolve_tiles(T::Type, selection; kw...)
+
+Convert a spatial `selection` (bounds, extent, or an already-resolved tile
+identifier) into tiles. The default assumes a regular grid addressed by
+`CartesianIndex`, using `bounds_to_tile_indices(T, selection)`; datasets on an
+irregular grid (e.g. `SoilGrids`) add their own method.
+"""
+_resolve_tiles(::Type, i::CartesianIndex; kw...) = i
+_resolve_tiles(::Type, indices::CartesianIndices; kw...) = indices
+_resolve_tiles(T::Type, selection; kw...) = bounds_to_tile_indices(T, selection)
+
+"""
+    _apply_tiles(primitive, exists, tiles)
+
+Apply `primitive` (a 1-argument function of a tile) to `tiles`, returning
+`missing` for tiles that fail `exists`. A single tile (e.g. `CartesianIndex`)
+is applied directly, with no `exists` check; an `AbstractArray` of tiles
+(`CartesianIndices`, or a plain `Vector` for an irregular grid) is mapped over,
+preserving its shape.
+"""
+_apply_tiles(primitive, exists, tile) = primitive(tile)
+_apply_tiles(primitive, exists, tiles::AbstractArray) =
+    map(tile -> exists(tile) ? primitive(tile) : missing, tiles)
+
+"""
+    _dispatch_tiles(op, primitive, exists, directory, T, selection; missing_selection_error, resolve_kw...)
+
+Shared dispatch for tiled datasets: if `selection` is `nothing`, `getraster`
+throws `missing_selection_error` and every other op returns `directory`;
+otherwise `selection` is resolved to tiles via `_resolve_tiles(T, selection;
+resolve_kw...)` and `primitive` applied to each with `_apply_tiles`.
+"""
+function _dispatch_tiles(op::Symbol, primitive, exists, directory, T, selection;
+        missing_selection_error="A spatial selector must be provided", resolve_kw...)
+    if isnothing(selection)
+        op === :getraster && throw(ArgumentError(missing_selection_error))
+        return directory
+    end
+    tiles = _resolve_tiles(T, selection; resolve_kw...)
+    return _apply_tiles(primitive, exists, tiles)
+end
+
+"""
+    _dispatch_regular_tiles(op, primitive, exists, directory, T; bounds, extent, tile_index)
+
+`_dispatch_tiles` for datasets addressed by `CartesianIndex` on a regular grid
+(`SRTM`, `CopernicusDEM`): exactly one of `bounds`/`extent`/`tile_index` must
+be given. `primitive(T, tile_index)` is the per-tile operation.
+"""
+function _dispatch_regular_tiles(op::Symbol, primitive, exists, directory, T;
+        bounds=nothing, extent=nothing, tile_index=nothing)
+    n_set = !isnothing(bounds) + !isnothing(extent) + !isnothing(tile_index)
+    n_set > 1 && throw(ArgumentError("Pass only one of `extent`, `bounds` or `tile_index`"))
+    selection = n_set == 0 ? nothing : something(extent, bounds, tile_index)
+    _dispatch_tiles(op, i -> primitive(T, i), exists, directory, T, selection;
+        missing_selection_error="One of `extent`, `bounds` or `tile_index` kwarg must be specified")
+end
+
 # fallback for _format
 _format(::Type, T) = _format(T)
 _format(T::Type) = string(nameof(T))

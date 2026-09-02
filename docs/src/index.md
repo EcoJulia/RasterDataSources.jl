@@ -119,6 +119,12 @@ Mean
 CPCSoil
 ```
 
+## SoilGrids
+
+```@docs
+SoilGrids
+```
+
 ## BARRA
 
 ```@docs
