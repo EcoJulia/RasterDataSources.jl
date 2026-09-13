@@ -38,10 +38,10 @@ function list_layers(T::Type{<:ModisProduct})
 
         @info "Starting download of layers list for product $prod"
         mkpath(dirname(path))
-        r = HTTP.download(
+        r = Downloads.download(
             join([string(MODIS_URI), prod, "bands"], "/"),
             path,
-            ["Accept" => "text/csv"],
+            headers = ["Accept" => "text/csv"],
         )
 
         # read downloaded file
@@ -81,6 +81,7 @@ function list_dates(
         r = HTTP.request(
             "GET",
             join([string(MODIS_URI), prod, "dates"], "/"),
+            ["Accept" => "application/json"],
             query = Dict("latitude" => string(lat), "longitude" => string(lon)),
         )
 
