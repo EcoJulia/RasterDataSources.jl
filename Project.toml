@@ -22,6 +22,7 @@ RasterDataSourcesProjExt = "Proj"
 
 [compat]
 ASCIIrasters = "0.1"
+Downloads = "1"
 Extents = "0.1"
 HTTP = "0.8, 0.9, 1, 2"
 JSON = "1"

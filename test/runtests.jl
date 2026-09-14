@@ -7,7 +7,7 @@ using SafeTestsets, Aqua, RasterDataSources, Pkg, Dates, Test
     Aqua.test_stale_deps(RasterDataSources)
     Aqua.test_undefined_exports(RasterDataSources)
     Aqua.test_project_extras(RasterDataSources)
-    Aqua.test_deps_compat(RasterDataSources; ignore=[:Dates, :DelimitedFiles, :Downloads])
+    Aqua.test_deps_compat(RasterDataSources; ignore=[:Dates, :DelimitedFiles])
 end
 
 # ALWB and AWAP download URLs return 403 Forbidden — BOM's Akamai layer

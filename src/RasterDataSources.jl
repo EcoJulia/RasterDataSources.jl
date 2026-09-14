@@ -6,7 +6,6 @@ module RasterDataSources
 end RasterDataSources
 
 using Dates,
-      Downloads,
       Extents,
       HTTP,
       URIs,
@@ -15,6 +14,8 @@ using Dates,
       DelimitedFiles
 
 import JSON
+
+import Downloads: download
 
 export WorldClim, CHELSA, EarthEnv, AWAP, ALWB, SRTM, CopernicusDEM, MODIS, ERA5, NCEP, TerraClimate, GRIDMET, SLGA, CRUCL2, CPCSoil, GADS, SILO, BARRA
 
