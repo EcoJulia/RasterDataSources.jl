@@ -66,7 +66,7 @@ function _maybe_download(uri::URI, filepath, headers = []; update::Bool=false)
         mkpath(dirname(filepath))
         @info "Starting download for $uri"
         try
-            Downloads.download(string(uri), filepath; headers)
+            download(string(uri), filepath; headers)
         catch e
             # Remove anything that was downloaded before the error
             isfile(filepath) && rm(filepath)

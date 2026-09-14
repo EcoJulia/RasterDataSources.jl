@@ -38,7 +38,7 @@ function list_layers(T::Type{<:ModisProduct})
 
         @info "Starting download of layers list for product $prod"
         mkpath(dirname(path))
-        r = Downloads.download(
+        r = download(
             join([string(MODIS_URI), prod, "bands"], "/"),
             path,
             headers = ["Accept" => "text/csv"],
