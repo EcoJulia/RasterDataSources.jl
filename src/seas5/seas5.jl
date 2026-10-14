@@ -92,6 +92,10 @@ _seas5_leadtime_key(::Type{SEAS5}) = "leadtime_hour"
 _seas5_leadtime_key(::Type{SEAS5Monthly}) = "leadtime_month"
 _seas5_leadtimes(::Type{SEAS5}) = 0:6:5160
 _seas5_leadtimes(::Type{SEAS5Monthly}) = 1:6
+# Default `leadtime` keyword: daily steps for SEAS5, valid for every variable
+# (see the `SEAS5` docstring). Shared with PointDataSources.jl.
+_seas5_default_leadtime(::Type{SEAS5}) = 24:24:5160
+_seas5_default_leadtime(::Type{SEAS5Monthly}) = 1:6
 
 # An `Integer` or collection of them; de-duplicates and sorts so input order
 # doesn't affect the cache path or CDS request.
@@ -185,13 +189,13 @@ getraster(T::Type{<:AbstractSEAS5}; kw...) = throw(ArgumentError(
     "variables must be specified, e.g. getraster($T, \"2m_temperature\"; date, extent)"
 ))
 function getraster(T::Type{SEAS5}, variables::SEAS5Variables;
-    date, extent, leadtime = 24:24:5160, system = "51",
+    date, extent, leadtime = _seas5_default_leadtime(T), system = "51",
 )
     options = (; leadtime = _check_seas5_leadtime(T, leadtime), system = _check_seas5_system(system))
     _getraster(T, _normalize_cds_variables(variables), date, extent, options)
 end
 function getraster(T::Type{SEAS5Monthly}, variables::SEAS5Variables;
-    date, extent, leadtime = 1:6, product_type = "monthly_mean", system = "51",
+    date, extent, leadtime = _seas5_default_leadtime(T), product_type = "monthly_mean", system = "51",
 )
     options = (;
         leadtime = _check_seas5_leadtime(T, leadtime),
