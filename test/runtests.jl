@@ -15,6 +15,7 @@ end
 @time @safetestset "era5" begin include("era5.jl") end
 @time @safetestset "era5 cds" begin include("era5-cds.jl") end
 @time @safetestset "era5 arco" begin include("era5-arco.jl") end
+@time @safetestset "seas5" begin include("seas5.jl") end
 @time @safetestset "terraclimate" begin include("terraclimate.jl") end
 @time @safetestset "gridmet" begin include("gridmet.jl") end
 @time @safetestset "silo" begin include("silo.jl") end

@@ -65,6 +65,13 @@ ERA5ECMWF
 ERA5ECMWFLand
 ```
 
+## SEAS5 / SEAS5Monthly
+
+```@docs
+SEAS5
+SEAS5Monthly
+```
+
 ## WorldClim
 
 ```@docs

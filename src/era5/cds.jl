@@ -107,7 +107,9 @@ function _cds_request_body(
     Dict("inputs" => inputs)
 end
 
-function _cds_submit(T::Type{<:AbstractERA5CDS}, creds, body::Dict)
+# Untyped beyond `RasterDataSource`: also used by the SEAS5 sources (seas5.jl),
+# which only need their own `_cds_dataset_id` and request body.
+function _cds_submit(T::Type{<:RasterDataSource}, creds, body::Dict)
     url = "$(_cds_api_base(creds))/processes/$(_cds_dataset_id(T))/execution"
     response = _cds_json_request("POST", url, creds; body)
     get(response, "jobID") do
@@ -268,6 +270,14 @@ function _getraster(
     date::Date, extent::Extents.Extent,
 )
     path = rasterpath(T, variables; date, extent)
+    _cds_retrieve(T, path, date) do
+        _cds_request_body(T, variables, date, extent)
+    end
+end
+
+# Submit -> poll -> download into `path`, unless a valid cached file is
+# already there. `make_body` is only called when a request is needed.
+function _cds_retrieve(make_body, T::Type{<:RasterDataSource}, path, date::Date)
     # Re-validate rather than trust a cached file outright: a process killed
     # mid-download can leave a partial/corrupt file behind.
     if isfile(path)
@@ -279,7 +289,7 @@ function _getraster(
         end
     end
     creds = _cds_credentials()
-    job_id = _cds_submit(T, creds, _cds_request_body(T, variables, date, extent))
+    job_id = _cds_submit(T, creds, make_body())
     @info "Submitted CDS job $job_id for $(_cds_dataset_id(T)) $(Dates.format(date, "yyyy-mm"))"
     _cds_poll(creds, job_id)
     _cds_download_result(creds, job_id, path)
