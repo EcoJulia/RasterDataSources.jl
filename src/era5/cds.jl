@@ -120,13 +120,18 @@ end
 const CDS_PENDING_STATUSES = ("accepted", "running")
 const CDS_FAILED_STATUSES = ("failed", "dismissed", "rejected")
 
-# Polls for job completion; not a retry loop -- CDS requests are async and
-# take from seconds to tens of minutes. Bounded by `max_attempts`
-# so a stalled job can't hang forever.
-function _cds_poll(creds, job_id::AbstractString; sleep_seconds = 2.0, max_sleep = 60.0, max_attempts = 200)
+# Longest wait for one CDS job, in minutes; `ENV["RASTERDATASOURCES_CDS_MAX_WAIT_MINUTES"]` overrides.
+_cds_max_wait_minutes() = parse(Float64, get(ENV, "RASTERDATASOURCES_CDS_MAX_WAIT_MINUTES", "360"))
+
+# Polls for job completion; not a retry loop -- CDS requests are async and queue
+# from seconds to hours. Logs status changes, and every `report_seconds` while pending.
+function _cds_poll(creds, job_id::AbstractString;
+    sleep_seconds = 2.0, max_sleep = 60.0, max_wait_minutes = _cds_max_wait_minutes(), report_seconds = 300.0,
+)
     url = "$(_cds_api_base(creds))/jobs/$job_id"
     start = time()
-    for _ in 1:max_attempts
+    last_status, last_report = "", start
+    while true
         response = _cds_json_request("GET", url, creds)
         status = get(response, "status") do
             error("CDS job $job_id status response missing \"status\". Response keys: $(collect(keys(response)))")
@@ -135,11 +140,18 @@ function _cds_poll(creds, job_id::AbstractString; sleep_seconds = 2.0, max_sleep
         status in CDS_FAILED_STATUSES && error("CDS job $job_id ended with status \"$status\"")
         status in CDS_PENDING_STATUSES ||
             error("CDS job $job_id returned an unrecognized status \"$status\"")
+        waited = (time() - start) / 60
+        if status != last_status || time() - last_report >= report_seconds
+            @info "CDS job $job_id: $(status == "accepted" ? "queued" : status), waited $(round(Int, waited)) min"
+            last_status, last_report = status, time()
+        end
+        waited >= max_wait_minutes && error(
+            "CDS job $job_id still \"$status\" after $(round(Int, waited)) min. " *
+            "Check its status at https://cds.climate.copernicus.eu/requests; " *
+            "set ENV[\"RASTERDATASOURCES_CDS_MAX_WAIT_MINUTES\"] to wait longer.")
         sleep(sleep_seconds)
         sleep_seconds = min(sleep_seconds * 1.5, max_sleep)
     end
-    elapsed = round(Int, time() - start)
-    error("CDS job $job_id did not complete after $max_attempts polling attempts ($(elapsed)s)")
 end
 
 # `JSON.parse` returns a `JSON.Object`, an `AbstractDict` but not a `Base.Dict`.
