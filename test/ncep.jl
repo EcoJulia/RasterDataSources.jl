@@ -98,7 +98,7 @@ using RasterDataSources: rastername, rasterpath, rasterurl, layers, getraster_ke
         # the whole test suite.
         raster_path = joinpath(ENV["RASTERDATASOURCES_PATH"], "NCEP", "reanalysis", "Monthlies", "surface", "slp.mon.mean.nc")
         server_reachable = try
-            HTTP.head("https://downloads.psl.noaa.gov/"; retry=false, connect_timeout=10, readtimeout=10)
+            HTTP.head("https://downloads.psl.noaa.gov/"; retry=false, connect_timeout=10, read_idle_timeout=10)
             true
         catch e
             @warn "Skipping NCEP download tests: NOAA PSL server unreachable" exception=e
