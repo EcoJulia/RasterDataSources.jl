@@ -6,6 +6,28 @@ Abstract supertype for raster data collections.
 abstract type RasterDataSource end
 
 """
+    CachedCloudSource
+
+Returned by `getraster` for cloud-hosted datasets that are read remotely
+rather than downloaded.
+
+# Fields
+- `url::String`: remote URL of the dataset.
+- `cache::String`: local folder to cache it in.
+
+# Example
+```julia
+source = getraster(ERA5{GoogleARCO})
+store = Zarr.CachingStore(source.url, source.cache)
+ds = zopen(Zarr.ConsolidatedStore(store, ""))
+```
+"""
+struct CachedCloudSource
+    url::String
+    cache::String
+end
+
+"""
     RasterDataSet
 
 Abstract supertype for datasets that belong to a [`RasterDataSource`](@ref).

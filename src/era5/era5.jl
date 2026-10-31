@@ -44,14 +44,17 @@ const ERA5_LAYERS = (
     lsm = "land_sea_mask",
 )
 
-layers(::Type{ERA5{SingleLevels,GoogleARCO}}) = keys(ERA5_LAYERS)
+# GoogleARCO only has SingleLevels, so ERA5{GoogleARCO,Land} has no methods.
+const GoogleARCOERA5 = Union{Type{ERA5{GoogleARCO}},Type{ERA5{GoogleARCO,SingleLevels}}}
+
+layers(::GoogleARCOERA5) = keys(ERA5_LAYERS)
 
 """
-    layername(::Type{ERA5{SingleLevels,GoogleARCO}}, layer::Symbol) -> String
+    layername(::Type{ERA5{GoogleARCO}}, layer::Symbol) -> String
 
 Convert a short layer name (e.g. `:t2m`) to the ARCO-ERA5 variable name (e.g. `"2m_temperature"`).
 """
-layername(::Type{ERA5{SingleLevels,GoogleARCO}}, layer::Symbol) = ERA5_LAYERS[layer]
+layername(::GoogleARCOERA5, layer::Symbol) = ERA5_LAYERS[layer]
 
 @doc """
     GoogleARCO <: ERA5Source
@@ -68,17 +71,18 @@ See: [ARCO-ERA5](https://cloud.google.com/storage/docs/public-datasets/era5)
 # Usage
 ```julia
 using RasterDataSources, Zarr
-store = Zarr.CachingStore(getraster(ERA5), rasterpath(ERA5))
+source = getraster(ERA5{GoogleARCO})
+store = Zarr.CachingStore(source.url, source.cache)
 ds = zopen(Zarr.ConsolidatedStore(store, ""))
-temp = ds[layername(ERA5, :t2m)]  # "2m_temperature"
+temp = ds[layername(ERA5{GoogleARCO}, :t2m)]  # "2m_temperature"
 ```
 """ GoogleARCO
 
-rasterpath(::Type{ERA5{SingleLevels,GoogleARCO}}) = joinpath(rasterpath(), "ERA5", "arco-era5-zarr")
+rasterpath(::GoogleARCOERA5) = joinpath(rasterpath(), "ERA5", "arco-era5-zarr")
 
 """
-    getraster(::Type{ERA5{SingleLevels,GoogleARCO}}) -> String
+    getraster(::Type{ERA5{GoogleARCO}}) -> CachedCloudSource
 
-The URL of the ARCO-ERA5 Zarr store.
+The URL of the ARCO-ERA5 Zarr store and its local cache folder.
 """
-getraster(::Type{ERA5{SingleLevels,GoogleARCO}}) = ARCO_ERA5_URL
+getraster(T::GoogleARCOERA5) = CachedCloudSource(ARCO_ERA5_URL, mkpath(rasterpath(T)))

@@ -1,19 +1,19 @@
-using RasterDataSources, URIs, Extents, Test, Dates, JSON
-using RasterDataSources: rastername, rasterpath, _cds_area, _cds_request_body, _cds_dataset_id,
-    _normalize_cds_variables, _extent_tag, _cds_result_href, _validate_cds_extent, _cds_credentials
+using RasterDataSources, URIs, Extents, Test, Dates
+using RasterDataSources: rastername, rasterpath, layers, _cds_area, _cds_request_body, _cds_dataset_id,
+    _cds_snap, _validate_cds_extent, _cds_token
 
-@testset "ERA5{SingleLevels,CDS} / ERA5{Land,CDS}" begin
+@testset "ERA5{CDS} / ERA5{CDS,Land}" begin
 
     tas_extent = Extent(X=(143.0, 149.0), Y=(-44.0, -40.0))
 
-    @test _cds_dataset_id(ERA5{SingleLevels,CDS}) == "reanalysis-era5-single-levels"
-    @test _cds_dataset_id(ERA5{Land,CDS}) == "reanalysis-era5-land"
+    @test _cds_dataset_id(ERA5{CDS}) == "reanalysis-era5-single-levels"
+    @test _cds_dataset_id(ERA5{CDS,Land}) == "reanalysis-era5-land"
 
     @test _cds_area(tas_extent) == [-40.0, 143.0, -44.0, 149.0]
 
-    body = _cds_request_body(ERA5{Land,CDS}, ("2m_temperature", "total_precipitation"), Date(2020, 2, 1), tas_extent)
+    body = _cds_request_body(ERA5{CDS,Land}, :t2m, Date(2020, 2, 1), tas_extent)
     inputs = body["inputs"]
-    @test inputs["variable"] == ["2m_temperature", "total_precipitation"]
+    @test inputs["variable"] == ["2m_temperature"]
     @test inputs["year"] == ["2020"]
     @test inputs["month"] == ["02"]
     @test inputs["day"] == [lpad(d, 2, '0') for d in 1:29] # 2020 is a leap year
@@ -24,76 +24,44 @@ using RasterDataSources: rastername, rasterpath, _cds_area, _cds_request_body, _
     @test inputs["data_format"] == "netcdf"
     @test !haskey(inputs, "product_type")
 
-    body2 = _cds_request_body(ERA5{SingleLevels,CDS}, ("2m_temperature",), Date(2021, 1, 1), tas_extent)
+    body2 = _cds_request_body(ERA5{CDS}, :t2m, Date(2021, 1, 1), tas_extent)
     @test body2["inputs"]["product_type"] == "reanalysis"
 
-    @test rasterpath(ERA5{SingleLevels,CDS}) == joinpath(ENV["RASTERDATASOURCES_PATH"], "CDS-ERA5")
-    @test rasterpath(ERA5{Land,CDS}) == joinpath(ENV["RASTERDATASOURCES_PATH"], "CDS-ERA5-Land")
+    @test rasterpath(ERA5{CDS}) == joinpath(ENV["RASTERDATASOURCES_PATH"], "CDS-ERA5")
+    @test rasterpath(ERA5{CDS,Land}) == joinpath(ENV["RASTERDATASOURCES_PATH"], "CDS-ERA5-Land")
 
-    name1 = rastername(ERA5{Land,CDS}, ("2m_temperature",); date=Date(2020, 2, 1), extent=tas_extent)
-    name2 = rastername(ERA5{Land,CDS}, ("2m_temperature", "total_precipitation"); date=Date(2020, 2, 1), extent=tas_extent)
-    @test name1 != name2 # different variable sets must not collide on disk
-    @test occursin("202002", name1)
-    @test endswith(name1, ".nc")
+    @test layername(ERA5{CDS,Land}, :e) == "total_evaporation"
+    @test layername(ERA5{CDS}, :e) == "evaporation"
+    @test :tcc in layers(ERA5{CDS})
+    @test !(:tcc in layers(ERA5{CDS,Land}))
 
-    @test RasterDataSources.getraster_keywords(ERA5{Land,CDS}) == (:date, :extent)
-    @test RasterDataSources.date_step(ERA5{Land,CDS}) == Month(1)
+    # Extents expand outward to the grid
+    odd_extent = Extent(X=(143.13, 148.97), Y=(-44.01, -0.1))
+    @test _cds_snap(ERA5{CDS}, odd_extent) == Extent(X=(143.0, 149.0), Y=(-44.25, 0.0))
+    @test _cds_snap(ERA5{CDS,Land}, odd_extent) == Extent(X=(143.1, 149.0), Y=(-44.1, -0.1))
+    @test _cds_area(_cds_snap(ERA5{CDS,Land}, odd_extent)) ==
+        _cds_request_body(ERA5{CDS,Land}, :t2m, Date(2020, 2, 1), odd_extent)["inputs"]["area"]
 
-    @test_throws ArgumentError getraster(ERA5{Land,CDS}; date=Date(2020, 2, 1), extent=tas_extent)
+    @test rastername(ERA5{CDS}, :t2m; date=Date(2020, 2, 1), extent=odd_extent) ==
+        "143.0_149.0_-44.25_0.0_202002.nc"
+    @test rasterpath(ERA5{CDS,Land}, :t2m; date=Date(2020, 2, 1), extent=tas_extent) ==
+        joinpath(ENV["RASTERDATASOURCES_PATH"], "CDS-ERA5-Land", "t2m", "143.0_149.0_-44.0_-40.0_202002.nc")
 
-    # Same variables, different input order/type/duplicates -> identical
-    # normalized tuple -> identical cache path.
-    @test _normalize_cds_variables(("tp", "t2m")) == _normalize_cds_variables(("t2m", "tp"))
-    name3 = rastername(ERA5{Land,CDS}, _normalize_cds_variables(("tp", "t2m")); date=Date(2020, 2, 1), extent=tas_extent)
-    name4 = rastername(ERA5{Land,CDS}, _normalize_cds_variables(("t2m", "tp")); date=Date(2020, 2, 1), extent=tas_extent)
-    @test name3 == name4
-    @test _normalize_cds_variables((:t2m, "t2m", "t2m")) == ("t2m",) # Symbol + dupes collapse to one
-    @test_throws ArgumentError _normalize_cds_variables(())
-    @test_throws ArgumentError _normalize_cds_variables(String[])
-    @test_throws ArgumentError _normalize_cds_variables((1, 2))
+    @test RasterDataSources.getraster_keywords(ERA5{CDS,Land}) == (:date, :extent)
+    @test RasterDataSources.date_step(ERA5{CDS,Land}) == Month(1)
 
-    # Reversed bounds must error, not silently build a nonsensical area/path.
-    @test_throws ArgumentError _extent_tag(Extent(X=(149.0, 143.0), Y=(-44.0, -40.0)))
-    @test_throws ArgumentError getraster(ERA5{Land,CDS}, "2m_temperature";
+    @test_throws ArgumentError getraster(ERA5{CDS,Land}, :tcc; date=Date(2020, 2, 1), extent=tas_extent)
+    @test_throws ArgumentError getraster(ERA5{CDS,Land}, :t2m;
         date=Date(2020, 2, 1), extent=Extent(X=(149.0, 143.0), Y=(-44.0, -40.0)))
 
-    # Out-of-range/non-finite coordinates must error too (an antimeridian
-    # crossing, e.g. X=(170,-170), is already caught by the reversed-bounds check).
     @test_throws ArgumentError _validate_cds_extent(Extent(X=(200.0, 210.0), Y=(-10.0, 10.0)))
     @test_throws ArgumentError _validate_cds_extent(Extent(X=(1.0, 2.0), Y=(-100.0, -10.0)))
     @test_throws ArgumentError _validate_cds_extent(Extent(X=(NaN, 2.0), Y=(-10.0, 10.0)))
 
-    # Rounding-adjacent extents must not collide onto the same cache tag.
-    near1 = Extent(X=(143.00001, 149.0), Y=(-44.0, -40.0))
-    near2 = Extent(X=(143.00002, 149.0), Y=(-44.0, -40.0))
-    @test _extent_tag(near1) != _extent_tag(near2)
-
-    @test_throws ArgumentError _normalize_cds_variables(("",))
-    @test_throws ArgumentError _normalize_cds_variables(("  ",))
-
-    # Regression: `JSON.parse` output here is a `JSON.Object`, not a
-    # `Base.Dict` -- a `body::Dict`-typed `_cds_result_href` passed hand-built
-    # `Dict` tests but raised a `MethodError` on a real parsed response.
-    # Run through the actual parser, not a hand-built `Dict`, to catch that.
-    @test _cds_result_href(JSON.parse("""{"location": "https://example.com/f.nc"}""")) ==
-        "https://example.com/f.nc"
-    @test _cds_result_href(JSON.parse("""{"asset": {"value": {"href": "https://example.com/g.nc"}}}""")) ==
-        "https://example.com/g.nc"
-    @test_throws ErrorException _cds_result_href(JSON.parse("""{"other": 1}"""))
-    @test_throws ErrorException _cds_result_href(JSON.parse("""{"asset": {"value": {}}}"""))
-
-    # ENV and the `.cdsapirc` file are overridden independently: an env key
-    # with no env URL must still pick up the file's URL, not fall back to the
-    # package default.
-    mktempdir() do dir
-        write(joinpath(dir, ".cdsapirc"), "url: https://example.com/custom\nkey: filekey\n")
-        withenv("HOME" => dir, "USERPROFILE" => dir, "CDSAPI_KEY" => "envkey", "CDSAPI_URL" => nothing) do
-            creds = _cds_credentials()
-            @test creds.key == "envkey"
-            @test creds.url == "https://example.com/custom"
-        end
+    withenv("RASTERDATASOURCES_ERA5_CDS_TOKEN" => "abc") do
+        @test _cds_token() == "abc"
     end
-
-    # Network access requires a CDS API token -- request/path construction
-    # only, no download.
+    withenv("RASTERDATASOURCES_ERA5_CDS_TOKEN" => nothing) do
+        @test_throws ErrorException _cds_token()
+    end
 end

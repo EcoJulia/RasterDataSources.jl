@@ -11,8 +11,7 @@ using Dates,
       URIs,
       ZipFile,
       ASCIIrasters,
-      DelimitedFiles,
-      CRC32c
+      DelimitedFiles
 
 import JSON
 
@@ -48,7 +47,7 @@ export PressureLevels, Surface, SurfaceFlux, SixHour
 
 export Values, Deciles
 
-export getraster, layername
+export getraster, layername, CachedCloudSource
 
 export Historical, Plus2C, Plus4C
 
