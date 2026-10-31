@@ -1,7 +1,6 @@
 
 const ARCO_ERA5_URL = "https://storage.googleapis.com/gcp-public-data-arco-era5/ar/full_37-1h-0p25deg-chunk-1.zarr-v3"
 
-struct ERA5 <: RasterDataSource end
 
 # Map layer symbols (short names) to ARCO-ERA5 variable names (long names)
 const ERA5_LAYERS = (
@@ -45,82 +44,41 @@ const ERA5_LAYERS = (
     lsm = "land_sea_mask",
 )
 
-layers(::Type{ERA5}) = keys(ERA5_LAYERS)
+layers(::Type{ERA5{SingleLevels,GoogleARCO}}) = keys(ERA5_LAYERS)
 
 """
-    layername(::Type{ERA5}, layer::Symbol) -> String
+    layername(::Type{ERA5{SingleLevels,GoogleARCO}}, layer::Symbol) -> String
 
 Convert a short layer name (e.g. `:t2m`) to the ARCO-ERA5 variable name (e.g. `"2m_temperature"`).
 """
-layername(::Type{ERA5}, layer::Symbol) = ERA5_LAYERS[layer]
+layername(::Type{ERA5{SingleLevels,GoogleARCO}}, layer::Symbol) = ERA5_LAYERS[layer]
 
 @doc """
-    ERA5 <: RasterDataSource
+    GoogleARCO <: ERA5Source
 
-Data from the ERA5 reanalysis dataset, accessed via Google's ARCO-ERA5 cloud-optimized Zarr store.
+[`ERA5`](@ref) from Google's public ARCO-ERA5 cloud-optimized Zarr store --
+no account needed. `SingleLevels` only: hourly, 0.25°, 1940-present (~3 month lag). Access is
+lazy: only the chunks you read are downloaded and cached locally.
 
 See: [ARCO-ERA5](https://cloud.google.com/storage/docs/public-datasets/era5)
 
-The dataset contains hourly data at 0.25° resolution from 1940 to present (~3 month lag).
-Data is accessed lazily - only the chunks you read are downloaded and cached locally.
-
-## Available layers
-
+# Available layers
 `$(keys(ERA5_LAYERS))`
 
-Common layers:
-- `:t2m` - 2m temperature
-- `:d2m` - 2m dewpoint temperature
-- `:u10`, `:v10` - 10m wind components
-- `:sp` - Surface pressure
-- `:msl` - Mean sea level pressure
-- `:tp` - Total precipitation
-- `:ssrd` - Surface solar radiation downwards
-- `:tcc` - Total cloud cover
-
-## Usage
-
+# Usage
 ```julia
 using RasterDataSources, Zarr
-
-# Get cloud source reference
-source = getraster(ERA5)
-
-# Create caching store and open
-store = Zarr.CachingHTTPStore(source)
+store = Zarr.CachingStore(getraster(ERA5), rasterpath(ERA5))
 ds = zopen(Zarr.ConsolidatedStore(store, ""))
-
-# Access a variable (chunks download on demand and are cached)
-temp = ds["2m_temperature"]
-
-# Or use the layer symbol helper
-varname = layername(ERA5, :t2m)  # "2m_temperature"
-temp = ds[varname]
+temp = ds[layername(ERA5, :t2m)]  # "2m_temperature"
 ```
+""" GoogleARCO
 
-The local cache is stored at `RasterDataSources.rasterpath(ERA5)`.
-Subsequent runs reuse cached chunks without re-downloading.
-""" ERA5
-
-# Path for local cache
-rasterpath(::Type{ERA5}) = joinpath(rasterpath(), "ERA5", "arco-era5-zarr")
+rasterpath(::Type{ERA5{SingleLevels,GoogleARCO}}) = joinpath(rasterpath(), "ERA5", "arco-era5-zarr")
 
 """
-    getraster(::Type{ERA5}) -> CachedCloudSource
+    getraster(::Type{ERA5{SingleLevels,GoogleARCO}}) -> String
 
-Returns a `CachedCloudSource` for ARCO-ERA5 with the remote URL and local cache path.
-
-Use with Zarr.jl:
-```julia
-source = getraster(ERA5)
-store = Zarr.CachingHTTPStore(source)
-ds = zopen(Zarr.ConsolidatedStore(store, ""))
-```
-
-The cache directory is `RasterDataSources.rasterpath(ERA5)`.
+The URL of the ARCO-ERA5 Zarr store.
 """
-function getraster(::Type{ERA5})
-    cache_path = rasterpath(ERA5)
-    mkpath(cache_path)
-    CachedCloudSource(ARCO_ERA5_URL, cache_path)
-end
+getraster(::Type{ERA5{SingleLevels,GoogleARCO}}) = ARCO_ERA5_URL

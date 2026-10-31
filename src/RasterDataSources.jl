@@ -11,13 +11,15 @@ using Dates,
       URIs,
       ZipFile,
       ASCIIrasters,
-      DelimitedFiles
+      DelimitedFiles,
+      CRC32c
 
 import JSON
 
 import Downloads: download
 
 export WorldClim, CHELSA, EarthEnv, AWAP, ALWB, SRTM, CopernicusDEM, MODIS, ERA5, NCEP, TerraClimate, GRIDMET, SLGA, CRUCL2, CPCSoil, GADS, SILO, BARRA
+export SingleLevels, Land, GoogleARCO, CDS, ECMWF
 
 export BARRAR2, BARRAC2, AUS11, AUST11, AUST04, Static
 
@@ -46,7 +48,7 @@ export PressureLevels, Surface, SurfaceFlux, SixHour
 
 export Values, Deciles
 
-export getraster, layername, CachedCloudSource
+export getraster, layername
 
 export Historical, Plus2C, Plus4C
 
@@ -73,7 +75,10 @@ include("awap/awap.jl")
 
 include("alwb/alwb.jl")
 
+include("era5/shared.jl")
 include("era5/era5.jl")
+include("era5/cds.jl")
+include("era5/ecmwf.jl")
 
 include("terraclimate/terraclimate.jl")
 

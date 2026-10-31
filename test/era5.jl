@@ -1,5 +1,5 @@
 using RasterDataSources, Test
-using RasterDataSources: rasterpath, layername, layers, CachedCloudSource
+using RasterDataSources: rasterpath, layername, layers
 
 @testset "ERA5" begin
     # Test rasterpath returns the cache directory
@@ -16,10 +16,10 @@ using RasterDataSources: rasterpath, layername, layers, CachedCloudSource
     @test layername(ERA5, :sp) == "surface_pressure"
     @test layername(ERA5, :tp) == "total_precipitation"
 
-    # Test getraster returns a CachedCloudSource
     source = getraster(ERA5)
-    @test source isa CachedCloudSource
-    @test source.url == "https://storage.googleapis.com/gcp-public-data-arco-era5/ar/full_37-1h-0p25deg-chunk-1.zarr-v3"
-    @test source.cache == era5_path
-    @test isdir(source.cache)
+    @test source == "https://storage.googleapis.com/gcp-public-data-arco-era5/ar/full_37-1h-0p25deg-chunk-1.zarr-v3"
+
+    # Omitted parameters default to SingleLevels and GoogleARCO; ERA5-Land isn't on GoogleARCO
+    @test getraster(ERA5{SingleLevels}) == getraster(ERA5{SingleLevels,GoogleARCO}) == source
+    @test_throws ArgumentError getraster(ERA5{Land})
 end

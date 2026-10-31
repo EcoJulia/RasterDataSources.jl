@@ -5,6 +5,7 @@ version = "0.8.0"
 
 [deps]
 ASCIIrasters = "81770e7c-c736-4fa5-8129-46dd21831640"
+CRC32c = "8bf52ea8-c179-5cab-976a-9e18b702a9bc"
 Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
 DelimitedFiles = "8bb1440f-4735-579b-a4ab-409b98df4dab"
 Downloads = "f43a241f-c20a-4ad4-852c-f6b1247861c6"
