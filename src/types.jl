@@ -8,23 +8,17 @@ abstract type RasterDataSource end
 """
     CachedCloudSource
 
-A reference to a cloud-hosted dataset with local caching.
-
-Contains the remote URL and local cache path. Downstream packages
-(e.g., Zarr.jl, Rasters.jl) can use this to create caching stores.
+Returned by `getraster` for cloud-hosted datasets that are read remotely
+rather than downloaded.
 
 # Fields
-- `url::String`: Remote URL of the dataset
-- `cache::String`: Local directory path for caching
+- `url::String`: remote URL of the dataset.
+- `cache::String`: local folder to cache it in.
 
 # Example
 ```julia
-source = getraster(ERA5)
-source.url    # "https://storage.googleapis.com/..."
-source.cache  # "/path/to/RasterDataSources/ERA5/..."
-
-# In Zarr.jl:
-store = Zarr.CachingHTTPStore(source.url, source.cache)
+source = getraster(ERA5{GoogleARCO})
+store = Zarr.CachingStore(source.url, source.cache)
 ds = zopen(Zarr.ConsolidatedStore(store, ""))
 ```
 """
