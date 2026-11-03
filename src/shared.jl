@@ -11,9 +11,6 @@ getraster(T::Type; kw...) = getraster(T, layers(T); kw...)
 Trait for defining data source keywords, which returns
 a `NTuple{N,Symbol}`.
 
-Only lists the source-specific keywords. `update`, which is accepted by every
-`getraster` method, is not included.
-
 The default fallback method returns `()`.
 """
 getraster_keywords(::Type{<:RasterDataSource}) = ()
