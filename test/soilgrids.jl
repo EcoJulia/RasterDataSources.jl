@@ -1,6 +1,6 @@
 import Proj
 using RasterDataSources, URIs, Extents, Test
-using RasterDataSources: rastername, rasterpath, rasterurl, layers, depths, _vrt_tiles
+using RasterDataSources: rastername, rasterpath, rasterurl, layers, depths, _vrt_tiles, _tile_extents
 
 @testset "SoilGrids" begin
     soilgrids_path = joinpath(ENV["RASTERDATASOURCES_PATH"], "SoilGrids")
@@ -36,7 +36,7 @@ using RasterDataSources: rastername, rasterpath, rasterurl, layers, depths, _vrt
       </VRTRasterBand>
     </VRTDataset>
     """
-    melbourne, edge = _vrt_tiles(vrt)
+    melbourne, edge = _tile_extents(_vrt_tiles(vrt))
     @test first(melbourne) == "tileSG-028-080/tileSG-028-080_2-1.tif"
     @test Extents.intersects(last(melbourne), Extent(X=(145.0, 145.0), Y=(-37.8, -37.8)))
     @test all(isfinite, (last(edge).X..., last(edge).Y...))

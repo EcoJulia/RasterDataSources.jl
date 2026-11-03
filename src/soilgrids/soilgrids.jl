@@ -100,28 +100,35 @@ function _tiles(T::Type{SoilGrids}, layer::Symbol, extent::Extents.Extent; kw...
     _check_order(extent.X)
     _check_order(extent.Y)
     vrt = read(_maybe_download(_vrturl(T, layer; kw...), _vrtpath(T, layer; kw...)), String)
-    [tile for (tile, tile_extent) in _vrt_tiles(vrt) if Extents.intersects(tile_extent, extent)]
+    [tile for (tile, tile_extent) in _tile_extents(_vrt_tiles(vrt)) if Extents.intersects(tile_extent, extent)]
 end
 
-# Tiles listed in a VRT index, with the longitude/latitude extent of each.
+# Each tile in a VRT index, as tile path => (x, y) bounds in metres of `GOODE_PROJ`.
 function _vrt_tiles(vrt::AbstractString)
-    x0, dx, _, y0, _, dy = parse.(Float64, split(match(r"<GeoTransform>([^<]+)</GeoTransform>", vrt)[1], ','))
-    sources = eachmatch(r"<SourceFilename[^>]*>\./[^/]+/([^<]+)</SourceFilename>.*?<DstRect([^>]*)>"s, vrt)
-    tiles = String[]
-    edges = Vector{NTuple{2,Float64}}[]
-    for source in sources
-        attribute(name) = parse(Float64, match(Regex("$name=\"([^\"]+)\""), source[2])[1])
-        col, row = attribute("xOff"), attribute("yOff")
-        xs = x0 .+ dx .* (col, col + attribute("xSize"))
-        ys = y0 .+ dy .* (row, row + attribute("ySize"))
-        push!(tiles, source[1])
-        push!(edges, _edge_points(xs, ys))
+    # Origin and pixel size of the global grid, in metres
+    geotransform = match(r"<GeoTransform>(.*?)</GeoTransform>", vrt)[1]
+    x0, dx, _, y0, _, dy = parse.(Float64, split(geotransform, ','))
+    # One block per tile
+    map(eachmatch(r"<ComplexSource>.*?</ComplexSource>"s, vrt)) do source
+        # Tile path, without the leading "./<dataset>/"
+        tile = String(match(r"<SourceFilename[^>]*>\./[^/]+/(.*?)</SourceFilename>", source.match)[1])
+        # Pixel offset and size of the tile in the global grid
+        dstrect(name) = parse(Float64, match(Regex("<DstRect[^>]* $name=\"(.*?)\""), source.match)[1])
+        col, row = dstrect("xOff"), dstrect("yOff")
+        xs = x0 + dx * col, x0 + dx * (col + dstrect("xSize"))
+        ys = y0 + dy * row, y0 + dy * (row + dstrect("ySize"))
+        tile => (xs, ys)
     end
-    # Project all points at once, so Proj is only set up once
-    lonlats = goode_to_latlon(reduce(vcat, edges))
-    n = length(first(edges))
-    map(enumerate(tiles)) do (i, tile)
-        points = filter(p -> all(isfinite, p), lonlats[(i - 1) * n + 1:i * n])
+end
+
+# Longitude/latitude extents of tiles from their bounds in metres of `GOODE_PROJ`.
+function _tile_extents(tiles)
+    edges = [_edge_points(xs, ys) for (_, (xs, ys)) in tiles]
+    # Project all points in one call, so Proj is only set up once
+    lonlats = Iterators.partition(goode_to_latlon(reduce(vcat, edges)), length(first(edges)))
+    map(tiles, lonlats) do (tile, _), points
+        # Points in the gaps between the projection's lobes are not finite
+        points = filter(p -> all(isfinite, p), points)
         tile => Extents.Extent(X=extrema(first, points), Y=extrema(last, points))
     end
 end
