@@ -47,16 +47,7 @@ EarthEnv
 
 ## ERA5
 
-```@docs
-ERA5
-RasterDataSources.ERA5Product
-SingleLevels
-Land
-RasterDataSources.ERA5Source
-GoogleARCO
-CDS
-ECMWF
-```
+See the [ERA5](era5.md) page.
 
 ## WorldClim
 
