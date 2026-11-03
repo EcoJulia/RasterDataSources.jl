@@ -12,4 +12,9 @@ function RasterDataSources.sinusoidal_to_latlon(x, y)
     transf(x, y)
 end
 
+function RasterDataSources.goode_to_latlon(points::AbstractVector)
+    transf = Proj.Transformation(RasterDataSources.GOODE_PROJ, "EPSG:4326"; always_xy = true)
+    map(((x, y),) -> Tuple(transf(x, y)), points)
+end
+
 end

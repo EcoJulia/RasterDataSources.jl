@@ -76,10 +76,13 @@ function _raster_tile_stem(::Type{CopernicusDEM}, tile_index::CartesianIndex{2},
     "Copernicus_DSM_COG_$(code)_$(ns)$(lpad(abs(lat), 2, '0'))_00_$(ew)$(lpad(abs(lon), 3, '0'))_00_DEM"
 end
 
+_has_tile(::Type{CopernicusDEM}, tile_index::CartesianIndex{2}; res) = _coverage(res)[tile_index]
+
 _rastername(T::Type{CopernicusDEM}, tile_index::CartesianIndex{2}; res=defres(T)) =
     _raster_tile_stem(T, tile_index, res) * ".tif"
+_rasterpath(T::Type{CopernicusDEM}; res=defres(T)) = joinpath(rasterpath(), "CopernicusDEM", res)
 _rasterpath(T::Type{CopernicusDEM}, tile_index::CartesianIndex{2}; res=defres(T)) =
-    joinpath(rasterpath(), "CopernicusDEM", res, _rastername(T, tile_index; res))
+    joinpath(_rasterpath(T; res), _rastername(T, tile_index; res))
 
 function _rasterurl(T::Type{CopernicusDEM}, tile_index::CartesianIndex{2}; res=defres(T))
     stem = _raster_tile_stem(T, tile_index, res)
@@ -111,37 +114,12 @@ function bounds_to_tile_indices(::Type{CopernicusDEM}, (xs, ys)::NTuple{2,NTuple
     rows = _cop_row(floor(Int, ys[2])):_cop_row(floor(Int, ys[1]))
     return CartesianIndices((rows, cols))
 end
+_tiles(T::Type{CopernicusDEM}, extent; res) = bounds_to_tile_indices(T, extent)
 
+# `extent` is the canonical spatial keyword; `bounds` is the legacy alias.
 for op in (:getraster, :rastername, :rasterpath, :rasterurl)
-    _op = Symbol('_', op) # Name of internal function
-    @eval begin
-        # Broadcasting function dispatch over a range of tiles
-        function $_op(T::Type{CopernicusDEM}, tile_index::CartesianIndices; res=defres(T))
-            broadcast(tile_index) do I
-                _coverage(res)[I] ? $_op(T, I; res) : missing
-            end
-        end
-        # Bounds to tile indices dispatch
-        $_op(T::Type{CopernicusDEM}, bounds::Tuple; res=defres(T)) =
-            $_op(T, bounds_to_tile_indices(T, bounds); res)
-        $_op(T::Type{CopernicusDEM}, bounds::Extents.Extent; res=defres(T)) =
-            $_op(T, bounds_to_tile_indices(T, bounds); res)
-
-        # Public function definition with keyword arguments. `extent` is the
-        # canonical spatial keyword; `bounds` is the legacy alias.
-        function $op(T::Type{CopernicusDEM};
-            res=defres(T), bounds=nothing, extent=nothing, tile_index=nothing,
-        )
-            _check_res(T, res)
-            n_set = !isnothing(bounds) + !isnothing(extent) + !isnothing(tile_index)
-            if n_set == 0
-                $(QuoteNode(op)) === :getraster ||
-                    return joinpath(rasterpath(), "CopernicusDEM", res)
-                throw(ArgumentError("One of `extent`, `bounds` or `tile_index` kwarg must be specified"))
-            elseif n_set > 1
-                throw(ArgumentError("Pass only one of `extent`, `bounds` or `tile_index`"))
-            end
-            return $_op(T, something(extent, bounds, tile_index); res)
-        end
+    @eval function $op(T::Type{CopernicusDEM}; res=defres(T), bounds=nothing, extent=nothing, tile_index=nothing)
+        _check_res(T, res)
+        _tiled($(Symbol('_', op)), _tile_selection(; bounds, extent, tile_index), T; res)
     end
 end

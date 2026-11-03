@@ -95,6 +95,12 @@ SRTM
 SLGA
 ```
 
+## SoilGrids
+
+```@docs
+SoilGrids
+```
+
 ## SILO
 
 ```@docs

@@ -108,6 +108,35 @@ function _map_layers(T, layers, args...; kw...)
     return NamedTuple{keys}(filenames)
 end
 
+# Tiled sources define `_tiles(T, args..., extent; kw...)`, the tiles covering `extent`,
+# `_has_tile(T, args..., tile; kw...)`, and operations on one tile, e.g. `_getraster(T, args..., tile; kw...)`.
+# `_tiled` applies an operation to a tile, an array of tiles, or the tiles covering an extent.
+# Without a selection `_rasterpath` gives the folder holding the tiles.
+function _rasterpath end
+
+function _tile_selection(; bounds=nothing, extent=nothing, tile_index=nothing)
+    count(!isnothing, (bounds, extent, tile_index)) > 1 &&
+        throw(ArgumentError("Pass only one of `extent`, `bounds` or `tile_index`"))
+    something(extent, bounds, tile_index, Some(nothing))
+end
+
+_tiled(f, ::Nothing, T, args...; kw...) = throw(ArgumentError("`extent` must be specified"))
+_tiled(::typeof(_rasterpath), ::Nothing, T, args...; kw...) = _rasterpath(T, args...; kw...)
+_tiled(f, extent::Union{Extents.Extent,Tuple}, T, args...; kw...) =
+    _tiled(f, _tiles(T, args..., extent; kw...), T, args...; kw...)
+_tiled(f, tiles::AbstractArray, T, args...; kw...) =
+    map(tile -> _has_tile(T, args..., tile; kw...) ? f(T, args..., tile; kw...) : missing, tiles)
+_tiled(f, tile, T, args...; kw...) = f(T, args..., tile; kw...)
+
+_check_order((a, b)) = a > b && throw(ArgumentError("Upper bound $b less than lower bound $a"))
+
+_check_depth(T, depth) = depth in depths(T) || throw(ArgumentError(
+    "Depth \"$depth\" is not valid. Valid depths: $(join(depths(T), ", "))"
+))
+_check_component(T, component) = component in components(T) || throw(ArgumentError(
+    "Component \"$component\" is not valid. Valid components: $(join(components(T), ", "))"
+))
+
 # fallback for _format
 _format(::Type, T) = _format(T)
 _format(T::Type) = string(nameof(T))

@@ -29,15 +29,13 @@ const SLGA_DEPTH_CODES = Dict(  # human-readable → SLGA internal underscore fo
     "30-60cm"   => "030_060",
     "60-100cm"  => "060_100",
     "100-200cm" => "100_200",
-    "0-999cm"   => "000_999",
-    "0-200cm"   => "000_200",
 )
 
 const SLGA_DEPTHS     = ("0-5cm", "5-15cm", "15-30cm", "30-60cm", "60-100cm", "100-200cm")
 const SLGA_COMPONENTS = ("EV", "05", "95")
 
-# Single-depth layers and their fixed depths
-const SLGA_SINGLE_DEPTHS = (der="0-999cm", des="0-200cm")
+# Layers with a single depth, which ignore `depth`, and their depth codes
+const SLGA_SINGLE_DEPTHS = (der="000_999", des="000_200")
 
 function _slga_attr_table()
     header = """
@@ -64,16 +62,14 @@ $(_slga_attr_table())
 Coarse fragments (`cfg`) have a distinct multi-file structure; use [`SLGA{CoarseFragments}`](@ref CoarseFragments) instead.
 
 Use `depth` and `component` keywords with `getraster`:
-- `depth`: $(join(SLGA_DEPTHS, ", "))
-  - `:der` only supports "$(SLGA_SINGLE_DEPTHS.der)"
-  - `:des` only supports "$(SLGA_SINGLE_DEPTHS.des)"
+- `depth`: $(join(SLGA_DEPTHS, ", ")), "$(first(SLGA_DEPTHS))" by default.
+  `:der` and `:des` cover the whole profile, and ignore `depth`.
 
 - `component`: $(join(SLGA_COMPONENTS, ", "))
 
 # Examples
 ```julia
 getraster(SLGA, :clay; depth="0-5cm", component="EV")
-getraster(SLGA, :clay; component="EV") # returns all depths
 getraster(SLGA, (:clay, :sand); depth="5-15cm", component="05")
 getraster(SLGA, :clay; depth=["0-5cm", "5-15cm"])   # returns Vector
 getraster(SLGA, :der) # single-depth layer
@@ -84,14 +80,13 @@ struct SLGA{X} <: RasterDataSource end
 layers(::Type{SLGA}) = Tuple(keys(SLGA_ATTRS))
 
 depths(::Type{SLGA}) = SLGA_DEPTHS
-depths(T::Type{SLGA}, layer::Symbol) = 
-    haskey(SLGA_SINGLE_DEPTHS, layer) ? (SLGA_SINGLE_DEPTHS[layer],) : SLGA_DEPTHS
+components(::Type{SLGA}) = SLGA_COMPONENTS
 
 getraster_keywords(::Type{SLGA}) = (:depth, :component)
 
 function rastername(::Type{SLGA}, layer::Symbol; depth, component)
     attr  = SLGA_ATTRS[layer]
-    dcode = SLGA_DEPTH_CODES[depth]
+    dcode = haskey(SLGA_SINGLE_DEPTHS, layer) ? SLGA_SINGLE_DEPTHS[layer] : SLGA_DEPTH_CODES[depth]
     "$(attr.code)_$(dcode)_$(component)$(attr.suffix)_$(attr.date).tif"
 end
 
@@ -103,20 +98,13 @@ rasterurl(::Type{SLGA}) = SLGA_URI
 rasterurl(T::Type{SLGA}, layer::Symbol; depth, component) =
     joinpath(SLGA_URI, SLGA_ATTRS[layer].code, rastername(T, layer; depth, component))
 
-# Public API — single layer
-function getraster(T::Type{SLGA}, layer::Symbol;
-    depth=_defdepth(T, layer), component="EV"
+function getraster(T::Type{SLGA}, layers::Union{Symbol,Tuple};
+    depth=first(SLGA_DEPTHS), component=first(SLGA_COMPONENTS)
 )
-    _getraster(T, layer, depth, component)
-end
-# Public API — multiple layers as Tuple
-function getraster(T::Type{SLGA}, ls::Tuple;
-    depth=_defdepth(T, :clay), component="EV"
-)
-    _getraster(T, ls, depth, component)
+    _getraster(T, layers, depth, component)
 end
 
-# Array of depths → Vector (mirrors CHELSA{Climate} month-array and SoilGrids patterns)
+# Array of depths → Vector
 function _getraster(T::Type{SLGA}, layer_or_layers, depth::AbstractArray, component)
     _getraster.(T, Ref(layer_or_layers), depth, Ref(component))
 end
@@ -127,25 +115,9 @@ end
 # Single layer, single depth → String (file path)
 function _getraster(T::Type{SLGA}, layer::Symbol, depth::AbstractString, component)
     _check_layer(T, layer)
-    _check_depth(T, layer, depth)
-    _check_component(component)
+    _check_depth(T, depth)
+    _check_component(T, component)
     path = rasterpath(T, layer; depth, component)
     url  = rasterurl(T, layer; depth, component)
     _maybe_download(url, path)
-end
-
-_defdepth(::Type{SLGA}, layer::Symbol) =
-    haskey(SLGA_SINGLE_DEPTHS, layer) ? SLGA_SINGLE_DEPTHS[layer] : "0-5cm"
-
-function _check_depth(T::Type{SLGA}, layer::Symbol, depth::AbstractString)
-    valid = depths(T, layer)
-    depth in valid || throw(ArgumentError(
-        "Depth \"$depth\" is not valid for layer :$layer. Valid depths: $(join(valid, ", "))"
-    ))
-end
-
-function _check_component(component::AbstractString)
-    component in SLGA_COMPONENTS || throw(ArgumentError(
-        "Component \"$component\" is not valid. Use one of: $(join(SLGA_COMPONENTS, ", "))"
-    ))
 end

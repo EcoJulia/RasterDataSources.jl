@@ -62,13 +62,12 @@ function rasterurls(T::Type{SLGA{CoarseFragments}}; depth)
     map(fname -> joinpath(SLGA_URI, "CFG", fname), rasternames(T; depth))
 end
 
-function getraster(T::Type{SLGA{CoarseFragments}}; depth="0-5cm")
+function getraster(T::Type{SLGA{CoarseFragments}}; depth=first(SLGA_DEPTHS))
     _getraster(T, depth)
 end
 
 function _getraster(T::Type{SLGA{CoarseFragments}}, depth::AbstractString)
-    depth in depths(T) || throw(ArgumentError(
-        "Depth \"$depth\" is not valid for SLGA{CoarseFragments}. Valid depths: $(join(depths(T), ", "))"))
+    _check_depth(T, depth)
     paths = rasterpaths(T; depth)
     urls  = rasterurls(T; depth)
     map(_maybe_download, urls, paths)
