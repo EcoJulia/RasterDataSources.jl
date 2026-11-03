@@ -8,7 +8,7 @@ Soil and Landscape Grid of Australia coarse-fragments product, which has a disti
 multi-file structure from the standard SLGA attribute layers — each depth produces
 7 files (six coarse-fragment probability class maps and one dominant class map).
 `getraster(SLGA{CoarseFragments}; depth=...)` returns a `NamedTuple` with keys
-`:class1`–`:class6` and `:dominant`.
+`:class1`–`:class6` and `:dominant`. Downloads need a TERN API key, as for [`SLGA`](@ref).
 
 # Examples
 ```julia

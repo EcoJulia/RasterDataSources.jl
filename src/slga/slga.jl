@@ -63,7 +63,8 @@ end
 
 Soil and Landscape Grid of Australia at ~90 m (3 arcsecond) resolution from CSIRO/TERN.
 Files are Cloud Optimised GeoTIFFs in WGS84 (EPSG:4326), covering continental Australia.
-Downloads need a TERN API key in `ENV["RASTERDATASOURCES_SLGA_TERN_API_KEY"]`.
+Downloads need a TERN API key in `ENV["RASTERDATASOURCES_SLGA_TERN_API_KEY"]`. Create one at
+https://account.tern.org.au/createapikey (sign in first).
 
 ## Available layers
 
