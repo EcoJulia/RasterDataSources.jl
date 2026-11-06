@@ -17,7 +17,7 @@ import JSON
 
 import Downloads: download
 
-export WorldClim, CHELSA, EarthEnv, AWAP, ALWB, SRTM, CopernicusDEM, MODIS, ERA5, NCEP, TerraClimate, GRIDMET, SLGA, CRUCL2, CPCSoil, GADS, SILO, BARRA
+export WorldClim, CHELSA, EarthEnv, AWAP, ALWB, SRTM, CopernicusDEM, MODIS, ERA5, NCEP, TerraClimate, GRIDMET, SLGA, CRUCL2, CPCSoil, GADS, SILO, BARRA, SEAS5
 export Google, ECMWF, ARCO, CDS, Land
 
 export BARRAR2, BARRAC2, AUS11, AUST11, AUST04, Static
@@ -80,6 +80,8 @@ include("era5/google_arco.jl")
 include("era5/ecmwf_cds.jl")
 include("era5/cds_api.jl")
 include("era5/ecmwf_arco.jl")
+
+include("seas5/seas5.jl")
 
 include("terraclimate/terraclimate.jl")
 

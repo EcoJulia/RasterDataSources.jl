@@ -44,10 +44,7 @@ getraster_keywords(::Type{<:ERA5{ECMWF,CDS}}) = (:date, :extent, :update)
 rasterpath(::Type{<:ERA5{ECMWF,CDS}}) = joinpath(rasterpath(), "ERA5", "ECMWF", "CDS")
 rasterpath(::Type{<:ERA5{ECMWF,CDS,Land}}) = joinpath(rasterpath(), "ERA5", "ECMWF", "CDS", "Land")
 
-function rastername(T::Type{<:ERA5{ECMWF,CDS}}, layer::Symbol; date, extent)
-    e = _cds_snap(T, extent)
-    "$(join((e.X..., e.Y...), "_"))_$(Dates.format(date, "yyyymm")).nc"
-end
+rastername(T::Type{<:ERA5{ECMWF,CDS}}, layer::Symbol; date, extent) = _cds_rastername(T, date, extent)
 rasterpath(T::Type{<:ERA5{ECMWF,CDS}}, layer::Symbol; date, extent) =
     joinpath(rasterpath(T), string(layer), rastername(T, layer; date, extent))
 

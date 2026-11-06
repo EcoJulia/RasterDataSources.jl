@@ -48,8 +48,8 @@ function _cds_request_body(T::Type{<:ERA5{ECMWF,CDS}}, layer::Symbol, date::Time
 end
 
 # Submits a job, waits for it, and downloads the result to `path`.
-function _cds_retrieve(T::Type{<:ERA5{ECMWF,CDS}}, layer::Symbol, date::TimeType, extent::Extents.Extent, path)
-    job_id = _cds_submit(T, _cds_request_body(T, layer, date, extent))
+function _cds_retrieve(T::Type{<:RasterDataSource}, layer::Symbol, date::TimeType, extent::Extents.Extent, path; kw...)
+    job_id = _cds_submit(T, _cds_request_body(T, layer, date, extent; kw...))
     @info "Submitted CDS job $job_id for $(_cds_dataset_id(T)) $layer $(Dates.format(date, "yyyy-mm"))"
     try
         _cds_poll(job_id)
@@ -62,7 +62,7 @@ function _cds_retrieve(T::Type{<:ERA5{ECMWF,CDS}}, layer::Symbol, date::TimeType
     _maybe_download(URI(results["asset"]["value"]["href"]), path; update=true)
 end
 
-function _cds_submit(T::Type{<:ERA5{ECMWF,CDS}}, body::Dict)
+function _cds_submit(T::Type{<:RasterDataSource}, body::Dict)
     url = "$CDS_API_URL/processes/$(_cds_dataset_id(T))/execution"
     response = _cds_post(url, body)
     get(response, "jobID") do
@@ -126,11 +126,16 @@ _cds_cells_per_degree(::Type{<:ERA5{ECMWF,CDS}}) = 4
 _cds_cells_per_degree(::Type{<:ERA5{ECMWF,CDS,Land}}) = 10
 
 # Expand `extent` outward to the grid, so the file name matches the returned data.
-function _cds_snap(T::Type{<:ERA5{ECMWF,CDS}}, extent::Extents.Extent)
+function _cds_snap(T::Type{<:RasterDataSource}, extent::Extents.Extent)
     _validate_cds_extent(extent)
     n = _cds_cells_per_degree(T)
     xmin, xmax = extent.X
     ymin, ymax = extent.Y
     Extents.Extent(X=(floor(Int, xmin * n) / n, ceil(Int, xmax * n) / n),
         Y=(floor(Int, ymin * n) / n, ceil(Int, ymax * n) / n))
+end
+
+function _cds_rastername(T::Type{<:RasterDataSource}, date::TimeType, extent::Extents.Extent)
+    e = _cds_snap(T, extent)
+    "$(join((e.X..., e.Y...), "_"))_$(Dates.format(date, "yyyymm")).nc"
 end

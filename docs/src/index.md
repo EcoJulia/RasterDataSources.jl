@@ -49,6 +49,12 @@ EarthEnv
 
 See the [ERA5](era5.md) page.
 
+## SEAS5
+
+```@docs
+SEAS5
+```
+
 ## WorldClim
 
 ```@docs
