@@ -7,7 +7,8 @@ function _cds_token()
 end
 
 _cds_headers() = ["PRIVATE-TOKEN" => _cds_token()]
-_cds_get(url) = JSON.parse(String(HTTP.get(url, _cds_headers()).body))
+_cds_get(url; kw...) = JSON.parse(String(HTTP.get(url, _cds_headers(); kw...).body))
+_cds_delete(url) = HTTP.delete(url, _cds_headers(); status_exception=false)
 _cds_post(url, body) =
     JSON.parse(String(HTTP.post(url, [_cds_headers(); "Content-Type" => "application/json"], JSON.json(body)).body))
 
@@ -50,7 +51,13 @@ end
 function _cds_retrieve(T::Type{<:ERA5{ECMWF,CDS}}, layer::Symbol, date::TimeType, extent::Extents.Extent, path)
     job_id = _cds_submit(T, _cds_request_body(T, layer, date, extent))
     @info "Submitted CDS job $job_id for $(_cds_dataset_id(T)) $layer $(Dates.format(date, "yyyy-mm"))"
-    _cds_poll(job_id)
+    try
+        _cds_poll(job_id)
+    catch
+        # CDS keeps a job queued after Julia stops waiting for it, where it still counts towards the user's limit on queued requests
+        _cds_delete("$CDS_API_URL/jobs/$job_id")
+        rethrow()
+    end
     results = _cds_get("$CDS_API_URL/jobs/$job_id/results")
     _maybe_download(URI(results["asset"]["value"]["href"]), path; update=true)
 end
@@ -80,7 +87,11 @@ function _cds_poll(job_id::AbstractString;
             error("CDS job $job_id status response missing \"status\". Response keys: $(collect(keys(response)))")
         end
         status == "successful" && return nothing
-        status in CDS_FAILED_STATUSES && error("CDS job $job_id ended with status \"$status\"")
+        if status in CDS_FAILED_STATUSES
+            # The results of a failed job are an error response holding the reason
+            reason = get(_cds_get("$url/results"; status_exception=false), "traceback", "no reason given")
+            error("CDS job $job_id ended with status \"$status\": $reason")
+        end
         status in CDS_PENDING_STATUSES ||
             error("CDS job $job_id returned an unrecognized status \"$status\"")
         waited = (time() - start) / 60
@@ -89,9 +100,8 @@ function _cds_poll(job_id::AbstractString;
             last_status, last_report = status, time()
         end
         waited >= max_wait_minutes && error(
-            "CDS job $job_id still \"$status\" after $(round(Int, waited)) min. " *
-            "Check its status at https://cds.climate.copernicus.eu/requests; " *
-            "set ENV[\"RASTERDATASOURCES_CDS_MAX_WAIT_MINUTES\"] to wait longer.")
+            "CDS job $job_id still \"$status\" after $(round(Int, waited)) min, so it is being cancelled. " *
+            "Set ENV[\"RASTERDATASOURCES_CDS_MAX_WAIT_MINUTES\"] to wait longer.")
         sleep(sleep_seconds)
         sleep_seconds = min(sleep_seconds * 1.5, max_sleep)
     end
