@@ -1,6 +1,5 @@
 
-const TERRACLIMATE_URI = URI(scheme="https", host="climate.northwestknowledge.net", path="/TERRACLIMATE-DATA")
-const TERRACLIMATE_FUTURE_URI = URI(scheme="https", host="thredds.northwestknowledge.net", path="/thredds/fileServer/TERRACLIMATE_ALL")
+const TERRACLIMATE_URI = URI(scheme="https", host="thredds.northwestknowledge.net", path="/thredds/fileServer/TERRACLIMATE_ALL")
 
 abstract type WarmingScenario end
 
@@ -116,9 +115,9 @@ _scenario_prefix(::Type{Historical}) = ""
 _scenario_prefix(::Type{Plus2C}) = "plus2C_"
 _scenario_prefix(::Type{Plus4C}) = "plus4C_"
 
-_scenario_uri(::Type{Historical}) = TERRACLIMATE_URI
-_scenario_uri(::Type{Plus2C}) = joinpath(TERRACLIMATE_FUTURE_URI, "data_plus2C")
-_scenario_uri(::Type{Plus4C}) = joinpath(TERRACLIMATE_FUTURE_URI, "data_plus4C")
+_scenario_uri(::Type{Historical}) = joinpath(TERRACLIMATE_URI, "data")
+_scenario_uri(::Type{Plus2C}) = joinpath(TERRACLIMATE_URI, "data_plus2C")
+_scenario_uri(::Type{Plus4C}) = joinpath(TERRACLIMATE_URI, "data_plus4C")
 
 # File naming
 rastername(::Type{TerraClimate{S}}, layer; date) where {S} =
