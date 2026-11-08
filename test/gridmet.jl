@@ -25,11 +25,11 @@ using RasterDataSources: rastername, rasterurl, rasterpath
     # Static elevation is a separate parametric type
     @test RasterDataSources.layers(GRIDMET{Elevation}) == (:elev,)
     @test RasterDataSources.getraster_keywords(GRIDMET{Elevation}) == ()
-    @test rastername(GRIDMET{Elevation}, :elev) == "metdata_elevationdata.nc"
+    @test rastername(GRIDMET{Elevation}, :elev) == "gridmet_elevation.nc"
     @test rasterpath(GRIDMET{Elevation}, :elev) ==
-        joinpath(gridmet_path, "elev", "metdata_elevationdata.nc")
+        joinpath(gridmet_path, "elev", "gridmet_elevation.nc")
     @test rasterurl(GRIDMET{Elevation}, :elev) ==
-        URI("http://thredds.northwestknowledge.net:8080/thredds/fileServer/MET/elev/metdata_elevationdata.nc")
+        URI(scheme="https", host="thredds.northwestknowledge.net", path="/thredds/fileServer/MET/elev/gridmet_elevation.nc")
 
     if !Sys.iswindows()
         # Test actual download
@@ -48,7 +48,7 @@ using RasterDataSources: rastername, rasterurl, rasterpath
             [joinpath(gridmet_path, "tmmx", "tmmx_2019.nc"), raster_path]
 
         # Static elevation layer, no date required
-        raster_path_elev = joinpath(gridmet_path, "elev", "metdata_elevationdata.nc")
+        raster_path_elev = joinpath(gridmet_path, "elev", "gridmet_elevation.nc")
         @test getraster(GRIDMET{Elevation}, :elev) == raster_path_elev
         @test isfile(raster_path_elev)
     end
