@@ -1,25 +1,32 @@
-const SLGA_URI = URI(scheme="https", host="esoil.io",
-    path="/TERNLandscapes/Public/Products/TERN/SLGA")
+const SLGA_URI = URI(scheme="https", host="data.tern.org.au",
+    path="/model-derived/slga/NationalMaps/SoilAndLandscapeGrid")
 
-# Per-attribute metadata: (code, description, units, date, middle-suffix-after-component)
+# The TERN data store serves files only with an API key, from https://account.tern.org.au/createapikey
+function _slga_headers()
+    haskey(ENV, "RASTERDATASOURCES_SLGA_TERN_API_KEY") ||
+        error("You must set `ENV[\"RASTERDATASOURCES_SLGA_TERN_API_KEY\"]` to your TERN API key, from https://account.tern.org.au/createapikey")
+    ["X-API-Key" => ENV["RASTERDATASOURCES_SLGA_TERN_API_KEY"]]
+end
+
+# Per-attribute metadata: (code, description, units, date, middle-suffix-after-component, folder under SLGA_URI)
 const SLGA_ATTRS = (
-    clay = (code="CLY", description="Clay content",                             units="%",        date="20210902", suffix="_N_P_AU_TRN_N"),
-    silt = (code="SLT", description="Silt content",                             units="%",        date="20210902", suffix="_N_P_AU_TRN_N"),
-    sand = (code="SND", description="Sand content",                             units="%",        date="20210902", suffix="_N_P_AU_TRN_N"),
-    bdod = (code="BDW", description="Bulk density (whole soil)",                units="g/cm³",    date="20230607", suffix="_N_P_AU_TRN_N"),
-    soc  = (code="SOC", description="Soil organic carbon",                      units="%",        date="20220727", suffix="_N_P_AU_TRN_N"),
-    phc  = (code="PHC", description="pH (CaCl\u2082)",                          units="\u2014",   date="20210913", suffix="_N_P_AU_NAT_C"),
-    phw  = (code="PHW", description="pH (water)",                               units="\u2014",   date="20220520", suffix="_N_P_AU_TRN_N"),
-    awc  = (code="AWC", description="Available water capacity",                 units="% vol",    date="20210614", suffix="_N_P_AU_TRN_N"),
-    ece  = (code="ECE", description="Effective cation exchange capacity",       units="meq/100g", date="20140801", suffix="_N_P_AU_NAT_C"),
-    cec  = (code="CEC", description="Cation exchange capacity",                 units="meq/100g", date="20220826", suffix="_N_P_AU_TRN_N"),
-    nto  = (code="NTO", description="Total nitrogen",                           units="%",        date="20231101", suffix="_N_P_AU_NAT_C"),
-    pto  = (code="PTO", description="Total phosphorus",                         units="%",        date="20231101", suffix="_N_P_AU_NAT_C"),
-    avp  = (code="AVP", description="Available phosphorus (Colwell)",           units="mg/kg",    date="20220826", suffix="_N_P_AU_TRN_N"),
-    dul  = (code="DUL", description="Drained upper limit (field capacity)",     units="% vol",    date="20210614", suffix="_N_P_AU_TRN_N"),
-    l15  = (code="L15", description="Lower limit (wilting point, -1500 kPa)",   units="% vol",    date="20210614", suffix="_N_P_AU_TRN_N"),
-    der  = (code="DER", description="Depth to a restricting layer",             units="m",        date="20150601", suffix="_N_P_AU_NAT_C"),
-    des  = (code="DES", description="Depth of soil (regolith)",                 units="m",        date="20190901", suffix="_N_P_AU_TRN_C"),
+    clay = (code="CLY", description="Clay content",                             units="%",        date="20210902", suffix="_N_P_AU_TRN_N", folder="CLY/v2"),
+    silt = (code="SLT", description="Silt content",                             units="%",        date="20210902", suffix="_N_P_AU_TRN_N", folder="SLT/v2"),
+    sand = (code="SND", description="Sand content",                             units="%",        date="20210902", suffix="_N_P_AU_TRN_N", folder="SND/v2"),
+    bdod = (code="BDW", description="Bulk density (whole soil)",                units="g/cm³",    date="20230607", suffix="_N_P_AU_TRN_N", folder="BDW/v2"),
+    soc  = (code="SOC", description="Soil organic carbon",                      units="%",        date="20220727", suffix="_N_P_AU_TRN_N", folder="SOC/90m/v2"),
+    phc  = (code="PHC", description="pH (CaCl\u2082)",                          units="\u2014",   date="20210913", suffix="_N_P_AU_NAT_C", folder="pHc/v2"),
+    phw  = (code="PHW", description="pH (water)",                               units="\u2014",   date="20220520", suffix="_N_P_AU_TRN_N", folder="PHW/v1"),
+    awc  = (code="AWC", description="Available water capacity",                 units="% vol",    date="20210614", suffix="_N_P_AU_TRN_N", folder="AWC/v2"),
+    ece  = (code="ECE", description="Effective cation exchange capacity",       units="meq/100g", date="20140801", suffix="_N_P_AU_NAT_C", folder="ECE/v1"),
+    cec  = (code="CEC", description="Cation exchange capacity",                 units="meq/100g", date="20220826", suffix="_N_P_AU_TRN_N", folder="CEC/v1"),
+    nto  = (code="NTO", description="Total nitrogen",                           units="%",        date="20231101", suffix="_N_P_AU_NAT_C", folder="NTO/v2"),
+    pto  = (code="PTO", description="Total phosphorus",                         units="%",        date="20231101", suffix="_N_P_AU_NAT_C", folder="PTO/v2"),
+    avp  = (code="AVP", description="Available phosphorus (Colwell)",           units="mg/kg",    date="20220826", suffix="_N_P_AU_TRN_N", folder="AVP/v1"),
+    dul  = (code="DUL", description="Drained upper limit (field capacity)",     units="% vol",    date="20210614", suffix="_N_P_AU_TRN_N", folder="DUL/v1"),
+    l15  = (code="L15", description="Lower limit (wilting point, -1500 kPa)",   units="% vol",    date="20210614", suffix="_N_P_AU_TRN_N", folder="L15/v1"),
+    der  = (code="DER", description="Depth to a restricting layer",             units="m",        date="20150601", suffix="_N_P_AU_NAT_C", folder="DER/v2"),
+    des  = (code="DES", description="Depth of soil (regolith)",                 units="m",        date="20190901", suffix="_N_P_AU_TRN_C", folder="DES/v2"),
 )
 
 const SLGA_DEPTH_CODES = Dict(  # human-readable → SLGA internal underscore format
@@ -56,6 +63,8 @@ end
 
 Soil and Landscape Grid of Australia at ~90 m (3 arcsecond) resolution from CSIRO/TERN.
 Files are Cloud Optimised GeoTIFFs in WGS84 (EPSG:4326), covering continental Australia.
+Downloads need a TERN API key in `ENV["RASTERDATASOURCES_SLGA_TERN_API_KEY"]`. Create one at
+https://account.tern.org.au/createapikey (sign in first).
 
 ## Available layers
 
@@ -101,7 +110,7 @@ rasterpath(T::Type{SLGA}, layer::Symbol; depth, component) =
 
 rasterurl(::Type{SLGA}) = SLGA_URI
 rasterurl(T::Type{SLGA}, layer::Symbol; depth, component) =
-    joinpath(SLGA_URI, SLGA_ATTRS[layer].code, rastername(T, layer; depth, component))
+    joinpath(SLGA_URI, SLGA_ATTRS[layer].folder, rastername(T, layer; depth, component))
 
 # Public API — single layer
 function getraster(T::Type{SLGA}, layer::Symbol;
@@ -131,7 +140,7 @@ function _getraster(T::Type{SLGA}, layer::Symbol, depth::AbstractString, compone
     _check_component(component)
     path = rasterpath(T, layer; depth, component)
     url  = rasterurl(T, layer; depth, component)
-    _maybe_download(url, path)
+    _maybe_download(url, path, _slga_headers())
 end
 
 _defdepth(::Type{SLGA}, layer::Symbol) =
