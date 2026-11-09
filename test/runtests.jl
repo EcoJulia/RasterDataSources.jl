@@ -13,8 +13,11 @@ end
 # ALWB and AWAP download URLs return 403 Forbidden — BOM's Akamai layer
 # blocks them. Re-enable when the endpoints work again.
 @time @safetestset "era5" begin include("era5.jl") end
-@time @safetestset "terraclimate" begin include("terraclimate.jl") end
-@time @safetestset "gridmet" begin include("gridmet.jl") end
+@time @safetestset "era5 cds" begin include("era5-cds.jl") end
+@time @safetestset "era5 arco" begin include("era5-arco.jl") end
+# TerraClimate and GRIDMET servers (northwestknowledge.net) refuse connections.
+# @time @safetestset "terraclimate" begin include("terraclimate.jl") end
+# @time @safetestset "gridmet" begin include("gridmet.jl") end
 @time @safetestset "silo" begin include("silo.jl") end
 @time @safetestset "barra" begin include("barra.jl") end
 @time @safetestset "chelsa bioclim" begin include("chelsa-bioclim.jl") end
@@ -32,7 +35,8 @@ end
 @time @safetestset "modis product info" begin include("modis-products.jl") end
 @time @safetestset "modis extent" begin include("modis-extent.jl") end
 @time @safetestset "modis interface" begin include("modis-interface.jl") end
-@time @safetestset "ncep" begin include("ncep.jl") end
+# NOAA PSL returns 403 Forbidden to CI runners.
+# @time @safetestset "ncep" begin include("ncep.jl") end
 @time @safetestset "slga" begin include("slga.jl") end
 @time @safetestset "gads" begin include("gads.jl") end
 @time @safetestset "crucl2" begin include("crucl2.jl") end

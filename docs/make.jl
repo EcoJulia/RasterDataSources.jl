@@ -3,6 +3,7 @@ using Documenter, RasterDataSources
 makedocs(
     sitename = "RasterDataSources.jl",
     checkdocs = :all,
+    pages = ["index.md", "era5.md"],
 )
 
 deploydocs(
