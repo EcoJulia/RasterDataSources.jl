@@ -1,5 +1,5 @@
 const GRIDMET_URI = URI(scheme="https", host="www.northwestknowledge.net", path="/metdata/data")
-const GRIDMET_ELEV_URI = URI("http://thredds.northwestknowledge.net:8080/thredds/fileServer/MET/elev/metdata_elevationdata.nc")
+const GRIDMET_ELEV_URI = URI(scheme="https", host="thredds.northwestknowledge.net", path="/thredds/fileServer/MET/elev")
 
 const GRIDMET_LAYERS = (
     tmmx = (description="Maximum near-surface air temperature",                    units="K"),
@@ -70,7 +70,7 @@ julia> getraster(GRIDMET, :tmmx; date=(Date(2018), Date(2020)))
 [".../tmmx_2018.nc", ".../tmmx_2019.nc", ".../tmmx_2020.nc"]
 
 julia> getraster(GRIDMET{Elevation}, :elev)
-"/path/to/storage/GRIDMET/elev/metdata_elevationdata.nc"
+"/path/to/storage/GRIDMET/elev/gridmet_elevation.nc"
 ```
 
 Returns the filepath/s of the downloaded or pre-existing files.
@@ -80,6 +80,32 @@ struct GRIDMET{X} <: RasterDataSource end
 # --- Daily meteorology (bare GRIDMET) --------------------------------------
 
 layers(::Type{GRIDMET}) = keys(GRIDMET_LAYERS)
+
+# The NetCDF variable name inside each file differs from the product code used in
+# the filename/URL, so map every layer to its internal variable name (verified
+# against the file headers on northwestknowledge.net). The Palmer/drought layers
+# (pdsi, z, spi, spei, eddi) are intentionally absent: their annual files 404 at
+# the download URL, so they can't be fetched by the per-year scheme regardless.
+const GRIDMET_VARNAMES = (
+    tmmx = :air_temperature,
+    tmmn = :air_temperature,
+    pr = :precipitation_amount,
+    rmax = :relative_humidity,
+    rmin = :relative_humidity,
+    sph = :specific_humidity,
+    srad = :surface_downwelling_shortwave_flux_in_air,
+    th = :wind_from_direction,
+    vs = :wind_speed,
+    etr = :potential_evapotranspiration,
+    pet = :potential_evapotranspiration,
+    vpd = :mean_vapor_pressure_deficit,
+    erc = Symbol("energy_release_component-g"),
+    bi = :burning_index_g,
+    fm1 = :dead_fuel_moisture_1hr,
+    fm100 = :dead_fuel_moisture_100hr,
+)
+layerkeys(::Type{GRIDMET}, layer::Symbol) = get(GRIDMET_VARNAMES, layer, layer)
+
 date_step(::Type{GRIDMET}) = Year(1)
 date_range(::Type{GRIDMET}) = (Date(1979, 1, 1), Date(2025, 12, 31))
 getraster_keywords(::Type{GRIDMET}) = (:date,)
@@ -116,12 +142,13 @@ end
 # --- Static elevation (GRIDMET{Elevation}) ---------------------------------
 
 layers(::Type{GRIDMET{Elevation}}) = (:elev,)
+layerkeys(::Type{GRIDMET{Elevation}}, layer::Symbol) = layer === :elev ? :elevation : layer
 getraster_keywords(::Type{GRIDMET{Elevation}}) = ()
 
-rastername(::Type{GRIDMET{Elevation}}, layer::Symbol) = "metdata_elevationdata.nc"
+rastername(::Type{GRIDMET{Elevation}}, layer::Symbol) = "gridmet_elevation.nc"
 rasterpath(T::Type{GRIDMET{Elevation}}, layer::Symbol) =
     joinpath(rasterpath(GRIDMET), string(layer), rastername(T, layer))
-rasterurl(::Type{GRIDMET{Elevation}}, layer::Symbol) = GRIDMET_ELEV_URI
+rasterurl(T::Type{GRIDMET{Elevation}}, layer::Symbol) = joinpath(GRIDMET_ELEV_URI, rastername(T, layer))
 
 getraster(T::Type{GRIDMET{Elevation}}, layers::Union{Tuple,Symbol}) =
     _getraster(T, layers)
