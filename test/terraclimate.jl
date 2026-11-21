@@ -17,7 +17,7 @@ using RasterDataSources: rastername, rasterurl, rasterpath
         joinpath(terraclimate_path, "historical", "TerraClimate_tmax_2020.nc")
 
     @test rasterurl(TerraClimate{Historical}, :tmax; date=Date(2020, 1)) ==
-        URI(scheme="https", host="climate.northwestknowledge.net", path="/TERRACLIMATE-DATA/TerraClimate_tmax_2020.nc")
+        URI(scheme="https", host="thredds.northwestknowledge.net", path="/thredds/fileServer/TERRACLIMATE_ALL/data/TerraClimate_tmax_2020.nc")
     @test rasterurl(TerraClimate{Plus2C}, :tmax; date=Date(2000, 1)) ==
         URI(scheme="https", host="thredds.northwestknowledge.net", path="/thredds/fileServer/TERRACLIMATE_ALL/data_plus2C/TerraClimate_plus2C_tmax_2000.nc")
     @test rasterurl(TerraClimate{Plus4C}, :tmax; date=Date(2000, 1)) ==

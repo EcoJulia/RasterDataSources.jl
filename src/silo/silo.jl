@@ -62,7 +62,7 @@ struct SILO <: RasterDataSource end
 layers(::Type{SILO}) = SILO_LAYERS
 date_step(::Type{SILO}) = Year(1)
 date_range(::Type{SILO}) = (Date(1889, 1, 1), Date(year(today()), 12, 31))
-getraster_keywords(::Type{SILO}) = (:date,)
+getraster_keywords(::Type{SILO}) = (:date, :update)
 
 rastername(::Type{SILO}, layer::Symbol; date) = "$(year(date)).$(layer).nc"
 

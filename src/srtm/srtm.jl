@@ -71,12 +71,15 @@ function _raster_tile_stem(tile_index::CartesianIndex)
     "srtm_$(lpad(x, 2, '0'))_$(lpad(y, 2, '0'))"
 end
 
+_has_tile(::Type{SRTM}, tile_index::CartesianIndex{2}) = HAS_SRTM_TILE[tile_index]
+
 _rastername(::Type{SRTM}, tile_index::CartesianIndex{2}) = _raster_tile_stem(tile_index) * ".tif"
-_rasterpath(T::Type{SRTM}, tile_index::CartesianIndex{2}) = joinpath(rasterpath(), "SRTM", _rastername(T, tile_index))
+_rasterpath(::Type{SRTM}) = joinpath(rasterpath(), "SRTM")
+_rasterpath(T::Type{SRTM}, tile_index::CartesianIndex{2}) = joinpath(_rasterpath(T), _rastername(T, tile_index))
 
 _zipname(::Type{SRTM}, tile_index::CartesianIndex{2}) = _raster_tile_stem(tile_index) * ".zip"
 _zipurl(T::Type{SRTM}, tile_index::CartesianIndex{2}) = joinpath(SRTM_URI, _zipname(T, tile_index))
-_zippath(T::Type{SRTM}, tile_index::CartesianIndex{2}) = joinpath(rasterpath(), "SRTM", "zips", _zipname(T, tile_index))
+_zippath(T::Type{SRTM}, tile_index::CartesianIndex{2}) = joinpath(_rasterpath(T), "zips", _zipname(T, tile_index))
 
 
 function _getraster(T::Type{SRTM}, tile_index::CartesianIndex{2})
@@ -121,33 +124,10 @@ function bounds_to_tile_indices(::Type{SRTM}, (xs, ys)::NTuple{2,NTuple{2,Real}}
     t_ys = reverse(_wgs84_to_tile_y.(ys))
     return CartesianIndices((t_ys[1]:(t_ys[2]), t_xs[1]:(t_xs[2])))
 end
+_tiles(T::Type{SRTM}, extent) = bounds_to_tile_indices(T, extent)
 
-_check_order((a, b)) = a > b && throw(ArgumentError("Upper bound $b less than lower bound $a"))
-
+# `extent` is the canonical spatial keyword; `bounds` is the legacy alias.
 for op in (:getraster, :rastername, :rasterpath, :zipname, :zipurl, :zippath)
-    _op = Symbol('_', op) # Name of internal function
-    @eval begin
-        # Broadcasting function dispatch
-        function $_op(T::Type{SRTM}, tile_index::CartesianIndices) 
-            broadcast(tile_index) do I
-                HAS_SRTM_TILE[I] ? $_op(T, I) : missing
-            end
-        end
-        # Bounds to tile indices dispatch
-        $_op(T::Type{SRTM}, bounds::Tuple) = $_op(T, bounds_to_tile_indices(T, bounds))
-        $_op(T::Type{SRTM}, bounds::Extents.Extent) = $_op(T, bounds_to_tile_indices(T, bounds))
-
-        # Public function definition with key-word arguments. `extent` is the
-        # canonical spatial keyword; `bounds` is the legacy alias.
-        function $op(T::Type{SRTM}; bounds=nothing, extent=nothing, tile_index=nothing)
-            n_set = !isnothing(bounds) + !isnothing(extent) + !isnothing(tile_index)
-            if n_set == 0
-                :op === :getraster || return joinpath(rasterpath(), "SRTM")
-                throw(ArgumentError("One of `extent`, `bounds` or `tile_index` kwarg must be specified"))
-            elseif n_set > 1
-                throw(ArgumentError("Pass only one of `extent`, `bounds` or `tile_index`"))
-            end
-            return $_op(T, something(extent, bounds, tile_index))
-        end
-    end
+    @eval $op(T::Type{SRTM}; bounds=nothing, extent=nothing, tile_index=nothing) =
+        _tiled($(Symbol('_', op)), _tile_selection(; bounds, extent, tile_index), T)
 end
