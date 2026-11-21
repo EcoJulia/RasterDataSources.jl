@@ -11,17 +11,17 @@ using RasterDataSources: rastername, rasterpath, rasterurl, layers, depths
 
     # Depths
     @test depths(SLGA) == ("0-5cm", "5-15cm", "15-30cm", "30-60cm", "60-100cm", "100-200cm")
-    @test depths(SLGA, :clay) == ("0-5cm", "5-15cm", "15-30cm", "30-60cm", "60-100cm", "100-200cm")
-    @test depths(SLGA, :der) == ("0-999cm",)
-    @test depths(SLGA, :des) == ("0-200cm",)
 
     # Filenames
     @test rastername(SLGA, :clay; depth="0-5cm", component="EV") ==
         "CLY_000_005_EV_N_P_AU_TRN_N_20210902.tif"
     @test rastername(SLGA, :bdod; depth="100-200cm", component="05") ==
         "BDW_100_200_05_N_P_AU_TRN_N_20230607.tif"
-    @test rastername(SLGA, :der; depth="0-999cm", component="EV") ==
+    # :der and :des ignore depth
+    @test rastername(SLGA, :der; depth="5-15cm", component="EV") ==
         "DER_000_999_EV_N_P_AU_NAT_C_20150601.tif"
+    @test rastername(SLGA, :des; depth="0-5cm", component="EV") ==
+        "DES_000_200_EV_N_P_AU_TRN_C_20190901.tif"
     @test rastername(SLGA, :phc; depth="0-5cm", component="95") ==
         "PHC_000_005_95_N_P_AU_NAT_C_20210913.tif"
 
@@ -34,7 +34,7 @@ using RasterDataSources: rastername, rasterpath, rasterurl, layers, depths
     @test rasterurl(SLGA, :clay; depth="0-5cm", component="EV") ==
         URI(scheme="https", host="data.tern.org.au",
             path="/model-derived/slga/NationalMaps/SoilAndLandscapeGrid/CLY/v2/CLY_000_005_EV_N_P_AU_TRN_N_20210902.tif")
-    @test rasterurl(SLGA, :der; depth="0-999cm", component="EV") ==
+    @test rasterurl(SLGA, :der; depth="5-15cm", component="EV") ==
         URI(scheme="https", host="data.tern.org.au",
             path="/model-derived/slga/NationalMaps/SoilAndLandscapeGrid/DER/v2/DER_000_999_EV_N_P_AU_NAT_C_20150601.tif")
 
@@ -42,7 +42,6 @@ using RasterDataSources: rastername, rasterpath, rasterurl, layers, depths
     @test_throws ArgumentError getraster(SLGA, :clay; depth="0-999cm", component="EV")
     @test_throws ArgumentError getraster(SLGA, :clay; depth="0-5cm", component="50")
     @test_throws ArgumentError getraster(SLGA, :not_a_layer; depth="0-5cm", component="EV")
-    @test_throws ArgumentError getraster(SLGA, :der; depth="0-5cm", component="EV")
 
     # Keywords trait
     @test RasterDataSources.getraster_keywords(SLGA) == (:depth, :component)
