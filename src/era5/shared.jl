@@ -9,7 +9,7 @@ abstract type ERA5Provider end
 struct Google <: ERA5Provider end
 
 """
-ECMWF, which produces ERA5 and serves it as [`ARCO`](@ref) Zarr and through the [`CDS`](@ref) API.
+ECMWF, which produces ERA5 and serves it as [`ARCO`](@ref) Zarr and through the [`OnDemand`](@ref) API.
 Both need a CDS API token in `ENV["RASTERDATASOURCES_ERA5_CDS_TOKEN"]`.
 """
 struct ECMWF <: ERA5Provider end
@@ -17,11 +17,11 @@ struct ECMWF <: ERA5Provider end
 """
     ERA5Store
 
-How [`ERA5`](@ref) data is served, its second parameter: [`ARCO`](@ref) or [`CDS`](@ref).
+How [`ERA5`](@ref) data is served, its second parameter: [`ARCO`](@ref) or [`OnDemand`](@ref).
 """
 abstract type ERA5Store end
 struct ARCO <: ERA5Store end
-struct CDS <: ERA5Store end
+struct OnDemand <: ERA5Store end
 
 """
     ERA5Product <: RasterDataSet
@@ -40,7 +40,7 @@ ERA5 reanalysis: hourly, 0.25° (~31 km), 1940-present. Available as:
 
 - `ERA5` or `ERA5{Google,ARCO}`: Google's public Zarr store, no account needed.
 - `ERA5{ECMWF,ARCO}` and `ERA5{ECMWF,ARCO,Land}`: ECMWF's Zarr stores.
-- `ERA5{ECMWF,CDS}` and `ERA5{ECMWF,CDS,Land}`: NetCDF downloads from the Climate Data Store API.
+- `ERA5{ECMWF,OnDemand}` and `ERA5{ECMWF,OnDemand,Land}`: NetCDF downloads from the Climate Data Store API.
 
 Layers use the CDS variable names, so they work with every provider, except:
 - Heights go last, e.g. `:temperature_2m` is CDS `2m_temperature`.
@@ -49,7 +49,7 @@ Layers use the CDS variable names, so they work with every provider, except:
     and ERA5-Land calls it `snow_depth_water_equivalent`, all in metres of water equivalent. ERA5-Land has both, and
     its `:snow_depth` is in metres of snow.
 
-See [`ARCO`](@ref) and [`CDS`](@ref) for usage.
+See [`ARCO`](@ref) and [`OnDemand`](@ref) for usage.
 
 # Layers
 

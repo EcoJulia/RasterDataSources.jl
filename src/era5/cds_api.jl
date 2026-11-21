@@ -7,19 +7,15 @@ function _cds_token()
 end
 
 _cds_headers() = ["PRIVATE-TOKEN" => _cds_token()]
-_cds_get(url) = JSON.parse(String(HTTP.get(url, _cds_headers()).body))
+_cds_get(url) = JSON.parse(HTTP.get(url, _cds_headers()).body)
 _cds_post(url, body) =
-    JSON.parse(String(HTTP.post(url, [_cds_headers(); "Content-Type" => "application/json"], JSON.json(body)).body))
+    JSON.parse(HTTP.post(url, [_cds_headers(); "Content-Type" => "application/json"], JSON.json(body)).body)
 
-_cds_dataset_id(::Type{<:ERA5{ECMWF,CDS}}) = "reanalysis-era5-single-levels"
-_cds_dataset_id(::Type{<:ERA5{ECMWF,CDS,Land}}) = "reanalysis-era5-land"
+_cds_dataset_id(::Type{<:ERA5{ECMWF,OnDemand}}) = "reanalysis-era5-single-levels"
+_cds_dataset_id(::Type{<:ERA5{ECMWF,OnDemand,Land}}) = "reanalysis-era5-land"
 
-_cds_variable(::Type{<:ERA5{ECMWF,CDS}}, layer::Symbol) = get(ERA5_CDS_NAMES, layer, string(layer))
-_cds_variable(::Type{<:ERA5{ECMWF,CDS,Land}}, layer::Symbol) = get(ERA5_LAND_CDS_NAMES, layer, string(layer))
-
-# ERA5-Land has only one product_type and omits it.
-_cds_extra_inputs(::Type{<:ERA5{ECMWF,CDS}}) = Dict{String,Any}("product_type" => "reanalysis")
-_cds_extra_inputs(::Type{<:ERA5{ECMWF,CDS,Land}}) = Dict{String,Any}()
+_cds_variable(::Type{<:ERA5{ECMWF,OnDemand}}, layer::Symbol) = get(ERA5_CDS_NAMES, layer, string(layer))
+_cds_variable(::Type{<:ERA5{ECMWF,OnDemand,Land}}, layer::Symbol) = get(ERA5_LAND_CDS_NAMES, layer, string(layer))
 
 # N/W/S/E.
 function _cds_area(extent::Extents.Extent)
@@ -29,7 +25,7 @@ function _cds_area(extent::Extents.Extent)
 end
 
 # Builds the `{"inputs": {...}}` body for one layer and calendar month, all hours of all days.
-function _cds_request_body(T::Type{<:ERA5{ECMWF,CDS}}, layer::Symbol, date::TimeType, extent::Extents.Extent)
+function _cds_request_body(T::Type{<:ERA5{ECMWF,OnDemand}}, layer::Symbol, date::TimeType, extent::Extents.Extent)
     days = [lpad(d, 2, '0') for d in 1:daysinmonth(date)]
     times = [lpad(h, 2, '0') * ":00" for h in 0:23]
     inputs = Dict(
@@ -42,20 +38,12 @@ function _cds_request_body(T::Type{<:ERA5{ECMWF,CDS}}, layer::Symbol, date::Time
         "data_format" => "netcdf",
         "download_format" => "unarchived",
     )
-    merge!(inputs, _cds_extra_inputs(T))
+    # ERA5-Land has only one product_type and omits it.
+    T <: ERA5{ECMWF,OnDemand,Land} || (inputs["product_type"] = "reanalysis")
     Dict("inputs" => inputs)
 end
 
-# Submits a job, waits for it, and downloads the result to `path`.
-function _cds_retrieve(T::Type{<:ERA5{ECMWF,CDS}}, layer::Symbol, date::TimeType, extent::Extents.Extent, path)
-    job_id = _cds_submit(T, _cds_request_body(T, layer, date, extent))
-    @info "Submitted CDS job $job_id for $(_cds_dataset_id(T)) $layer $(Dates.format(date, "yyyy-mm"))"
-    _cds_poll(job_id)
-    results = _cds_get("$CDS_API_URL/jobs/$job_id/results")
-    _maybe_download(URI(results["asset"]["value"]["href"]), path; update=true)
-end
-
-function _cds_submit(T::Type{<:ERA5{ECMWF,CDS}}, body::Dict)
+function _cds_submit(T::Type{<:ERA5{ECMWF,OnDemand}}, body::Dict)
     url = "$CDS_API_URL/processes/$(_cds_dataset_id(T))/execution"
     response = _cds_post(url, body)
     get(response, "jobID") do
@@ -112,15 +100,24 @@ function _validate_cds_extent(extent::Extents.Extent)
 end
 
 # Grid cells per degree of the regular lat/lon grid CDS serves.
-_cds_cells_per_degree(::Type{<:ERA5{ECMWF,CDS}}) = 4
-_cds_cells_per_degree(::Type{<:ERA5{ECMWF,CDS,Land}}) = 10
+_cds_cells_per_degree(::Type{<:ERA5{ECMWF,OnDemand}}) = 4
+_cds_cells_per_degree(::Type{<:ERA5{ECMWF,OnDemand,Land}}) = 10
 
 # Expand `extent` outward to the grid, so the file name matches the returned data.
-function _cds_snap(T::Type{<:ERA5{ECMWF,CDS}}, extent::Extents.Extent)
+function _cds_snap(T::Type{<:ERA5{ECMWF,OnDemand}}, extent::Extents.Extent)
     _validate_cds_extent(extent)
     n = _cds_cells_per_degree(T)
     xmin, xmax = extent.X
     ymin, ymax = extent.Y
     Extents.Extent(X=(floor(Int, xmin * n) / n, ceil(Int, xmax * n) / n),
         Y=(floor(Int, ymin * n) / n, ceil(Int, ymax * n) / n))
+end
+
+# Submits a job, waits for it, and downloads the result to `path`.
+function _cds_retrieve(T::Type{<:ERA5{ECMWF,OnDemand}}, layer::Symbol, date::TimeType, extent::Extents.Extent, path)
+    job_id = _cds_submit(T, _cds_request_body(T, layer, date, extent))
+    @info "Submitted CDS job $job_id for $(_cds_dataset_id(T)) $layer $(Dates.format(date, "yyyy-mm"))"
+    _cds_poll(job_id)
+    results = _cds_get("$CDS_API_URL/jobs/$job_id/results")
+    _maybe_download(URI(results["asset"]["value"]["href"]), path; update=true)
 end

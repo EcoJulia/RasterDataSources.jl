@@ -26,7 +26,7 @@ temp = ds[layername(ERA5, :total_precipitation)]
 # ECMWF
 
 `ERA5{ECMWF,ARCO}` and `ERA5{ECMWF,ARCO,Land}`: ECMWF's stores, with no job queue
-(unlike [`CDS`](@ref)). Not guaranteed byte-identical to a CDS download. The CDS API
+(unlike [`OnDemand`](@ref)). Not guaranteed byte-identical to a CDS download. The CDS API
 token is sent as a `Bearer` header by the caller. Each store holds several layers,
 and only some ERA5 layers are available.
 

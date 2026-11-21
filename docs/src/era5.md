@@ -7,7 +7,7 @@ Google
 ECMWF
 RasterDataSources.ERA5Store
 ARCO
-CDS
+OnDemand
 RasterDataSources.ERA5Product
 Land
 CachedCloudSource

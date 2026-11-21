@@ -384,9 +384,9 @@ _group_layers(groups) = Tuple(Iterators.flatten(g.layers for g in groups))
 function _era5_layer_table()
     sources = (
         ("`{Google,ARCO}`", keys(ERA5_LAYERS), ERA5_GOOGLE_NAMES),
-        ("`{ECMWF,CDS}`", keys(ERA5_LAYERS), ERA5_CDS_NAMES),
+        ("`{ECMWF,OnDemand}`", keys(ERA5_LAYERS), ERA5_CDS_NAMES),
         ("`{ECMWF,ARCO}`", _group_layers(ECMWF_ERA5_GROUPS), (;)),
-        ("`{ECMWF,CDS,Land}`", keys(ERA5_LAND_LAYERS), ERA5_LAND_CDS_NAMES),
+        ("`{ECMWF,OnDemand,Land}`", keys(ERA5_LAND_LAYERS), ERA5_LAND_CDS_NAMES),
         ("`{ECMWF,ARCO,Land}`", _group_layers(ECMWF_ERA5_LAND_GROUPS), (;)),
     )
     function cell(layer, (_, layers, names))

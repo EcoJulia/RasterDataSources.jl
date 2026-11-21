@@ -5,8 +5,8 @@ using RasterDataSources: rasterpath, layers, layername, getraster_keywords, _ecm
     @test length(layers(ERA5{ECMWF,ARCO})) == 23
     @test length(layers(ERA5{ECMWF,ARCO,Land})) == 20
     @test :temperature_2m in layers(ERA5{ECMWF,ARCO,Land})
-    @test all(in(layers(ERA5{ECMWF,CDS})), layers(ERA5{ECMWF,ARCO}))
-    @test all(in(layers(ERA5{ECMWF,CDS,Land})), layers(ERA5{ECMWF,ARCO,Land}))
+    @test all(in(layers(ERA5{ECMWF,OnDemand})), layers(ERA5{ECMWF,ARCO}))
+    @test all(in(layers(ERA5{ECMWF,OnDemand,Land})), layers(ERA5{ECMWF,ARCO,Land}))
 
     @test layername(ERA5{ECMWF,ARCO}, :temperature_2m) == "t2m"
     @test layername(ERA5{ECMWF,ARCO,Land}, :snow_depth) == "sde"
