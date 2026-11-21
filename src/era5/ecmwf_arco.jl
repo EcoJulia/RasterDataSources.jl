@@ -81,6 +81,7 @@ getraster(T::Type{<:ERA5{ECMWF,ARCO}}, layers::Union{Tuple,Symbol}; chunking::Sy
     (_check_arco_chunking(chunking); _getraster(T, layers, chunking))
 _getraster(T::Type{<:ERA5{ECMWF,ARCO}}, layers::Tuple, chunking) = _map_layers(T, layers, chunking)
 function _getraster(T::Type{<:ERA5{ECMWF,ARCO}}, layer::Symbol, chunking)
+    layer = _era5_layer(T, layer)
     _check_layer(T, layer)
     CachedCloudSource(string(_ecmwf_arco_group_url(T, layer; chunking)), mkpath(rasterpath(T, layer; chunking)))
 end

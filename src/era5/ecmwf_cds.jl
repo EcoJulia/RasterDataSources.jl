@@ -61,6 +61,7 @@ _getraster(T::Type{<:ERA5{ECMWF,OnDemand}}, layers, dates::AbstractArray, extent
 _getraster(T::Type{<:ERA5{ECMWF,OnDemand}}, layers::Tuple, date::TimeType, extent; update) =
     _map_layers(T, layers, date, extent; update)
 function _getraster(T::Type{<:ERA5{ECMWF,OnDemand}}, layer::Symbol, date::TimeType, extent::Extents.Extent; update)
+    layer = _era5_layer(T, layer)
     _check_layer(T, layer)
     path = rasterpath(T, layer; date, extent)
     (update || !isfile(path)) || return path

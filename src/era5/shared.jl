@@ -63,5 +63,12 @@ struct ERA5{P<:ERA5Provider,S<:ERA5Store,D<:ERA5Product} <: RasterDataSource end
 _era5_layers(::Type{<:ERA5}) = ERA5_LAYERS
 _era5_layers(::Type{<:ERA5{<:ERA5Provider,<:ERA5Store,Land}}) = ERA5_LAND_LAYERS
 
+# ECMWF short names, such as `:t2m`, also work as layer names, as they did before v0.8.
+const ERA5_SHORT_NAMES = Dict(Symbol(v) => k for (k, v) in pairs(ERA5_LAYERS))
+const ERA5_LAND_SHORT_NAMES = Dict(Symbol(v) => k for (k, v) in pairs(ERA5_LAND_LAYERS))
+_era5_short_names(::Type{<:ERA5}) = ERA5_SHORT_NAMES
+_era5_short_names(::Type{<:ERA5{<:ERA5Provider,<:ERA5Store,Land}}) = ERA5_LAND_SHORT_NAMES
+_era5_layer(T::Type{<:ERA5}, layer::Symbol) = get(_era5_short_names(T), layer, layer)
+
 # ECMWF files use the short names.
-layername(T::Type{<:ERA5{ECMWF}}, layer::Symbol) = _era5_layers(T)[layer]
+layername(T::Type{<:ERA5{ECMWF}}, layer::Symbol) = _era5_layers(T)[_era5_layer(T, layer)]
