@@ -28,3 +28,6 @@ docs/site/
 # environment.
 Manifest.toml
 .claude/settings.local.json
+
+# Generated from CHANGELOG.md by docs/make.jl
+docs/src/changelog.md

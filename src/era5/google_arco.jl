@@ -10,7 +10,10 @@ layers(::GoogleARCOERA5) = keys(ERA5_LAYERS)
 
 The variable name in Google's store, e.g. `"2m_temperature"` for `:temperature_2m`.
 """
-layername(::GoogleARCOERA5, layer::Symbol) = get(ERA5_GOOGLE_NAMES, layer, string(layer))
+function layername(::GoogleARCOERA5, layer::Symbol)
+    layer = _era5_layer(ERA5, layer)
+    get(ERA5_GOOGLE_NAMES, layer, string(layer))
+end
 
 rasterpath(::GoogleARCOERA5) = joinpath(rasterpath(), "ERA5", "Google", "ARCO")
 
