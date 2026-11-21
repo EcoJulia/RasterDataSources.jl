@@ -17,6 +17,23 @@ using RasterDataSources: rastername, rasterpath, rasterurl, layers, getraster_ke
         @test :hgt in layers(NCEP{PressureLevels, 1, Month})
         @test :slp in layers(NCEP{Surface, 1, Month})
         @test :tmax in layers(NCEP{SurfaceFlux, 1})
+        # Reanalysis 2 has no specific humidity on pressure levels, or 6-hourly lifted index
+        @test :shum in layers(NCEP{PressureLevels, 1})
+        @test !(:shum in layers(NCEP{PressureLevels, 2}))
+        @test !(:shum in layers(NCEP{PressureLevels, 2, Month}))
+        @test :lftx in layers(NCEP{Surface, 1})
+        @test !(:lftx in layers(NCEP{Surface, 2}))
+    end
+
+    @testset "server layout quirks" begin
+        @test rasterurl(NCEP{Surface, 2, Month}, :pr_wtr; date=Date(2001)) ==
+            URI("https://downloads.psl.noaa.gov/Datasets/ncep.reanalysis2.derived/surface/pr_wtr.eatm.mon.mean.nc")
+        @test rasterurl(NCEP{SurfaceFlux, 1}, :tcdc; date=Date(2001)) ==
+            URI("https://downloads.psl.noaa.gov/Datasets/ncep.reanalysis/other_gauss/tcdc.eatm.gauss.2001.nc")
+        @test rasterurl(NCEP{SurfaceFlux, 2}, :tcdc; date=Date(2001)) ==
+            URI("https://downloads.psl.noaa.gov/Datasets/ncep.reanalysis2/gaussian_grid/tcdc.eatm.gauss.2001.nc")
+        @test rasterpath(NCEP{SurfaceFlux, 1}, :tcdc; date=Date(2001)) ==
+            joinpath(ENV["RASTERDATASOURCES_PATH"], "NCEP", "reanalysis", "other_gauss", "tcdc.eatm.gauss.2001.nc")
     end
 
     @testset "getraster_keywords" begin
@@ -49,28 +66,28 @@ using RasterDataSources: rastername, rasterpath, rasterurl, layers, getraster_ke
             @test rastername(NCEP{PressureLevels, 1, Day}, :hgt; date=Date(2001)) == "hgt.2001.nc"
             path = joinpath(ENV["RASTERDATASOURCES_PATH"], "NCEP", "reanalysis", "Dailies", "pressure", "hgt.2001.nc")
             @test rasterpath(NCEP{PressureLevels, 1, Day}, :hgt; date=Date(2001)) == path
-            url = URI(scheme="https", host="downloads.psl.noaa.gov", path="/Datasets/ncep.reanalysis/Dailies/pressure/hgt.2001.nc")
+            url = URI(scheme="https", host="downloads.psl.noaa.gov", path="/Datasets/ncep.reanalysis.dailyavgs/pressure/hgt.2001.nc")
             @test rasterurl(NCEP{PressureLevels, 1, Day}, :hgt; date=Date(2001)) == url
         end
         @testset "Surface Day" begin
             @test rastername(NCEP{Surface, 1, Day}, :slp; date=Date(2001)) == "slp.2001.nc"
             path = joinpath(ENV["RASTERDATASOURCES_PATH"], "NCEP", "reanalysis", "Dailies", "surface", "slp.2001.nc")
             @test rasterpath(NCEP{Surface, 1, Day}, :slp; date=Date(2001)) == path
-            url = URI(scheme="https", host="downloads.psl.noaa.gov", path="/Datasets/ncep.reanalysis/Dailies/surface/slp.2001.nc")
+            url = URI(scheme="https", host="downloads.psl.noaa.gov", path="/Datasets/ncep.reanalysis.dailyavgs/surface/slp.2001.nc")
             @test rasterurl(NCEP{Surface, 1, Day}, :slp; date=Date(2001)) == url
         end
         @testset "PressureLevels Month" begin
             @test rastername(NCEP{PressureLevels, 1, Month}, :hgt; date=Date(2001)) == "hgt.mon.mean.nc"
             path = joinpath(ENV["RASTERDATASOURCES_PATH"], "NCEP", "reanalysis", "Monthlies", "pressure", "hgt.mon.mean.nc")
             @test rasterpath(NCEP{PressureLevels, 1, Month}, :hgt; date=Date(2001)) == path
-            url = URI(scheme="https", host="downloads.psl.noaa.gov", path="/Datasets/ncep.reanalysis/Monthlies/pressure/hgt.mon.mean.nc")
+            url = URI(scheme="https", host="downloads.psl.noaa.gov", path="/Datasets/ncep.reanalysis.derived/pressure/hgt.mon.mean.nc")
             @test rasterurl(NCEP{PressureLevels, 1, Month}, :hgt; date=Date(2001)) == url
         end
         @testset "Surface Month" begin
             @test rastername(NCEP{Surface, 1, Month}, :slp; date=Date(2001)) == "slp.mon.mean.nc"
             path = joinpath(ENV["RASTERDATASOURCES_PATH"], "NCEP", "reanalysis", "Monthlies", "surface", "slp.mon.mean.nc")
             @test rasterpath(NCEP{Surface, 1, Month}, :slp; date=Date(2001)) == path
-            url = URI(scheme="https", host="downloads.psl.noaa.gov", path="/Datasets/ncep.reanalysis/Monthlies/surface/slp.mon.mean.nc")
+            url = URI(scheme="https", host="downloads.psl.noaa.gov", path="/Datasets/ncep.reanalysis.derived/surface/slp.mon.mean.nc")
             @test rasterurl(NCEP{Surface, 1, Month}, :slp; date=Date(2001)) == url
         end
     end
@@ -80,7 +97,7 @@ using RasterDataSources: rastername, rasterpath, rasterurl, layers, getraster_ke
             @test rastername(NCEP{Surface, 2, Day}, :mslp; date=Date(2001)) == "mslp.2001.nc"
             path = joinpath(ENV["RASTERDATASOURCES_PATH"], "NCEP", "reanalysis2", "Dailies", "surface", "mslp.2001.nc")
             @test rasterpath(NCEP{Surface, 2, Day}, :mslp; date=Date(2001)) == path
-            url = URI(scheme="https", host="downloads.psl.noaa.gov", path="/Datasets/ncep.reanalysis2/Dailies/surface/mslp.2001.nc")
+            url = URI(scheme="https", host="downloads.psl.noaa.gov", path="/Datasets/ncep.reanalysis2.dailyavgs/surface/mslp.2001.nc")
             @test rasterurl(NCEP{Surface, 2, Day}, :mslp; date=Date(2001)) == url
         end
         @testset "SurfaceFlux" begin
