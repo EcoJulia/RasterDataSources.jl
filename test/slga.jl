@@ -11,17 +11,17 @@ using RasterDataSources: rastername, rasterpath, rasterurl, layers, depths
 
     # Depths
     @test depths(SLGA) == ("0-5cm", "5-15cm", "15-30cm", "30-60cm", "60-100cm", "100-200cm")
-    @test depths(SLGA, :clay) == ("0-5cm", "5-15cm", "15-30cm", "30-60cm", "60-100cm", "100-200cm")
-    @test depths(SLGA, :der) == ("0-999cm",)
-    @test depths(SLGA, :des) == ("0-200cm",)
 
     # Filenames
     @test rastername(SLGA, :clay; depth="0-5cm", component="EV") ==
         "CLY_000_005_EV_N_P_AU_TRN_N_20210902.tif"
     @test rastername(SLGA, :bdod; depth="100-200cm", component="05") ==
         "BDW_100_200_05_N_P_AU_TRN_N_20230607.tif"
-    @test rastername(SLGA, :der; depth="0-999cm", component="EV") ==
+    # :der and :des ignore depth
+    @test rastername(SLGA, :der; depth="5-15cm", component="EV") ==
         "DER_000_999_EV_N_P_AU_NAT_C_20150601.tif"
+    @test rastername(SLGA, :des; depth="0-5cm", component="EV") ==
+        "DES_000_200_EV_N_P_AU_TRN_C_20190901.tif"
     @test rastername(SLGA, :phc; depth="0-5cm", component="95") ==
         "PHC_000_005_95_N_P_AU_NAT_C_20210913.tif"
 
@@ -32,17 +32,16 @@ using RasterDataSources: rastername, rasterpath, rasterurl, layers, depths
 
     # URLs
     @test rasterurl(SLGA, :clay; depth="0-5cm", component="EV") ==
-        URI(scheme="https", host="esoil.io",
-            path="/TERNLandscapes/Public/Products/TERN/SLGA/CLY/CLY_000_005_EV_N_P_AU_TRN_N_20210902.tif")
-    @test rasterurl(SLGA, :der; depth="0-999cm", component="EV") ==
-        URI(scheme="https", host="esoil.io",
-            path="/TERNLandscapes/Public/Products/TERN/SLGA/DER/DER_000_999_EV_N_P_AU_NAT_C_20150601.tif")
+        URI(scheme="https", host="data.tern.org.au",
+            path="/model-derived/slga/NationalMaps/SoilAndLandscapeGrid/CLY/v2/CLY_000_005_EV_N_P_AU_TRN_N_20210902.tif")
+    @test rasterurl(SLGA, :der; depth="5-15cm", component="EV") ==
+        URI(scheme="https", host="data.tern.org.au",
+            path="/model-derived/slga/NationalMaps/SoilAndLandscapeGrid/DER/v2/DER_000_999_EV_N_P_AU_NAT_C_20150601.tif")
 
     # Validation errors
     @test_throws ArgumentError getraster(SLGA, :clay; depth="0-999cm", component="EV")
     @test_throws ArgumentError getraster(SLGA, :clay; depth="0-5cm", component="50")
     @test_throws ArgumentError getraster(SLGA, :not_a_layer; depth="0-5cm", component="EV")
-    @test_throws ArgumentError getraster(SLGA, :der; depth="0-5cm", component="EV")
 
     # Keywords trait
     @test RasterDataSources.getraster_keywords(SLGA) == (:depth, :component)
@@ -54,6 +53,14 @@ using RasterDataSources: rastername, rasterpath, rasterurl, layers, depths
 
     # cfg no longer in SLGA
     @test :cfg ∉ layers(SLGA)
+
+    # Downloads need a TERN API key
+    if haskey(ENV, "RASTERDATASOURCES_SLGA_TERN_API_KEY")
+        path = getraster(SLGA, :clay; depth="0-5cm", component="EV")
+        @test isfile(path)
+    else
+        @test_throws ErrorException getraster(SLGA, :clay; depth="0-5cm", component="EV")
+    end
 end
 
 @testset "SLGA{CoarseFragments}" begin
@@ -72,10 +79,10 @@ end
 
     # URLs
     urls = RasterDataSources.rasterurls(SLGA{CoarseFragments}; depth="0-5cm")
-    @test urls.class1 == URI(scheme="https", host="esoil.io",
-        path="/TERNLandscapes/Public/Products/TERN/SLGA/CFG/CFG_000_005_EV_N_P_AU_TRN_N_20221006_CF_Probability_Class1.tif")
-    @test urls.dominant == URI(scheme="https", host="esoil.io",
-        path="/TERNLandscapes/Public/Products/TERN/SLGA/CFG/CFG_000_005_EV_N_P_AU_TRN_N_20221006_Dominant_Class.tif")
+    @test urls.class1 == URI(scheme="https", host="data.tern.org.au",
+        path="/model-derived/slga/NationalMaps/SoilAndLandscapeGrid/CFG/v1/CFG_000_005_EV_N_P_AU_TRN_N_20221006_CF_Probability_Class1.tif")
+    @test urls.dominant == URI(scheme="https", host="data.tern.org.au",
+        path="/model-derived/slga/NationalMaps/SoilAndLandscapeGrid/CFG/v1/CFG_000_005_EV_N_P_AU_TRN_N_20221006_Dominant_Class.tif")
 
     # Validation error
     @test_throws ArgumentError getraster(SLGA{CoarseFragments}; depth="0-999cm")

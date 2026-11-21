@@ -47,9 +47,7 @@ EarthEnv
 
 ## ERA5
 
-```@docs
-ERA5
-```
+See the [ERA5](era5.md) page.
 
 ## WorldClim
 
@@ -93,6 +91,12 @@ SRTM
 
 ```@docs
 SLGA
+```
+
+## SoilGrids
+
+```@docs
+SoilGrids
 ```
 
 ## SILO

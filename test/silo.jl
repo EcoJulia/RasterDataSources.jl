@@ -16,7 +16,7 @@ using RasterDataSources: rastername, rasterurl, rasterpath
         URI(scheme="https", host="s3-ap-southeast-2.amazonaws.com",
             path="/silo-open-data/Official/annual/daily_rain/2020.daily_rain.nc")
 
-    @test RasterDataSources.getraster_keywords(SILO) == (:date,)
+    @test RasterDataSources.getraster_keywords(SILO) == (:date, :update)
     @test RasterDataSources.layers(SILO) == (
         :daily_rain, :et_morton_actual, :et_morton_potential,
         :et_morton_wet, :et_short_crop, :et_tall_crop, :evap_morton_lake, :evap_pan,

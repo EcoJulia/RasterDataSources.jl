@@ -10,7 +10,7 @@ Changelog.generate(
 makedocs(
     sitename = "RasterDataSources.jl",
     checkdocs = :all,
-    pages = ["index.md", "changelog.md"],
+    pages = ["index.md", "era5.md", "changelog.md"],
 )
 
 deploydocs(
