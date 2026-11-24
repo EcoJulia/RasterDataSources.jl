@@ -69,10 +69,15 @@ function _maybe_download(uri::URI, filepath, headers = []; update::Bool=false)
         for attempt in 1:5
             try
                 range = isfile(part) ? ["Range" => "bytes=$(filesize(part))-"] : []
-                open(io -> download(string(uri), io; headers=[headers; range]), part, "a")
+                open(part, "a") do io
+                    download(string(uri), io; headers=[headers; range])
+                end
                 break
             catch e
-                attempt == 5 && (rm(part; force=true); rethrow())
+                if attempt == 5
+                    rm(part; force=true)
+                    rethrow()
+                end
                 @warn "Download interrupted, resuming" exception=e
             end
         end
