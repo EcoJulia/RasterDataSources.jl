@@ -62,13 +62,21 @@ function _maybe_download(uri::URI, filepath, headers = []; update::Bool=false)
     if update || !isfile(filepath)
         mkpath(dirname(filepath))
         @info "Starting download for $uri"
-        try
-            download(string(uri), filepath; headers)
-        catch e
-            # Remove anything that was downloaded before the error
-            isfile(filepath) && rm(filepath)
-            throw(e)
+        # Download to a .part file so an interrupted download never looks finished.
+        # Servers sometimes end long transfers early, so retry for the remaining bytes.
+        part = filepath * ".part"
+        rm(part; force=true)
+        for attempt in 1:5
+            try
+                range = isfile(part) ? ["Range" => "bytes=$(filesize(part))-"] : []
+                open(io -> download(string(uri), io; headers=[headers; range]), part, "a")
+                break
+            catch e
+                attempt == 5 && (rm(part; force=true); rethrow())
+                @warn "Download interrupted, resuming" exception=e
+            end
         end
+        mv(part, filepath; force=true)
     end
     filepath
 end

@@ -13,6 +13,7 @@ end
 @testset "RasterDataSources" begin
     # ALWB and AWAP download URLs return 403 Forbidden — BOM's Akamai layer
     # blocks them. Re-enable when the endpoints work again.
+    @time @safetestset "download" begin include("download.jl") end
     @time @safetestset "era5" begin include("era5.jl") end
     @time @safetestset "era5 cds" begin include("era5-cds.jl") end
     @time @safetestset "era5 arco" begin include("era5-arco.jl") end
